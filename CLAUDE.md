@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-OpenLLMetry MCP Server (`openllmetry-mcp`) is an MCP (Model Context Protocol) server that enables AI agents to query and analyze OpenTelemetry traces from LLM applications. It parses OpenLLMetry semantic conventions (the `gen_ai.*` attributes) to enable automated debugging and observability.
+Opentelemetry MCP Server (`opentelemetry-mcp`) is an MCP (Model Context Protocol) server that enables AI agents to query and analyze OpenTelemetry traces from LLM applications. It parses Opentelemetry semantic conventions (the `gen_ai.*` attributes) to enable automated debugging and observability.
 
 **Key Features:**
 - Multi-backend support: Jaeger, Grafana Tempo, and Traceloop
@@ -21,19 +21,19 @@ OpenLLMetry MCP Server (`openllmetry-mcp`) is an MCP (Model Context Protocol) se
 uv sync
 
 # Run the server (stdio transport for Claude Desktop)
-uv run openllmetry-mcp
+uv run opentelemetry-mcp
 
 # Run with HTTP transport
-uv run openllmetry-mcp --transport http --port 8000
+uv run opentelemetry-mcp --transport http --port 8000
 
 # Override backend configuration
-uv run openllmetry-mcp --backend jaeger --url http://localhost:16686
+uv run opentelemetry-mcp --backend jaeger --url http://localhost:16686
 
 # Run all tests
 uv run pytest
 
 # Run with coverage
-uv run pytest --cov=openllmetry_mcp --cov-report=html
+uv run pytest --cov=opentelemetry_mcp --cov-report=html
 
 # Run specific test file
 uv run pytest tests/test_models.py
@@ -52,7 +52,7 @@ uv run mypy src/
 
 ### Backend Abstraction Pattern
 
-All trace storage backends implement the `BaseBackend` abstract interface in [src/openllmetry_mcp/backends/base.py](src/openllmetry_mcp/backends/base.py):
+All trace storage backends implement the `BaseBackend` abstract interface in [opentelemetry_mcp/backends/base.py](opentelemetry_mcp/backends/base.py):
 
 ```python
 class BaseBackend(ABC):
@@ -69,18 +69,18 @@ class BaseBackend(ABC):
 ```
 
 Concrete implementations:
-- [backends/jaeger.py](src/openllmetry_mcp/backends/jaeger.py) - Jaeger backend
-- [backends/tempo.py](src/openllmetry_mcp/backends/tempo.py) - Grafana Tempo backend
-- [backends/traceloop.py](src/openllmetry_mcp/backends/traceloop.py) - Traceloop backend
+- [backends/jaeger.py](opentelemetry_mcp/backends/jaeger.py) - Jaeger backend
+- [backends/tempo.py](opentelemetry_mcp/backends/tempo.py) - Grafana Tempo backend
+- [backends/traceloop.py](opentelemetry_mcp/backends/traceloop.py) - Traceloop backend
 
 ### Tool-Based Architecture
 
-Each MCP capability is implemented as a separate tool module in [src/openllmetry_mcp/tools/](src/openllmetry_mcp/tools/):
-- [tools/search.py](src/openllmetry_mcp/tools/search.py) - Search traces with filters
-- [tools/trace.py](src/openllmetry_mcp/tools/trace.py) - Get detailed trace by ID
-- [tools/usage.py](src/openllmetry_mcp/tools/usage.py) - Aggregate token usage metrics
-- [tools/services.py](src/openllmetry_mcp/tools/services.py) - List available services
-- [tools/errors.py](src/openllmetry_mcp/tools/errors.py) - Find traces with errors
+Each MCP capability is implemented as a separate tool module in [opentelemetry_mcp/tools/](opentelemetry_mcp/tools/):
+- [tools/search.py](opentelemetry_mcp/tools/search.py) - Search traces with filters
+- [tools/trace.py](opentelemetry_mcp/tools/trace.py) - Get detailed trace by ID
+- [tools/usage.py](opentelemetry_mcp/tools/usage.py) - Aggregate token usage metrics
+- [tools/services.py](opentelemetry_mcp/tools/services.py) - List available services
+- [tools/errors.py](opentelemetry_mcp/tools/errors.py) - Find traces with errors
 
 **Critical:** All tools MUST return JSON strings (not dicts). This is required by the MCP protocol.
 
@@ -94,10 +94,10 @@ return {"result": data}
 
 ### Key Components
 
-- [server.py](src/openllmetry_mcp/server.py) - FastMCP application, CLI interface, tool handlers
-- [config.py](src/openllmetry_mcp/config.py) - Pydantic configuration models
-- [models.py](src/openllmetry_mcp/models.py) - Core data models (SpanData, TraceData, UsageMetrics)
-- [attributes.py](src/openllmetry_mcp/attributes.py) - Strongly-typed OpenTelemetry attribute models
+- [server.py](opentelemetry_mcp/server.py) - FastMCP application, CLI interface, tool handlers
+- [config.py](opentelemetry_mcp/config.py) - Pydantic configuration models
+- [models.py](opentelemetry_mcp/models.py) - Core data models (SpanData, TraceData, UsageMetrics)
+- [attributes.py](opentelemetry_mcp/attributes.py) - Strongly-typed OpenTelemetry attribute models
 
 ## Configuration
 
@@ -111,9 +111,9 @@ return {"result": data}
 
 **Configuration Precedence:** CLI args > environment variables > defaults
 
-## OpenLLMetry Semantic Conventions
+## Opentelemetry Semantic Conventions
 
-The server parses both current and legacy OpenLLMetry conventions:
+The server parses both current and legacy Opentelemetry conventions:
 
 **Primary (gen_ai.*):**
 - `gen_ai.system` - LLM provider (e.g., "openai", "anthropic")
@@ -154,15 +154,15 @@ Parse attributes using: `LLMSpanAttributes.from_span(span_data)`
 - Server starts even if backend is initially unhealthy
 
 ### 5. Adding New Backends
-1. Create new file in [src/openllmetry_mcp/backends/](src/openllmetry_mcp/backends/)
+1. Create new file in [opentelemetry_mcp/backends/](opentelemetry_mcp/backends/)
 2. Extend `BaseBackend` class
 3. Implement all abstract methods
-4. Add to backend factory in [config.py](src/openllmetry_mcp/config.py)
+4. Add to backend factory in [config.py](opentelemetry_mcp/config.py)
 
 ### 6. Adding New Tools
-1. Create new module in [src/openllmetry_mcp/tools/](src/openllmetry_mcp/tools/)
+1. Create new module in [opentelemetry_mcp/tools/](opentelemetry_mcp/tools/)
 2. Implement tool function that takes backend and returns JSON string
-3. Register in [server.py](src/openllmetry_mcp/server.py) using `@mcp.tool()`
+3. Register in [server.py](opentelemetry_mcp/server.py) using `@mcp.tool()`
 
 ## Testing
 

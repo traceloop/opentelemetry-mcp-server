@@ -3,8 +3,8 @@
 import json
 from typing import Any
 
-from openllmetry_mcp.backends.base import BaseBackend
-from openllmetry_mcp.models import LLMSpanAttributes
+from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.models import LLMSpanAttributes
 
 
 async def get_trace(backend: BaseBackend, trace_id: str) -> str:
@@ -48,7 +48,7 @@ async def get_trace(backend: BaseBackend, trace_id: str) -> str:
                 "attributes": span.attributes.to_dict(),
             }
 
-            # If it's an LLM span, parse OpenLLMetry attributes
+            # If it's an LLM span, parse Opentelemetry attributes
             if span.is_llm_span:
                 llm_attrs = LLMSpanAttributes.from_span(span)
                 if llm_attrs:

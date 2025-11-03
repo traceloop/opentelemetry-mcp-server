@@ -4,17 +4,17 @@ from datetime import datetime
 
 import pytest
 
-from openllmetry_mcp.backends.traceloop import TraceloopBackend
-from openllmetry_mcp.models import TraceQuery
+from opentelemetry_mcp.backends.traceloop import TraceloopBackend
+from opentelemetry_mcp.models import TraceQuery
 
 
-def test_traceloop_backend_requires_api_key():
+def test_traceloop_backend_requires_api_key() -> None:
     """Test that Traceloop backend requires an API key."""
     with pytest.raises(ValueError, match="requires an API key"):
         TraceloopBackend(url="https://api.traceloop.com/v2", api_key=None)
 
 
-def test_traceloop_backend_initialization():
+def test_traceloop_backend_initialization() -> None:
     """Test Traceloop backend initializes correctly."""
     backend = TraceloopBackend(
         url="https://api.traceloop.com/v2",
@@ -28,7 +28,7 @@ def test_traceloop_backend_initialization():
     assert backend.project_id == "default"
 
 
-def test_traceloop_client_headers():
+def test_traceloop_client_headers() -> None:
     """Test that Traceloop client has correct headers."""
     backend = TraceloopBackend(
         url="https://api.traceloop.com/v2",
@@ -40,7 +40,7 @@ def test_traceloop_client_headers():
     assert client.headers["Content-Type"] == "application/json"
 
 
-def test_build_filters_for_search():
+def test_build_filters_for_search() -> None:
     """Test filter building for search_traces."""
     query = TraceQuery(
         service_name="my-service",
@@ -137,7 +137,7 @@ def test_build_filters_for_search():
     }
 
 
-def test_convert_root_span_to_trace():
+def test_convert_root_span_to_trace() -> None:
     """Test converting Traceloop root span to TraceData."""
     backend = TraceloopBackend(url="https://api.traceloop.com/v2", api_key="test_key")
 
@@ -169,7 +169,7 @@ def test_convert_root_span_to_trace():
     assert trace.duration_ms == 3000
 
 
-def test_convert_spans_to_trace():
+def test_convert_spans_to_trace() -> None:
     """Test converting Traceloop spans array to TraceData."""
     backend = TraceloopBackend(url="https://api.traceloop.com/v2", api_key="test_key")
 
@@ -200,14 +200,15 @@ def test_convert_spans_to_trace():
 
     trace = backend._convert_spans_to_trace("abc123", spans_data)
 
+    assert trace is not None
     assert trace.trace_id == "abc123"
     assert len(trace.spans) == 2
     assert trace.spans[0].span_id == "root"
     assert trace.spans[1].span_id == "child"
-    assert trace.spans[1].attributes["gen_ai.system"] == "openai"
+    assert trace.spans[1].attributes.gen_ai_system == "openai"
 
 
-def test_timestamp_conversion():
+def test_timestamp_conversion() -> None:
     """Test timestamp conversion from milliseconds to datetime."""
     # Traceloop returns timestamps in milliseconds
     timestamp_ms = 1704120000000
@@ -221,7 +222,7 @@ def test_timestamp_conversion():
     assert dt.day == 1
 
 
-def test_duration_conversion():
+def test_duration_conversion() -> None:
     """Test duration stays in milliseconds."""
     # Traceloop returns duration in milliseconds
     duration_ms = 3500

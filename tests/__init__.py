@@ -1,1 +1,1 @@
-"""Tests for OpenLLMetry MCP Server."""
+"""Tests for Opentelemetry MCP Server."""

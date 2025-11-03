@@ -4,9 +4,9 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from openllmetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
-from openllmetry_mcp.backends.base import BaseBackend
-from openllmetry_mcp.models import SpanData, TraceData, TraceQuery
+from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
+from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.models import SpanData, TraceData, TraceQuery
 
 logger = logging.getLogger(__name__)
 

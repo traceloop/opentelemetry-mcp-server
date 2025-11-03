@@ -4,8 +4,8 @@ import json
 from datetime import datetime
 from typing import Any
 
-from openllmetry_mcp.backends.base import BaseBackend
-from openllmetry_mcp.models import TraceQuery, TraceSummary
+from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.models import TraceQuery, TraceSummary
 
 
 async def find_errors(

@@ -1,4 +1,4 @@
-"""Data models for OpenTelemetry traces and OpenLLMetry conventions."""
+"""Data models for OpenTelemetry traces and Opentelemetry conventions."""
 
 from datetime import datetime
 from typing import Literal
@@ -44,7 +44,7 @@ class SpanData(BaseModel):
 
 
 class LLMSpanAttributes(BaseModel):
-    """Parsed OpenLLMetry (gen_ai.*) span attributes."""
+    """Parsed Opentelemetry (gen_ai.*) span attributes."""
 
     system: str  # Provider: openai, anthropic, etc.
     request_model: str | None = None
@@ -68,7 +68,7 @@ class LLMSpanAttributes(BaseModel):
 
     @classmethod
     def from_span(cls, span: SpanData) -> "LLMSpanAttributes | None":
-        """Extract OpenLLMetry attributes from a span."""
+        """Extract Opentelemetry attributes from a span."""
         if not span.is_llm_span:
             return None
 
@@ -220,7 +220,7 @@ class TraceQuery(BaseModel):
     limit: int = Field(default=100, ge=1, le=1000)
     has_error: bool | None = None
 
-    # OpenLLMetry-specific filters
+    # Opentelemetry-specific filters
     gen_ai_system: str | None = None  # Filter by LLM provider
     gen_ai_model: str | None = None  # Filter by model name
 
@@ -249,7 +249,7 @@ class TraceQuery(BaseModel):
 
         params["limit"] = self.limit
 
-        # Add tags including OpenLLMetry filters
+        # Add tags including Opentelemetry filters
         all_tags = dict(self.tags)
         if self.gen_ai_system:
             all_tags["gen_ai.system"] = self.gen_ai_system

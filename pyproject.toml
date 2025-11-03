@@ -1,7 +1,7 @@
 [project]
-name = "openllmetry-mcp"
+name = "opentelemetry-mcp"
 version = "0.1.0"
-description = "MCP server for querying OpenTelemetry traces from LLM applications with OpenLLMetry support"
+description = "MCP server for querying OpenTelemetry traces from LLM applications with Opentelemetry support"
 authors = [
     {name = "Doron Kopit", email = "doron@traceloop.com"}
 ]
@@ -28,7 +28,7 @@ dev = [
 ]
 
 [project.scripts]
-openllmetry-mcp = "openllmetry_mcp.server:main"
+opentelemetry-mcp = "opentelemetry_mcp.server:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -52,7 +52,7 @@ select = ["E", "F", "I", "N", "W", "UP"]
 ignore = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["openllmetry_mcp"]
+known-first-party = ["opentelemetry_mcp"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -67,4 +67,4 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
-addopts = "--cov=openllmetry_mcp --cov-report=term-missing"
+addopts = "--cov=opentelemetry_mcp --cov-report=term-missing"

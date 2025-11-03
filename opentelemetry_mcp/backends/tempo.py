@@ -4,9 +4,9 @@ import logging
 from datetime import datetime
 from typing import Any, Literal
 
-from openllmetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
-from openllmetry_mcp.backends.base import BaseBackend
-from openllmetry_mcp.models import SpanData, TraceData, TraceQuery
+from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
+from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.models import SpanData, TraceData, TraceQuery
 
 logger = logging.getLogger(__name__)
 
@@ -193,7 +193,7 @@ class TempoBackend(BaseBackend):
         for key, value in query.tags.items():
             conditions.append(f'span.{key} = "{value}"')
 
-        # Add OpenLLMetry filters
+        # Add Opentelemetry filters
         if query.gen_ai_system:
             conditions.append(f'span.gen_ai.system = "{query.gen_ai_system}"')
 

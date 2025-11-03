@@ -1,4 +1,4 @@
-"""Configuration management for OpenLLMetry MCP Server."""
+"""Configuration management for Opentelemetry MCP Server."""
 
 import os
 from typing import Literal

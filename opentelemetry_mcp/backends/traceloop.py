@@ -1,4 +1,4 @@
-"""Traceloop backend implementation for querying OpenLLMetry traces."""
+"""Traceloop backend implementation for querying Opentelemetry traces."""
 
 import logging
 from datetime import datetime, timedelta
@@ -6,9 +6,9 @@ from typing import Any, Literal
 
 import httpx
 
-from openllmetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
-from openllmetry_mcp.backends.base import BaseBackend
-from openllmetry_mcp.models import SpanData, TraceData, TraceQuery
+from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
+from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.models import SpanData, TraceData, TraceQuery
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class TraceloopBackend(BaseBackend):
     """Traceloop API backend implementation.
 
     Implements the Traceloop API v2 for querying OpenTelemetry traces
-    with OpenLLMetry semantic conventions. Uses hardcoded project_id "default"
+    with Opentelemetry semantic conventions. Uses hardcoded project_id "default"
     as the Traceloop backend resolves the actual project from the API key.
     """
 

@@ -2,7 +2,7 @@
 
 import json
 
-from openllmetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.backends.base import BaseBackend
 
 
 async def list_services(backend: BaseBackend) -> str:

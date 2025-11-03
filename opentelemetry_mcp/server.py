@@ -1,4 +1,4 @@
-"""OpenLLMetry MCP Server - Main entry point."""
+"""Opentelemetry MCP Server - Main entry point."""
 
 import asyncio
 import logging
@@ -7,12 +7,12 @@ import sys
 import click
 from fastmcp import FastMCP
 
-from openllmetry_mcp.backends.base import BaseBackend
-from openllmetry_mcp.backends.jaeger import JaegerBackend
-from openllmetry_mcp.backends.tempo import TempoBackend
-from openllmetry_mcp.backends.traceloop import TraceloopBackend
-from openllmetry_mcp.config import ServerConfig
-from openllmetry_mcp.tools import errors, search, services, trace, usage
+from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.backends.jaeger import JaegerBackend
+from opentelemetry_mcp.backends.tempo import TempoBackend
+from opentelemetry_mcp.backends.traceloop import TraceloopBackend
+from opentelemetry_mcp.config import ServerConfig
+from opentelemetry_mcp.tools import errors, search, services, trace, usage
 
 # Set up logging
 logging.basicConfig(
@@ -25,7 +25,7 @@ _backend: BaseBackend | None = None
 _config: ServerConfig | None = None
 
 # Initialize FastMCP server
-mcp = FastMCP("openllmetry-mcp")
+mcp = FastMCP("opentelemetry-mcp")
 
 
 def _create_backend(config: ServerConfig) -> BaseBackend:
@@ -150,7 +150,7 @@ async def search_traces(
 async def get_trace(trace_id: str) -> str:
     """Get complete trace details by trace ID.
 
-    Returns all spans with attributes, including parsed OpenLLMetry data for LLM operations.
+    Returns all spans with attributes, including parsed Opentelemetry data for LLM operations.
 
     Args:
         trace_id: Trace identifier
@@ -309,7 +309,7 @@ def main(
     host: str,
     port: int,
 ) -> None:
-    """OpenLLMetry MCP Server - Query OpenTelemetry traces from LLM applications.
+    """Opentelemetry MCP Server - Query OpenTelemetry traces from LLM applications.
 
     Supports multiple backends: Jaeger, Tempo, and Traceloop.
     Configuration can be provided via environment variables or CLI arguments.
@@ -320,13 +320,13 @@ def main(
 
     Examples:
       # Run with stdio transport (default, for Claude Desktop)
-      openllmetry-mcp --backend traceloop
+      opentelemetry-mcp --backend traceloop
 
       # Run with HTTP transport for network access
-      openllmetry-mcp --transport http --port 8000
+      opentelemetry-mcp --transport http --port 8000
 
       # Run with HTTP on specific host/port
-      openllmetry-mcp --transport http --host 127.0.0.1 --port 9000
+      opentelemetry-mcp --transport http --host 127.0.0.1 --port 9000
     """
     global _config
 

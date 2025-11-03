@@ -1,13 +1,17 @@
 """Pytest configuration and fixtures."""
 
-import pytest
+from typing import Any
 
-from openllmetry_mcp.config import BackendConfig
-from openllmetry_mcp.models import SpanData, TraceData
+import pytest
+from pydantic import HttpUrl
+
+from opentelemetry_mcp.attributes import SpanAttributes
+from opentelemetry_mcp.config import BackendConfig
+from opentelemetry_mcp.models import SpanData, TraceData
 
 
 @pytest.fixture
-def sample_span_data() -> dict:
+def sample_span_data() -> dict[str, Any]:
     """Sample Jaeger span data for testing."""
     return {
         "traceID": "abc123",
@@ -42,13 +46,13 @@ def sample_trace_data() -> TraceData:
         start_time=datetime.now(),
         duration_ms=5000,
         status="OK",
-        attributes={
+        attributes=SpanAttributes.model_validate({
             "gen_ai.system": "openai",
             "gen_ai.request.model": "gpt-4",
             "gen_ai.usage.prompt_tokens": 100,
             "gen_ai.usage.completion_tokens": 200,
             "gen_ai.usage.total_tokens": 300,
-        },
+        }),
     )
 
     return TraceData(
@@ -67,6 +71,6 @@ def jaeger_backend_config() -> BackendConfig:
     """Jaeger backend configuration for testing."""
     return BackendConfig(
         type="jaeger",
-        url="http://localhost:16686",
+        url=HttpUrl("http://localhost:16686"),
         timeout=5.0,
     )

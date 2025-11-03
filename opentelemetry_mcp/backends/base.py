@@ -5,8 +5,8 @@ from typing import Any
 
 import httpx
 
-from openllmetry_mcp.attributes import HealthCheckResponse
-from openllmetry_mcp.models import TraceData, TraceQuery
+from opentelemetry_mcp.attributes import HealthCheckResponse
+from opentelemetry_mcp.models import TraceData, TraceQuery
 
 
 class BaseBackend(ABC):
