@@ -1,0 +1,77 @@
+name: CI
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+        types: [opened, synchronize]
+
+jobs:
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup UV
+              uses: astral-sh/setup-uv@v3
+              with:
+                  version: "latest"
+                  enable-cache: true
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+            - name: Install dependencies
+              run: uv sync --dev
+            - name: Lint with Ruff
+              run: uv run ruff check --output-format=github
+            - name: Lint with Mypy
+              run: uv run mypy .
+    test:
+        name: Test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup UV
+              uses: astral-sh/setup-uv@v3
+              with:
+                  version: "latest"
+                  enable-cache: true
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+            - name: Install dependencies
+              run: uv sync --dev
+            - name: Test with pytest
+              run: uv run pytest
+    build-test:
+        needs: test
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                platform: [amd64, arm64]
+                include:
+                    - platform: amd64
+                      runs-on: ubuntu-latest
+                      docker-platform: linux/amd64
+                    - platform: arm64
+                      runs-on: Linux-ARM64
+                      docker-platform: linux/arm64
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Create GH token file
+              run: echo "${{ secrets.GH_ACCESS_TOKEN }}" > gh_token.txt
+
+            - name: Docker Build
+              uses: docker/build-push-action@v6
+              with:
+                  platforms: ${{ matrix.docker-platform }}
+                  context: .
+                  push: false
+                  secret-files: |
+                      "gh_token=gh_token.txt"
