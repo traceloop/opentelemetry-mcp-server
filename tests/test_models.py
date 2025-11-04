@@ -42,13 +42,15 @@ def test_llm_span_attributes_from_span() -> None:
         service_name="test",
         start_time=datetime.now(),
         duration_ms=100,
-        attributes=SpanAttributes.model_validate({
-            "gen_ai.system": "openai",
-            "gen_ai.request.model": "gpt-4",
-            "gen_ai.usage.prompt_tokens": 150,
-            "gen_ai.usage.completion_tokens": 300,
-            "gen_ai.usage.total_tokens": 450,
-        }),
+        attributes=SpanAttributes.model_validate(
+            {
+                "gen_ai.system": "openai",
+                "gen_ai.request.model": "gpt-4",
+                "gen_ai.usage.prompt_tokens": 150,
+                "gen_ai.usage.completion_tokens": 300,
+                "gen_ai.usage.total_tokens": 450,
+            }
+        ),
     )
 
     llm_attrs = LLMSpanAttributes.from_span(span)
@@ -69,12 +71,14 @@ def test_llm_span_attributes_anthropic_tokens() -> None:
         service_name="test",
         start_time=datetime.now(),
         duration_ms=200,
-        attributes=SpanAttributes.model_validate({
-            "gen_ai.system": "anthropic",
-            "gen_ai.request.model": "claude-3-opus",
-            "gen_ai.usage.input_tokens": 100,  # Anthropic uses input_tokens
-            "gen_ai.usage.output_tokens": 200,  # Anthropic uses output_tokens
-        }),
+        attributes=SpanAttributes.model_validate(
+            {
+                "gen_ai.system": "anthropic",
+                "gen_ai.request.model": "claude-3-opus",
+                "gen_ai.usage.input_tokens": 100,  # Anthropic uses input_tokens
+                "gen_ai.usage.output_tokens": 200,  # Anthropic uses output_tokens
+            }
+        ),
     )
 
     llm_attrs = LLMSpanAttributes.from_span(span)

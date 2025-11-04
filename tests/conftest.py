@@ -46,13 +46,15 @@ def sample_trace_data() -> TraceData:
         start_time=datetime.now(),
         duration_ms=5000,
         status="OK",
-        attributes=SpanAttributes.model_validate({
-            "gen_ai.system": "openai",
-            "gen_ai.request.model": "gpt-4",
-            "gen_ai.usage.prompt_tokens": 100,
-            "gen_ai.usage.completion_tokens": 200,
-            "gen_ai.usage.total_tokens": 300,
-        }),
+        attributes=SpanAttributes.model_validate(
+            {
+                "gen_ai.system": "openai",
+                "gen_ai.request.model": "gpt-4",
+                "gen_ai.usage.prompt_tokens": 100,
+                "gen_ai.usage.completion_tokens": 200,
+                "gen_ai.usage.total_tokens": 300,
+            }
+        ),
     )
 
     return TraceData(

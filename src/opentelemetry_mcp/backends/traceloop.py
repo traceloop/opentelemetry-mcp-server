@@ -277,7 +277,7 @@ class TraceloopBackend(BaseBackend):
 
         try:
             # Health endpoint is at root, not /v2
-            health_url = self.url.rstrip('/') + '/health'
+            health_url = self.url.rstrip("/") + "/health"
             # Make request without base_url override
             async with httpx.AsyncClient(timeout=self.timeout) as temp_client:
                 response = await temp_client.get(health_url)

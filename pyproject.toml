@@ -25,6 +25,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "mypy>=1.8.0",
     "ruff>=0.1.0",
+    "types-click>=7.1.0",
 ]
 
 [project.scripts]
@@ -41,6 +42,7 @@ dev-dependencies = [
     "pytest-cov>=4.1.0",
     "mypy>=1.8.0",
     "ruff>=0.1.0",
+    "types-click>=7.1.0",
 ]
 
 [tool.ruff]
