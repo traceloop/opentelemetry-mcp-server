@@ -6,7 +6,8 @@ from typing import Any
 
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
 from opentelemetry_mcp.backends.base import BaseBackend
-from opentelemetry_mcp.models import SpanData, TraceData, TraceQuery
+from opentelemetry_mcp.backends.filter_engine import FilterEngine
+from opentelemetry_mcp.models import FilterOperator, SpanData, TraceData, TraceQuery
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +26,21 @@ class JaegerBackend(BaseBackend):
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
 
+    def get_supported_operators(self) -> set[FilterOperator]:
+        """Get natively supported operators via Jaeger API.
+
+        Jaeger has very limited filtering - only supports equals via tags.
+        Most filtering will be done client-side.
+
+        Returns:
+            Set of supported FilterOperator values
+        """
+        return {
+            FilterOperator.EQUALS,  # Via tags parameter
+        }
+
     async def search_traces(self, query: TraceQuery) -> list[TraceData]:
-        """Search for traces using Jaeger Query API.
+        """Search for traces using Jaeger Query API with hybrid filtering.
 
         Args:
             query: Trace query parameters
@@ -37,8 +51,31 @@ class JaegerBackend(BaseBackend):
         Raises:
             httpx.HTTPError: If API request fails
         """
-        # Jaeger requires a service parameter, so if none specified, query all services
-        if not query.service_name:
+        # Get all filters (legacy + explicit)
+        all_filters = query.get_all_filters()
+
+        # Jaeger only supports service filtering via API (via query.to_backend_params())
+        # All other filters must be applied client-side, even if operator is supported
+        supported_fields = {"service.name"}  # Only service filtering via API
+
+        native_filters = [
+            f
+            for f in all_filters
+            if f.field in supported_fields and f.operator == FilterOperator.EQUALS
+        ]
+        client_filters = [f for f in all_filters if f not in native_filters]
+
+        if client_filters:
+            logger.info(
+                f"Will apply {len(client_filters)} filters client-side: "
+                f"{[(f.field, f.operator.value) for f in client_filters]}"
+            )
+
+        # Check if service filter is present in native filters
+        service_filters = [f for f in native_filters if f.field == "service.name"]
+
+        if not service_filters:
+            # No service specified, query all services
             logger.debug("No service specified, querying all services")
             services_response = await self.client.get("/api/services")
             services_response.raise_for_status()
@@ -46,7 +83,7 @@ class JaegerBackend(BaseBackend):
 
             all_traces = []
             for service in services:
-                # Create a new query with the service name
+                # Create a new query with the service name filter added
                 service_query = TraceQuery(
                     service_name=service,
                     operation_name=query.operation_name,
@@ -58,12 +95,16 @@ class JaegerBackend(BaseBackend):
                     limit=query.limit,
                     has_error=query.has_error,
                     gen_ai_system=query.gen_ai_system,
-                    gen_ai_model=query.gen_ai_model,
+                    gen_ai_request_model=query.gen_ai_request_model,
+                    gen_ai_response_model=query.gen_ai_response_model,
+                    filters=query.filters,
                 )
 
                 # Query this service
                 try:
-                    service_traces = await self._search_service_traces(service_query)
+                    service_traces = await self._search_service_traces_with_filters(
+                        service_query, native_filters, client_filters
+                    )
                     all_traces.extend(service_traces)
                 except Exception as e:
                     logger.warning(f"Failed to query service {service}: {e}")
@@ -74,17 +115,25 @@ class JaegerBackend(BaseBackend):
             return all_traces[: query.limit]
 
         # Single service query
-        return await self._search_service_traces(query)
+        return await self._search_service_traces_with_filters(query, native_filters, client_filters)
 
-    async def _search_service_traces(self, query: TraceQuery) -> list[TraceData]:
-        """Search traces for a specific service.
+    async def _search_service_traces_with_filters(
+        self,
+        query: TraceQuery,
+        native_filters: list[Any],
+        client_filters: list[Any],
+    ) -> list[TraceData]:
+        """Search traces for a specific service with hybrid filtering.
 
         Args:
             query: Trace query with service_name set
+            native_filters: Filters that can be pushed to Jaeger
+            client_filters: Filters to apply client-side
 
         Returns:
             List of matching traces
         """
+        # Use legacy to_backend_params for now (handles service, operation, duration, time, tags)
         params = query.to_backend_params()
 
         logger.debug(f"Searching traces with params: {params}")
@@ -98,11 +147,11 @@ class JaegerBackend(BaseBackend):
         for trace_data in data.get("data", []):
             trace = self._parse_jaeger_trace(trace_data)
             if trace:
-                # Apply post-query filters if needed
-                if query.has_error is not None:
-                    if query.has_error != trace.has_errors:
-                        continue
                 traces.append(trace)
+
+        # Apply client-side filters
+        if client_filters:
+            traces = FilterEngine.apply_filters(traces, client_filters)
 
         return traces
 

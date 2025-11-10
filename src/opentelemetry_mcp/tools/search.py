@@ -2,9 +2,12 @@
 
 import json
 from datetime import datetime
+from typing import Any
+
+from pydantic import ValidationError
 
 from opentelemetry_mcp.backends.base import BaseBackend
-from opentelemetry_mcp.models import TraceQuery, TraceSummary
+from opentelemetry_mcp.models import Filter, TraceQuery, TraceSummary
 
 
 async def search_traces(
@@ -17,28 +20,44 @@ async def search_traces(
     max_duration_ms: int | None = None,
     gen_ai_system: str | None = None,
     gen_ai_model: str | None = None,
+    gen_ai_request_model: str | None = None,
+    gen_ai_response_model: str | None = None,
     has_error: bool | None = None,
     tags: dict[str, str] | None = None,
+    filters: list[dict[str, Any]] | None = None,
     limit: int = 100,
 ) -> str:
     """Search for OpenTelemetry traces with optional filters.
 
+    Supports both legacy simple parameters and the new generic filter system.
+
     Args:
         backend: Backend instance to query
-        service_name: Filter by service name
-        operation_name: Filter by operation/span name
+        service_name: Filter by service name (legacy parameter)
+        operation_name: Filter by operation/span name (legacy parameter)
         start_time: Start time (ISO 8601 format)
         end_time: End time (ISO 8601 format)
-        min_duration_ms: Minimum trace duration in milliseconds
-        max_duration_ms: Maximum trace duration in milliseconds
-        gen_ai_system: Filter by LLM provider (openai, anthropic, etc.)
-        gen_ai_model: Filter by LLM model name
-        has_error: Filter traces with errors (true/false)
-        tags: Additional tag filters as key-value pairs
+        min_duration_ms: Minimum trace duration in milliseconds (legacy parameter)
+        max_duration_ms: Maximum trace duration in milliseconds (legacy parameter)
+        gen_ai_system: Filter by LLM provider (legacy parameter)
+        gen_ai_model: DEPRECATED - Use gen_ai_request_model or gen_ai_response_model
+        gen_ai_request_model: Filter by requested model name
+        gen_ai_response_model: Filter by actual model used
+        has_error: Filter traces with errors (legacy parameter)
+        tags: Additional tag filters as key-value pairs (legacy parameter)
+        filters: Generic filter conditions (list of filter objects)
         limit: Maximum number of traces to return (1-1000)
 
     Returns:
         JSON string with trace summaries
+
+    Example filter:
+        {
+            "field": "gen_ai.usage.prompt_tokens",
+            "operator": "gt",
+            "value": 1000,
+            "value_type": "number"
+        }
     """
     # Parse timestamps
     start_dt = None
@@ -56,6 +75,27 @@ async def search_traces(
         except ValueError as e:
             return json.dumps({"error": f"Invalid end_time format: {e}"})
 
+    # Parse filters from dicts to Filter models
+    filter_objects = []
+    if filters:
+        try:
+            for filter_dict in filters:
+                filter_obj = Filter(**filter_dict)
+                filter_objects.append(filter_obj)
+        except ValidationError as e:
+            return json.dumps({"error": f"Invalid filter format: {e}"})
+        except Exception as e:
+            return json.dumps({"error": f"Failed to parse filters: {e}"})
+
+    # Handle backward compatibility: if gen_ai_model is provided but not the new params,
+    # use it for request_model (legacy behavior)
+    final_request_model = gen_ai_request_model
+    final_response_model = gen_ai_response_model
+
+    if gen_ai_model and not gen_ai_request_model and not gen_ai_response_model:
+        # Legacy mode: use gen_ai_model for request_model
+        final_request_model = gen_ai_model
+
     # Build query
     query = TraceQuery(
         service_name=service_name,
@@ -65,9 +105,11 @@ async def search_traces(
         min_duration_ms=min_duration_ms,
         max_duration_ms=max_duration_ms,
         gen_ai_system=gen_ai_system,
-        gen_ai_model=gen_ai_model,
+        gen_ai_request_model=final_request_model,
+        gen_ai_response_model=final_response_model,
         has_error=has_error,
         tags=tags or {},
+        filters=filter_objects,
         limit=limit,
     )
 

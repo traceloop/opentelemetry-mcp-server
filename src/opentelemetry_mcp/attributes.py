@@ -30,6 +30,11 @@ class SpanAttributes(BaseModel):
     gen_ai_request_max_tokens: int | None = Field(None, alias="gen_ai.request.max_tokens")
     gen_ai_request_is_streaming: bool | None = Field(None, alias="gen_ai.request.is_streaming")
 
+    # Response Attributes
+    gen_ai_response_finish_reasons: list[str] | None = Field(
+        None, alias="gen_ai.response.finish_reasons"
+    )
+
     # Usage Metrics (gen_ai.* format)
     gen_ai_usage_prompt_tokens: int | None = Field(None, alias="gen_ai.usage.prompt_tokens")
     gen_ai_usage_input_tokens: int | None = Field(None, alias="gen_ai.usage.input_tokens")
@@ -40,10 +45,12 @@ class SpanAttributes(BaseModel):
     # Legacy llm.* attributes (for backward compatibility with Traceloop)
     llm_vendor: str | None = Field(None, alias="llm.vendor")
     llm_request_model: str | None = Field(None, alias="llm.request.model")
+    llm_response_finish_reasons: list[str] | None = Field(None, alias="llm.response.finish_reasons")
     llm_usage_prompt_tokens: int | None = Field(None, alias="llm.usage.prompt_tokens")
     llm_usage_input_tokens: int | None = Field(None, alias="llm.usage.input_tokens")
     llm_usage_completion_tokens: int | None = Field(None, alias="llm.usage.completion_tokens")
     llm_usage_output_tokens: int | None = Field(None, alias="llm.usage.output_tokens")
+    llm_usage_total_tokens: int | None = Field(None, alias="llm.usage.total_tokens")
 
     # OpenTelemetry Standard Attributes
     service_name: str | None = Field(None, alias="service.name")

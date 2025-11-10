@@ -17,6 +17,7 @@ class BackendConfig(BaseModel):
     url: HttpUrl
     api_key: str | None = Field(default=None, exclude=True)
     timeout: float = Field(default=30.0, gt=0, le=300)
+    environments: list[str] = Field(default_factory=lambda: ["prd"])
 
     @field_validator("url")
     @classmethod
@@ -40,11 +41,16 @@ class BackendConfig(BaseModel):
                 f"Invalid BACKEND_TYPE: {backend_type}. Must be one of: jaeger, tempo, traceloop"
             )
 
+        # Parse environments from comma-separated string
+        environments_str = os.getenv("BACKEND_ENVIRONMENTS", "prd")
+        environments = [env.strip() for env in environments_str.split(",") if env.strip()]
+
         return cls(
             type=backend_type,  # type: ignore
             url=backend_url,  # type: ignore
             api_key=os.getenv("BACKEND_API_KEY"),
             timeout=float(os.getenv("BACKEND_TIMEOUT", "30")),
+            environments=environments,
         )
 
 
@@ -74,6 +80,7 @@ class ServerConfig(BaseModel):
         backend_type: str | None = None,
         backend_url: str | None = None,
         api_key: str | None = None,
+        environments: str | None = None,
     ) -> None:
         """Apply CLI argument overrides to configuration."""
         if backend_type:
@@ -89,3 +96,8 @@ class ServerConfig(BaseModel):
 
         if api_key:
             self.backend.api_key = api_key
+
+        if environments:
+            self.backend.environments = [
+                env.strip() for env in environments.split(",") if env.strip()
+            ]

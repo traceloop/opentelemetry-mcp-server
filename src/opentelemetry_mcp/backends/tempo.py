@@ -6,7 +6,15 @@ from typing import Any, Literal
 
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
 from opentelemetry_mcp.backends.base import BaseBackend
-from opentelemetry_mcp.models import SpanData, TraceData, TraceQuery
+from opentelemetry_mcp.backends.filter_engine import FilterEngine
+from opentelemetry_mcp.models import (
+    Filter,
+    FilterOperator,
+    FilterType,
+    SpanData,
+    TraceData,
+    TraceQuery,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +33,29 @@ class TempoBackend(BaseBackend):
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
 
+    def get_supported_operators(self) -> set[FilterOperator]:
+        """Get natively supported operators via TraceQL.
+
+        Tempo's TraceQL supports most operators natively.
+
+        Returns:
+            Set of supported FilterOperator values
+        """
+        return {
+            FilterOperator.EQUALS,
+            FilterOperator.NOT_EQUALS,
+            FilterOperator.GT,
+            FilterOperator.LT,
+            FilterOperator.GTE,
+            FilterOperator.LTE,
+            FilterOperator.CONTAINS,  # Via regex =~
+            FilterOperator.IN,  # Via OR logic
+            FilterOperator.EXISTS,  # Via != nil
+            FilterOperator.NOT_EXISTS,  # Via = nil
+        }
+
     async def search_traces(self, query: TraceQuery) -> list[TraceData]:
-        """Search traces using TraceQL.
+        """Search traces using TraceQL with hybrid filtering.
 
         Args:
             query: Trace query parameters
@@ -37,16 +66,40 @@ class TempoBackend(BaseBackend):
         Raises:
             httpx.HTTPError: If API request fails
         """
-        # Build TraceQL query
-        traceql = self._build_traceql_query(query)
+        # Get all filters (legacy + explicit)
+        all_filters = query.get_all_filters()
+
+        # Separate supported and unsupported filters
+        supported_operators = self.get_supported_operators()
+        native_filters = [f for f in all_filters if f.operator in supported_operators]
+        client_filters = [f for f in all_filters if f.operator not in supported_operators]
+
+        if client_filters:
+            logger.info(
+                f"Will apply {len(client_filters)} filters client-side: "
+                f"{[f.operator.value for f in client_filters]}"
+            )
+
+        # Build TraceQL query from native filters
+        traceql = self._build_traceql_from_filters(native_filters, query)
         logger.debug(f"Executing TraceQL: {traceql}")
 
         params: dict[str, str | int] = {"q": traceql, "limit": query.limit}
 
+        # Tempo requires time range - default to last 24 hours if not specified
         if query.start_time:
             params["start"] = int(query.start_time.timestamp())
+        else:
+            from datetime import timedelta
+
+            params["start"] = int((datetime.now() - timedelta(days=1)).timestamp())
+
         if query.end_time:
             params["end"] = int(query.end_time.timestamp())
+        else:
+            from datetime import timedelta
+
+            params["end"] = int((datetime.now() + timedelta(hours=1)).timestamp())
 
         response = await self.client.get("/api/search", params=params)
         response.raise_for_status()
@@ -54,9 +107,9 @@ class TempoBackend(BaseBackend):
         data = response.json()
         traces = []
 
-        # Tempo search returns trace IDs, we need to fetch full traces
+        # Tempo search returns an array of trace results directly
         # WARNING: Each trace requires a separate HTTP request, so limit to avoid performance issues
-        trace_results = data.get("traces", [])
+        trace_results = data if isinstance(data, list) else data.get("traces", [])
         max_traces_to_fetch = min(len(trace_results), 50)  # Cap at 50 to avoid too many requests
 
         if len(trace_results) > max_traces_to_fetch:
@@ -72,11 +125,15 @@ class TempoBackend(BaseBackend):
                     trace_response = await self.client.get(f"/api/traces/{trace_id}")
                     trace_response.raise_for_status()
                     trace_data = trace_response.json()
-                    trace = self._parse_tempo_trace(trace_data)
+                    trace = self._parse_tempo_trace(trace_data, trace_id_hex=trace_id)
                     if trace:
                         traces.append(trace)
                 except Exception as e:
                     logger.warning(f"Failed to fetch trace {trace_id}: {e}")
+
+        # Apply client-side filters
+        if client_filters:
+            traces = FilterEngine.apply_filters(traces, client_filters)
 
         return traces
 
@@ -93,6 +150,9 @@ class TempoBackend(BaseBackend):
     async def list_services(self) -> list[str]:
         """List all services from Tempo.
 
+        Uses search results to extract unique service names since the tag values
+        endpoint may not be available on all Tempo instances.
+
         Returns:
             List of service names
 
@@ -101,13 +161,32 @@ class TempoBackend(BaseBackend):
         """
         logger.debug("Listing services")
 
-        # Tempo uses tag values endpoint
-        response = await self.client.get("/api/search/tag/service.name/values")
+        # Use TraceQL to search all traces and extract unique services
+        traceql = "{}"  # Match all traces
+        params: dict[str, str | int] = {"q": traceql, "limit": 1000}
+
+        # Add default time range (last 24 hours)
+        from datetime import timedelta
+
+        params["start"] = int((datetime.now() - timedelta(days=1)).timestamp())
+        params["end"] = int((datetime.now() + timedelta(hours=1)).timestamp())
+
+        response = await self.client.get("/api/search", params=params)
         response.raise_for_status()
 
         data = response.json()
-        tag_values_raw = data.get("tagValues", [])
-        return [str(v) for v in tag_values_raw]
+        trace_results = data if isinstance(data, list) else data.get("traces", [])
+
+        # Extract unique service names
+        services_set = set()
+        for trace_result in trace_results:
+            service_name = trace_result.get("rootServiceName")
+            if service_name:
+                services_set.add(service_name)
+
+        services = sorted(list(services_set))
+        logger.debug(f"Found {len(services)} unique services from {len(trace_results)} traces")
+        return services
 
     async def get_service_operations(self, service_name: str) -> list[str]:
         """Get operations for a service from Tempo.
@@ -134,7 +213,8 @@ class TempoBackend(BaseBackend):
 
         # Extract unique operation names
         operations = set()
-        for trace_result in data.get("traces", []):
+        trace_results = data if isinstance(data, list) else data.get("traces", [])
+        for trace_result in trace_results:
             if "rootServiceName" in trace_result:
                 operations.add(trace_result.get("rootTraceName", ""))
 
@@ -149,8 +229,9 @@ class TempoBackend(BaseBackend):
         logger.debug("Checking backend health")
 
         try:
-            # Try to get tag values as a health check
-            response = await self.client.get("/api/search/tags")
+            # Try a simple search as a health check
+            params: dict[str, str | int] = {"q": "{}", "limit": 1}
+            response = await self.client.get("/api/search", params=params)
             response.raise_for_status()
 
             return HealthCheckResponse(
@@ -166,8 +247,124 @@ class TempoBackend(BaseBackend):
                 error=str(e),
             )
 
+    def _build_traceql_from_filters(self, filters: list[Filter], query: TraceQuery) -> str:
+        """Build TraceQL query from Filter objects.
+
+        Args:
+            filters: List of Filter conditions
+            query: Original query (for time range)
+
+        Returns:
+            TraceQL query string
+        """
+        conditions = []
+
+        for filter_obj in filters:
+            condition = self._filter_to_traceql(filter_obj)
+            if condition:
+                conditions.append(condition)
+
+        # If no filters, match all traces
+        if not conditions:
+            return "{}"
+
+        # Combine with AND logic
+        return "{ " + " && ".join(conditions) + " }"
+
+    def _filter_to_traceql(self, filter_obj: Filter) -> str | None:
+        """Convert a single Filter to TraceQL condition.
+
+        Args:
+            filter_obj: Filter to convert
+
+        Returns:
+            TraceQL condition string or None if not supported
+        """
+        field = filter_obj.field
+        operator = filter_obj.operator
+        value = filter_obj.value
+        values = filter_obj.values
+
+        # Map field names to TraceQL syntax
+        if field == "service.name":
+            traceql_field = "resource.service.name"
+        elif field == "name" or field == "operation_name":
+            traceql_field = "name"
+        elif field == "duration":
+            traceql_field = "duration"
+        elif field == "status":
+            # Special handling for status
+            if operator == FilterOperator.EQUALS:
+                if value == "ERROR":
+                    return "status = error"
+                elif value == "OK":
+                    return "status = ok"
+            return None
+        else:
+            # Assume it's a span attribute
+            traceql_field = f"span.{field}"
+
+        # Build condition based on operator
+        if operator == FilterOperator.EQUALS:
+            if filter_obj.value_type == FilterType.STRING:
+                return f'{traceql_field} = "{value}"'
+            else:
+                return f"{traceql_field} = {value}"
+
+        elif operator == FilterOperator.NOT_EQUALS:
+            if filter_obj.value_type == FilterType.STRING:
+                return f'{traceql_field} != "{value}"'
+            else:
+                return f"{traceql_field} != {value}"
+
+        elif operator == FilterOperator.GT:
+            if field == "duration":
+                return f"{traceql_field} > {value}ms"
+            return f"{traceql_field} > {value}"
+
+        elif operator == FilterOperator.LT:
+            if field == "duration":
+                return f"{traceql_field} < {value}ms"
+            return f"{traceql_field} < {value}"
+
+        elif operator == FilterOperator.GTE:
+            if field == "duration":
+                return f"{traceql_field} >= {value}ms"
+            return f"{traceql_field} >= {value}"
+
+        elif operator == FilterOperator.LTE:
+            if field == "duration":
+                return f"{traceql_field} <= {value}ms"
+            return f"{traceql_field} <= {value}"
+
+        elif operator == FilterOperator.CONTAINS:
+            # Use regex for contains
+            return f'{traceql_field} =~ ".*{value}.*"'
+
+        elif operator == FilterOperator.IN:
+            # Build OR condition
+            if not values:
+                return None
+            if filter_obj.value_type == FilterType.STRING:
+                or_conditions = [f'{traceql_field} = "{v}"' for v in values]
+            else:
+                or_conditions = [f"{traceql_field} = {v}" for v in values]
+            return "(" + " || ".join(or_conditions) + ")"
+
+        elif operator == FilterOperator.EXISTS:
+            return f"{traceql_field} != nil"
+
+        elif operator == FilterOperator.NOT_EXISTS:
+            return f"{traceql_field} = nil"
+
+        logger.warning(f"Unsupported operator for TraceQL: {operator}")
+        return None
+
     def _build_traceql_query(self, query: TraceQuery) -> str:
-        """Build TraceQL query from query parameters.
+        """Build TraceQL query from query parameters (legacy method).
+
+        This method is kept for backward compatibility. New code should use
+        _build_traceql_from_filters with query.get_all_filters().
 
         Args:
             query: Trace query parameters
@@ -175,53 +372,23 @@ class TempoBackend(BaseBackend):
         Returns:
             TraceQL query string
         """
-        conditions = []
+        # Convert to filters and delegate
+        filters = query.get_all_filters()
+        if not filters:
+            # Empty query - match all traces
+            return "{}"
+        return self._build_traceql_from_filters(filters, query)
 
-        if query.service_name:
-            conditions.append(f'resource.service.name = "{query.service_name}"')
-
-        if query.operation_name:
-            conditions.append(f'name = "{query.operation_name}"')
-
-        if query.min_duration_ms:
-            conditions.append(f"duration > {query.min_duration_ms}ms")
-
-        if query.max_duration_ms:
-            conditions.append(f"duration < {query.max_duration_ms}ms")
-
-        # Add tag filters
-        for key, value in query.tags.items():
-            conditions.append(f'span.{key} = "{value}"')
-
-        # Add Opentelemetry filters
-        if query.gen_ai_system:
-            conditions.append(f'span.gen_ai.system = "{query.gen_ai_system}"')
-
-        if query.gen_ai_model:
-            conditions.append(f'span.gen_ai.request.model = "{query.gen_ai_model}"')
-
-        if query.has_error:
-            conditions.append("status = error")
-
-        # If we have gen_ai filters but no explicit system, match any LLM trace
-        # This is important for get_llm_usage to only return LLM traces
-        if not query.gen_ai_system and not query.gen_ai_model and not conditions:
-            # Empty query - match all LLM traces by default
-            return '{span.gen_ai.system=~".+"}'
-
-        # Combine conditions
-        if conditions:
-            return "{ " + " && ".join(conditions) + " }"
-        else:
-            return "{}"  # Match all traces
-
-    def _parse_tempo_trace(self, trace_data: dict[str, Any]) -> TraceData | None:
+    def _parse_tempo_trace(
+        self, trace_data: dict[str, Any], trace_id_hex: str | None = None
+    ) -> TraceData | None:
         """Parse Tempo trace format to TraceData.
 
         Tempo returns OTLP JSON format, which is different from Jaeger.
 
         Args:
             trace_data: Raw Tempo trace data
+            trace_id_hex: Optional hex trace ID from search API (preferred over OTLP base64)
 
         Returns:
             Parsed TraceData or None
@@ -234,7 +401,7 @@ class TempoBackend(BaseBackend):
                 return None
 
             all_spans = []
-            trace_id = None
+            trace_id = trace_id_hex  # Use hex format if provided
 
             for batch in batches:
                 resource = batch.get("resource", {})
@@ -246,6 +413,7 @@ class TempoBackend(BaseBackend):
                         span = self._parse_otlp_span(span_data, str(service_name))
                         if span:
                             all_spans.append(span)
+                            # Only use OTLP trace_id as fallback if hex not provided
                             if not trace_id:
                                 trace_id = span.trace_id
 
@@ -327,12 +495,20 @@ class TempoBackend(BaseBackend):
 
             # Parse status
             status_data = span_data.get("status", {})
-            status_code = status_data.get("code", 0)
+            status_code = status_data.get("code")
             status: Literal["OK", "ERROR", "UNSET"] = "UNSET"
-            if status_code == 1:
-                status = "OK"
-            elif status_code == 2:
-                status = "ERROR"
+
+            # Handle both string enum and numeric formats
+            if isinstance(status_code, str):
+                if "OK" in status_code:
+                    status = "OK"
+                elif "ERROR" in status_code:
+                    status = "ERROR"
+            elif isinstance(status_code, int):
+                if status_code == 1:
+                    status = "OK"
+                elif status_code == 2:
+                    status = "ERROR"
 
             # Parse events with strong typing
             events: list[SpanEvent] = []

@@ -6,7 +6,7 @@ from typing import Any
 import httpx
 
 from opentelemetry_mcp.attributes import HealthCheckResponse
-from opentelemetry_mcp.models import TraceData, TraceQuery
+from opentelemetry_mcp.models import FilterOperator, TraceData, TraceQuery
 
 
 class BaseBackend(ABC):
@@ -32,13 +32,29 @@ class BaseBackend(ABC):
         Returns:
             Reusable AsyncClient instance with automatic connection pooling
         """
-        if self._client is None or self._client.is_closed:
+        # Check if client needs to be created/recreated
+        # Use try-except because .is_closed can fail if event loop is closed
+        needs_new_client = False
+        if self._client is None:
+            needs_new_client = True
+        else:
+            try:
+                if self._client.is_closed:
+                    needs_new_client = True
+            except RuntimeError:
+                # Event loop is closed, need new client
+                needs_new_client = True
+
+        if needs_new_client:
             self._client = httpx.AsyncClient(
                 base_url=self.url,
                 headers=self._create_headers(),
                 timeout=self.timeout,
                 follow_redirects=True,
             )
+
+        # Type check: ensure client is never None
+        assert self._client is not None, "Client should be initialized by now"
         return self._client
 
     @abstractmethod
@@ -47,6 +63,17 @@ class BaseBackend(ABC):
 
         Returns:
             Dictionary of HTTP headers (e.g., Authorization, Content-Type)
+        """
+        pass
+
+    @abstractmethod
+    def get_supported_operators(self) -> set[FilterOperator]:
+        """Get the set of filter operators that this backend natively supports.
+
+        Operators not in this set will be applied via client-side filtering.
+
+        Returns:
+            Set of natively supported FilterOperator values
         """
         pass
 

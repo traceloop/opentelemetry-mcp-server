@@ -1,11 +1,83 @@
 """Data models for OpenTelemetry traces and Opentelemetry conventions."""
 
 from datetime import datetime
+from enum import Enum
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from .attributes import SpanAttributes, SpanEvent
+
+
+class FilterOperator(str, Enum):
+    """Supported filter operators for trace queries."""
+
+    # String operators
+    EQUALS = "equals"
+    NOT_EQUALS = "not_equals"
+    CONTAINS = "contains"
+    NOT_CONTAINS = "not_contains"
+    STARTS_WITH = "starts_with"
+    ENDS_WITH = "ends_with"
+    IN = "in"
+    NOT_IN = "not_in"
+
+    # Number operators
+    GT = "gt"
+    LT = "lt"
+    GTE = "gte"
+    LTE = "lte"
+    BETWEEN = "between"
+
+    # Existence operators
+    EXISTS = "exists"
+    NOT_EXISTS = "not_exists"
+
+
+class FilterType(str, Enum):
+    """Data types for filter values."""
+
+    STRING = "string"
+    NUMBER = "number"
+    BOOLEAN = "boolean"
+
+
+class Filter(BaseModel):
+    """A single filter condition for trace queries."""
+
+    field: str = Field(..., description="Field name in dotted notation (e.g., 'gen_ai.system')")
+    operator: FilterOperator = Field(..., description="Comparison operator")
+    value: str | int | float | bool | None = Field(
+        default=None, description="Single value for most operators"
+    )
+    values: list[str | int | float | bool] | None = Field(
+        default=None, description="Multiple values for 'in', 'not_in', 'between' operators"
+    )
+    value_type: FilterType = Field(..., description="Type of the value(s)")
+
+    @model_validator(mode="after")
+    def validate_filter_values(self) -> "Filter":
+        """Validate that value/values are provided correctly for the operator."""
+        requires_multiple = self.operator in [
+            FilterOperator.IN,
+            FilterOperator.NOT_IN,
+            FilterOperator.BETWEEN,
+        ]
+        requires_none = self.operator in [FilterOperator.EXISTS, FilterOperator.NOT_EXISTS]
+
+        if requires_none:
+            if self.value is not None or self.values is not None:
+                raise ValueError(f"Operator '{self.operator}' does not accept value or values")
+        elif requires_multiple:
+            if not self.values:
+                raise ValueError(f"Operator '{self.operator}' requires 'values' field")
+            if self.operator == FilterOperator.BETWEEN and len(self.values) != 2:
+                raise ValueError("Operator 'between' requires exactly 2 values")
+        else:
+            if self.value is None:
+                raise ValueError(f"Operator '{self.operator}' requires 'value' field")
+
+        return self
 
 
 class SpanData(BaseModel):
@@ -57,6 +129,9 @@ class LLMSpanAttributes(BaseModel):
     max_tokens: int | None = None
     is_streaming: bool = False
 
+    # Response attributes
+    finish_reasons: list[str] | None = None
+
     # Usage metrics
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
@@ -68,7 +143,7 @@ class LLMSpanAttributes(BaseModel):
 
     @classmethod
     def from_span(cls, span: SpanData) -> "LLMSpanAttributes | None":
-        """Extract Opentelemetry attributes from a span."""
+        """Extract Opentelemetry attributes from a span with enhanced token calculation."""
         if not span.is_llm_span:
             return None
 
@@ -89,6 +164,39 @@ class LLMSpanAttributes(BaseModel):
             or attrs.llm_usage_output_tokens
             or 0
         )
+
+        # Enhanced total_tokens calculation:
+        # 1. Try explicit total_tokens attributes
+        # 2. Sum all gen_ai.usage.* numeric attributes
+        # 3. Fallback to prompt + completion
+        total_tokens = attrs.gen_ai_usage_total_tokens or attrs.llm_usage_total_tokens
+
+        if not total_tokens:
+            # Search for all gen_ai.usage.* attributes and sum numeric values
+            usage_sum = 0
+            attrs_dict = attrs.to_dict()
+            for key, value in attrs_dict.items():
+                if key.startswith("gen_ai.usage.") and isinstance(value, int):
+                    usage_sum += value
+
+            # If we found usage attributes, use their sum
+            if usage_sum > 0:
+                total_tokens = usage_sum
+            # Otherwise fallback to prompt + completion
+            elif prompt_tokens or completion_tokens:
+                total_tokens = prompt_tokens + completion_tokens
+
+        # Parse finish_reasons (can be array or comma-separated string)
+        finish_reasons = attrs.gen_ai_response_finish_reasons or attrs.llm_response_finish_reasons
+        if finish_reasons is None:
+            # Check if it's stored as a string in extra attributes
+            finish_reasons_raw = attrs.get("gen_ai.response.finish_reasons") or attrs.get(
+                "llm.response.finish_reasons"
+            )
+            if isinstance(finish_reasons_raw, str):
+                finish_reasons = [reason.strip() for reason in finish_reasons_raw.split(",")]
+            elif isinstance(finish_reasons_raw, list):
+                finish_reasons = finish_reasons_raw
 
         # Extract prompt preview from events or attributes
         prompt_preview = None
@@ -127,9 +235,10 @@ class LLMSpanAttributes(BaseModel):
             top_p=attrs.gen_ai_request_top_p,
             max_tokens=attrs.gen_ai_request_max_tokens,
             is_streaming=attrs.gen_ai_request_is_streaming or False,
+            finish_reasons=finish_reasons,
             prompt_tokens=prompt_tokens if prompt_tokens else None,
             completion_tokens=completion_tokens if completion_tokens else None,
-            total_tokens=attrs.gen_ai_usage_total_tokens,
+            total_tokens=total_tokens if total_tokens else None,
             prompt_preview=prompt_preview,
             completion_preview=completion_preview,
         )
@@ -210,6 +319,7 @@ class TraceData(BaseModel):
 class TraceQuery(BaseModel):
     """Query parameters for searching traces."""
 
+    # Legacy simple parameters (for backward compatibility)
     service_name: str | None = None
     operation_name: str | None = None
     start_time: datetime | None = None
@@ -220,9 +330,136 @@ class TraceQuery(BaseModel):
     limit: int = Field(default=100, ge=1, le=1000)
     has_error: bool | None = None
 
-    # Opentelemetry-specific filters
+    # Opentelemetry-specific filters (legacy)
     gen_ai_system: str | None = None  # Filter by LLM provider
-    gen_ai_model: str | None = None  # Filter by model name
+    gen_ai_request_model: str | None = None  # Filter by requested model
+    gen_ai_response_model: str | None = None  # Filter by actual model used
+
+    # New generic filter system
+    filters: list[Filter] = Field(default_factory=list, description="Generic filter conditions")
+    logical_operator: Literal["AND"] = Field(
+        default="AND", description="Logical operator for combining filters (currently only AND)"
+    )
+
+    def has_filters(self) -> bool:
+        """Check if any filters (legacy or new) are specified."""
+        return bool(
+            self.service_name
+            or self.operation_name
+            or self.min_duration_ms
+            or self.max_duration_ms
+            or self.has_error
+            or self.gen_ai_system
+            or self.gen_ai_request_model
+            or self.gen_ai_response_model
+            or self.tags
+            or self.filters
+        )
+
+    def get_all_filters(self) -> list[Filter]:
+        """Convert legacy parameters to Filter objects and combine with explicit filters.
+
+        Returns:
+            Combined list of all filters (legacy converted + explicit)
+        """
+        all_filters: list[Filter] = []
+
+        # Convert legacy parameters to filters
+        if self.service_name:
+            all_filters.append(
+                Filter(
+                    field="service.name",
+                    operator=FilterOperator.EQUALS,
+                    value=self.service_name,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.operation_name:
+            all_filters.append(
+                Filter(
+                    field="name",
+                    operator=FilterOperator.EQUALS,
+                    value=self.operation_name,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.min_duration_ms:
+            all_filters.append(
+                Filter(
+                    field="duration",
+                    operator=FilterOperator.GTE,
+                    value=self.min_duration_ms,
+                    value_type=FilterType.NUMBER,
+                )
+            )
+
+        if self.max_duration_ms:
+            all_filters.append(
+                Filter(
+                    field="duration",
+                    operator=FilterOperator.LTE,
+                    value=self.max_duration_ms,
+                    value_type=FilterType.NUMBER,
+                )
+            )
+
+        if self.has_error is not None:
+            all_filters.append(
+                Filter(
+                    field="status",
+                    operator=FilterOperator.EQUALS,
+                    value="ERROR" if self.has_error else "OK",
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.gen_ai_system:
+            all_filters.append(
+                Filter(
+                    field="gen_ai.system",
+                    operator=FilterOperator.EQUALS,
+                    value=self.gen_ai_system,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.gen_ai_request_model:
+            all_filters.append(
+                Filter(
+                    field="gen_ai.request.model",
+                    operator=FilterOperator.EQUALS,
+                    value=self.gen_ai_request_model,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.gen_ai_response_model:
+            all_filters.append(
+                Filter(
+                    field="gen_ai.response.model",
+                    operator=FilterOperator.EQUALS,
+                    value=self.gen_ai_response_model,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        # Add custom tags as filters
+        for key, value in self.tags.items():
+            all_filters.append(
+                Filter(
+                    field=key,
+                    operator=FilterOperator.EQUALS,
+                    value=value,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        # Add explicit filters
+        all_filters.extend(self.filters)
+
+        return all_filters
 
     def to_backend_params(self) -> dict[str, str | int]:
         """Convert query to backend-specific parameters."""
@@ -253,8 +490,10 @@ class TraceQuery(BaseModel):
         all_tags = dict(self.tags)
         if self.gen_ai_system:
             all_tags["gen_ai.system"] = self.gen_ai_system
-        if self.gen_ai_model:
-            all_tags["gen_ai.request.model"] = self.gen_ai_model
+        if self.gen_ai_request_model:
+            all_tags["gen_ai.request.model"] = self.gen_ai_request_model
+        if self.gen_ai_response_model:
+            all_tags["gen_ai.response.model"] = self.gen_ai_response_model
 
         if all_tags:
             # Jaeger expects JSON-encoded tags

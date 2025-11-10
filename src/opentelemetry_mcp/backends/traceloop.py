@@ -8,7 +8,15 @@ import httpx
 
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
 from opentelemetry_mcp.backends.base import BaseBackend
-from opentelemetry_mcp.models import SpanData, TraceData, TraceQuery
+from opentelemetry_mcp.backends.filter_engine import FilterEngine
+from opentelemetry_mcp.models import (
+    Filter,
+    FilterOperator,
+    FilterType,
+    SpanData,
+    TraceData,
+    TraceQuery,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,13 +29,20 @@ class TraceloopBackend(BaseBackend):
     as the Traceloop backend resolves the actual project from the API key.
     """
 
-    def __init__(self, url: str, api_key: str | None = None, timeout: float = 30.0):
+    def __init__(
+        self,
+        url: str,
+        api_key: str | None = None,
+        timeout: float = 30.0,
+        environments: list[str] | None = None,
+    ):
         """Initialize Traceloop backend.
 
         Args:
             url: Traceloop API base URL (e.g., https://api.traceloop.com)
             api_key: API key for authentication (required, contains project info)
             timeout: Request timeout in seconds
+            environments: List of environments to query (default: ["production"])
         """
         super().__init__(url, api_key, timeout)
 
@@ -36,6 +51,9 @@ class TraceloopBackend(BaseBackend):
 
         # Use "default" as project_id - Traceloop resolves actual project from API key
         self.project_id = "default"
+
+        # Store environments for all API requests
+        self.environments = environments if environments else ["production"]
 
     def _create_headers(self) -> dict[str, str]:
         """Create headers for Traceloop API requests.
@@ -48,8 +66,25 @@ class TraceloopBackend(BaseBackend):
             "Content-Type": "application/json",
         }
 
+    def get_supported_operators(self) -> set[FilterOperator]:
+        """Get natively supported operators via Traceloop API.
+
+        Traceloop supports basic comparison operators.
+
+        Returns:
+            Set of supported FilterOperator values
+        """
+        return {
+            FilterOperator.EQUALS,
+            FilterOperator.NOT_EQUALS,
+            FilterOperator.GT,
+            FilterOperator.LT,
+            FilterOperator.GTE,
+            FilterOperator.LTE,
+        }
+
     async def search_traces(self, query: TraceQuery) -> list[TraceData]:
-        """Search for traces using Traceloop API.
+        """Search for traces using Traceloop API with hybrid filtering.
 
         Uses the root-spans endpoint to get trace-level data with aggregated metrics.
 
@@ -64,87 +99,57 @@ class TraceloopBackend(BaseBackend):
         """
         logger.debug(f"Searching traces with query: {query}")
 
-        # Build filter array
-        filters = []
+        # Get all filters (legacy + explicit)
+        all_filters = query.get_all_filters()
 
-        # Service filter
-        if query.service_name:
-            filters.append(
-                {"field": "service.name", "operator": "equals", "value": query.service_name}
-            )
+        # Separate supported and unsupported filters by operator
+        supported_operators = self.get_supported_operators()
+        native_filters = [f for f in all_filters if f.operator in supported_operators]
+        client_filters = [f for f in all_filters if f.operator not in supported_operators]
 
-        # Operation/span name filter
-        if query.operation_name:
-            filters.append(
-                {"field": "span_name", "operator": "equals", "value": query.operation_name}
-            )
+        # Convert native filters to Traceloop format
+        # If a filter can't be converted (returns None), move it to client-side filtering
+        traceloop_filters = []
+        for native_filter in native_filters:
+            converted = self._filter_to_traceloop(native_filter)
+            if converted is not None:
+                traceloop_filters.append(converted)
+            else:
+                # Filter can't be sent to API, apply it client-side
+                client_filters.append(native_filter)
+                logger.debug(
+                    f"Filter for field '{native_filter.field}' not supported by API, "
+                    "will apply client-side"
+                )
 
-        # LLM provider filter (gen_ai.system)
-        if query.gen_ai_system:
-            filters.append(
-                {
-                    "field": "span_attributes.gen_ai.system",
-                    "operator": "equals",
-                    "value": query.gen_ai_system,
-                }
-            )
-
-        # Model filter (gen_ai.request.model)
-        if query.gen_ai_model:
-            filters.append(
-                {
-                    "field": "span_attributes.gen_ai.request.model",
-                    "operator": "equals",
-                    "value": query.gen_ai_model,
-                }
-            )
-
-        # Duration filter (convert seconds to milliseconds)
-        if query.min_duration_ms:
-            filters.append(
-                {
-                    "field": "duration",
-                    "operator": "greater_than",
-                    "value": str(query.min_duration_ms),
-                }
-            )
-        if query.max_duration_ms:
-            filters.append(
-                {
-                    "field": "duration",
-                    "operator": "less_than",
-                    "value": str(query.max_duration_ms),
-                }
-            )
-
-        # Error filter
-        if query.has_error:
-            filters.append({"field": "status_code", "operator": "equals", "value": "ERROR"})
-
-        # Additional tag filters
-        for key, value in query.tags.items():
-            filters.append(
-                {
-                    "field": f"{key}",
-                    "operator": "equals",
-                    "value": value,
-                }
+        if client_filters:
+            logger.info(
+                f"Will apply {len(client_filters)} filters client-side: "
+                f"{[(f.field, f.operator.value) for f in client_filters]}"
             )
 
         # Build request body
         body = {
-            "filters": filters,
+            "filters": traceloop_filters,
             "logical_operator": "and",
+            "environments": self.environments,
             "sort_by": "timestamp",
             "sort_order": "DESC",
+            "cursor": 0,
             "limit": query.limit,
         }
 
         # Add time range (convert to seconds for Traceloop API)
         if query.start_time:
             body["from_timestamp_sec"] = int(query.start_time.timestamp())
+        else:
+            # Default to last 24 hours if not specified
+            body["from_timestamp_sec"] = int((datetime.now() - timedelta(days=1)).timestamp())
+
         if query.end_time:
             body["to_timestamp_sec"] = int(query.end_time.timestamp())
+        else:
+            body["to_timestamp_sec"] = int(datetime.now().timestamp())
 
         # Make request
         endpoint = f"/v2/projects/{self.project_id}/traces/root-spans"
@@ -165,6 +170,10 @@ class TraceloopBackend(BaseBackend):
             trace = self._convert_root_span_to_trace(root_span)
             if trace:
                 traces.append(trace)
+
+        # Apply client-side filters
+        if client_filters:
+            traces = FilterEngine.apply_filters(traces, client_filters)
 
         return traces
 
@@ -207,6 +216,8 @@ class TraceloopBackend(BaseBackend):
         """List all services from Traceloop.
 
         Queries for unique service names from recent data (last 7 days).
+        Uses root-spans endpoint as a workaround since spans/attributes/values
+        endpoint may not be available on all Traceloop instances.
 
         Returns:
             List of service names
@@ -216,22 +227,36 @@ class TraceloopBackend(BaseBackend):
         """
         logger.debug("Listing services")
 
-        # Query recent data (last 7 days)
+        # Use root-spans endpoint to get recent traces
         body = {
-            "attribute_name": "service_name",
+            "filters": [],
+            "logical_operator": "and",
+            "environments": self.environments,
+            "sort_by": "timestamp",
+            "sort_order": "DESC",
+            "cursor": 0,
+            "limit": 1000,  # Get more traces to find all services
             "from_timestamp_sec": int((datetime.now() - timedelta(days=7)).timestamp()),
             "to_timestamp_sec": int(datetime.now().timestamp()),
         }
 
-        endpoint = f"/v2/projects/{self.project_id}/spans/attributes/values"
+        endpoint = f"/v2/projects/{self.project_id}/traces/root-spans"
         response = await self.client.post(endpoint, json=body)
         response.raise_for_status()
 
         data = response.json()
-        services_raw = data.get("values", [])
-        services: list[str] = [str(s) for s in services_raw]
+        root_spans_data = data.get("root_spans", {})
+        root_spans = root_spans_data.get("data", [])
 
-        logger.debug(f"Found {len(services)} services")
+        # Extract unique service names
+        services_set = set()
+        for root_span in root_spans:
+            service_name = root_span.get("service_name")
+            if service_name:
+                services_set.add(service_name)
+
+        services = sorted(list(services_set))
+        logger.debug(f"Found {len(services)} unique services from {len(root_spans)} traces")
         return services
 
     async def get_service_operations(self, service_name: str) -> list[str]:
@@ -298,6 +323,80 @@ class TraceloopBackend(BaseBackend):
                 project_id=self.project_id,
                 error=str(e),
             )
+
+    def _filter_to_traceloop(self, filter_obj: Filter) -> dict[str, Any] | None:
+        """Convert a Filter object to Traceloop API filter format.
+
+        Args:
+            filter_obj: Filter to convert
+
+        Returns:
+            Traceloop filter dict or None if not convertible
+        """
+        field = filter_obj.field
+        operator = filter_obj.operator
+        value = filter_obj.value
+
+        # Convert gen_ai.* to llm.* for Traceloop backend
+        # Traceloop uses legacy llm.* naming convention instead of gen_ai.*
+        if field.startswith("gen_ai."):
+            # Map gen_ai.system -> llm.vendor (special case)
+            if field == "gen_ai.system":
+                field = "llm.vendor"
+            else:
+                # General mapping: gen_ai.* -> llm.*
+                field = field.replace("gen_ai.", "llm.", 1)
+            logger.debug(f"Converted filter field to Traceloop format: {filter_obj.field} -> {field}")
+
+        # Map field names to Traceloop API fields
+        if field == "service.name":
+            traceloop_field = "service.name"
+        elif field == "name" or field == "operation_name":
+            traceloop_field = "span_name"
+        elif field == "duration":
+            traceloop_field = "duration"
+        elif field == "status":
+            # Status filtering is not supported by Traceloop API - filter client-side
+            logger.debug("Status filter not supported by Traceloop, will apply client-side")
+            return None
+        elif field.startswith("llm."):
+            # LLM attributes in Traceloop don't need span_attributes. prefix
+            traceloop_field = field
+        else:
+            # Assume it's a span attribute - prefix with span_attributes.
+            traceloop_field = f"span_attributes.{field}"
+
+        # Map operators to Traceloop format
+        operator_map = {
+            FilterOperator.EQUALS: "equals",
+            FilterOperator.NOT_EQUALS: "not_equals",
+            FilterOperator.GT: "greater_than",
+            FilterOperator.LT: "less_than",
+            FilterOperator.GTE: "greater_than_or_equal",
+            FilterOperator.LTE: "less_than_or_equal",
+        }
+
+        traceloop_operator = operator_map.get(operator)
+        if not traceloop_operator:
+            logger.warning(
+                f"Operator {operator} not supported by Traceloop, will filter client-side"
+            )
+            return None
+
+        # Map value_type to Traceloop format
+        value_type_map = {
+            FilterType.STRING: "string",
+            FilterType.NUMBER: "number",
+            FilterType.BOOLEAN: "boolean",
+        }
+        traceloop_value_type = value_type_map.get(filter_obj.value_type, "string")
+
+        return {
+            "field": traceloop_field,
+            "operator": traceloop_operator,
+            "value": str(value),
+            "value_type": traceloop_value_type,
+        }
 
     @staticmethod
     def _transform_llm_attributes_to_gen_ai(attrs: dict[str, Any]) -> dict[str, Any]:

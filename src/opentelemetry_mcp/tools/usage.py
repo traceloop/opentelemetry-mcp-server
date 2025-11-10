@@ -15,6 +15,8 @@ async def get_llm_usage(
     service_name: str | None = None,
     gen_ai_system: str | None = None,
     gen_ai_model: str | None = None,
+    gen_ai_request_model: str | None = None,
+    gen_ai_response_model: str | None = None,
     limit: int = 1000,
 ) -> str:
     """Get aggregated LLM usage metrics for a time period.
@@ -25,7 +27,9 @@ async def get_llm_usage(
         end_time: End time (ISO 8601 format)
         service_name: Filter by service name
         gen_ai_system: Filter by LLM provider (openai, anthropic, etc.)
-        gen_ai_model: Filter by LLM model name
+        gen_ai_model: DEPRECATED - Use gen_ai_request_model or gen_ai_response_model
+        gen_ai_request_model: Filter by requested model name
+        gen_ai_response_model: Filter by actual model used
         limit: Maximum number of traces to analyze (default: 1000)
 
     Returns:
@@ -47,13 +51,22 @@ async def get_llm_usage(
         except ValueError as e:
             return json.dumps({"error": f"Invalid end_time format: {e}"})
 
+    # Handle backward compatibility for gen_ai_model
+    final_request_model = gen_ai_request_model
+    final_response_model = gen_ai_response_model
+
+    if gen_ai_model and not gen_ai_request_model and not gen_ai_response_model:
+        # Legacy mode: use gen_ai_model for request_model
+        final_request_model = gen_ai_model
+
     # Build query to find LLM traces
     query = TraceQuery(
         service_name=service_name,
         start_time=start_dt,
         end_time=end_dt,
         gen_ai_system=gen_ai_system,
-        gen_ai_model=gen_ai_model,
+        gen_ai_request_model=final_request_model,
+        gen_ai_response_model=final_response_model,
         limit=limit,
     )
 

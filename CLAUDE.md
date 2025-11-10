@@ -8,8 +8,10 @@ Opentelemetry MCP Server (`opentelemetry-mcp`) is an MCP (Model Context Protocol
 
 **Key Features:**
 - Multi-backend support: Jaeger, Grafana Tempo, and Traceloop
-- 5 MCP tools: `search_traces`, `get_trace`, `get_llm_usage`, `list_services`, `find_errors`
+- 9 MCP tools: Core tools + LLM-oriented discovery and analysis tools
 - Token usage tracking and aggregation across models/services
+- Finish reasons tracking for debugging truncated/filtered responses
+- Enhanced token calculation supporting all `gen_ai.usage.*` attributes
 - Dual transport modes: stdio (Claude Desktop) and HTTP/SSE (network access)
 
 ## Development Commands
@@ -76,11 +78,19 @@ Concrete implementations:
 ### Tool-Based Architecture
 
 Each MCP capability is implemented as a separate tool module in [opentelemetry_mcp/tools/](opentelemetry_mcp/tools/):
+
+**Core Tools:**
 - [tools/search.py](opentelemetry_mcp/tools/search.py) - Search traces with filters
 - [tools/trace.py](opentelemetry_mcp/tools/trace.py) - Get detailed trace by ID
 - [tools/usage.py](opentelemetry_mcp/tools/usage.py) - Aggregate token usage metrics
 - [tools/services.py](opentelemetry_mcp/tools/services.py) - List available services
 - [tools/errors.py](opentelemetry_mcp/tools/errors.py) - Find traces with errors
+
+**LLM-Oriented Tools (Discovery & Analysis):**
+- [tools/list_models.py](opentelemetry_mcp/tools/list_models.py) - List all models in use with statistics
+- [tools/model_stats.py](opentelemetry_mcp/tools/model_stats.py) - Performance stats for a specific model
+- [tools/expensive_traces.py](opentelemetry_mcp/tools/expensive_traces.py) - Find highest token usage traces
+- [tools/slow_traces.py](opentelemetry_mcp/tools/slow_traces.py) - Find slowest LLM traces
 
 **Critical:** All tools MUST return JSON strings (not dicts). This is required by the MCP protocol.
 
@@ -163,6 +173,271 @@ Parse attributes using: `LLMSpanAttributes.from_span(span_data)`
 1. Create new module in [opentelemetry_mcp/tools/](opentelemetry_mcp/tools/)
 2. Implement tool function that takes backend and returns JSON string
 3. Register in [server.py](opentelemetry_mcp/server.py) using `@mcp.tool()`
+
+## LLM-Oriented Tools
+
+The server provides specialized tools optimized for LLM observability and cost optimization:
+
+### `list_llm_models` - Model Discovery
+Lists all LLM models being used with usage statistics.
+
+**Use Cases:**
+- Discover shadow AI usage (unauthorized models)
+- Track model adoption across services
+- Identify deprecated models still in use
+
+**Parameters:**
+- `start_time`, `end_time` - Time range filter
+- `service_name` - Filter by service
+- `gen_ai_system` - Filter by provider (openai, anthropic, etc.)
+- `limit` - Max traces to analyze (default: 1000)
+
+**Returns:** List of models with `request_count`, `first_seen`, `last_seen`
+
+**Example:** "What models is my production service using?"
+
+### `get_llm_model_stats` - Performance Analysis
+Get detailed performance statistics for a specific model including latency percentiles, token usage, error rates, and finish reason distributions.
+
+**Use Cases:**
+- Compare model performance (gpt-4 vs claude-3-opus)
+- Identify problematic models with high error rates
+- Analyze finish reasons to detect truncation issues
+
+**Parameters:**
+- `model_name` - Model to analyze (required)
+- `start_time`, `end_time` - Time range filter
+- `service_name` - Filter by service
+
+**Returns:**
+- Request/success/error counts and rates
+- Duration percentiles (mean, median, p50, p95, p99)
+- Token usage percentiles (prompt, completion, total)
+- Finish reasons breakdown
+
+**Example:** "How is gpt-4 performing this week?"
+
+### `get_llm_expensive_traces` - Cost Optimization
+Find traces with highest token usage for cost optimization.
+
+**Use Cases:**
+- Identify inefficient prompts consuming excessive tokens
+- Find runaway requests with huge context windows
+- Prioritize optimization efforts on high-cost operations
+
+**Parameters:**
+- `limit` - Number of traces to return (default: 10)
+- `start_time`, `end_time` - Time range filter
+- `min_tokens` - Minimum token threshold
+- `service_name`, `gen_ai_model` - Filters
+
+**Returns:** Top N traces sorted by total tokens with breakdown (prompt/completion/total)
+
+**Example:** "Show me the 10 most expensive requests today"
+
+### `get_llm_slow_traces` - Performance Optimization
+Find slowest LLM traces by duration to identify latency bottlenecks.
+
+**Use Cases:**
+- Identify slow operations affecting user experience
+- Debug timeout issues
+- Optimize critical path operations
+
+**Parameters:**
+- `limit` - Number of traces to return (default: 10)
+- `start_time`, `end_time` - Time range filter
+- `min_duration_ms` - Minimum duration threshold
+- `service_name`, `gen_ai_model` - Filters
+
+**Returns:** Top N traces sorted by duration with token counts and model info
+
+**Example:** "What are the slowest LLM calls in the last hour?"
+
+## Enhanced Token Calculation
+
+The server uses an intelligent token calculation strategy that searches for ALL `gen_ai.usage.*` attributes:
+
+1. **Primary:** Use explicit `gen_ai.usage.total_tokens` if present
+2. **Fallback 1:** Sum all numeric `gen_ai.usage.*` attributes found
+3. **Fallback 2:** Calculate as `prompt_tokens + completion_tokens`
+
+This ensures compatibility with custom token metrics beyond standard prompt/completion/total (e.g., `gen_ai.usage.cached_tokens`, `gen_ai.usage.reasoning_tokens`).
+
+## Finish Reasons Support
+
+The `gen_ai.response.finish_reasons` attribute is now fully supported for debugging:
+
+**Common Finish Reasons:**
+- `stop` - Normal completion
+- `length` - Hit max_tokens limit (response truncated)
+- `content_filter` - Content policy violation
+- `tool_calls` / `function_call` - Model requested tool/function execution
+
+**Use Cases:**
+- Identify truncated responses: Filter for `finish_reason = "length"`
+- Debug content filter issues: Find traces with `finish_reason = "content_filter"`
+- Analyze tool usage: Count `finish_reason = "tool_calls"`
+
+**Supported in:**
+- `get_llm_model_stats` - Finish reason distribution breakdown
+- Parsed in `LLMSpanAttributes` for all LLM spans
+
+## Generic Filter System
+
+The `search_traces` tool supports a powerful generic filter system in addition to legacy simple parameters.
+
+### Filter Structure
+
+Each filter is an object with:
+- **field**: Field name in dotted notation (e.g., `"gen_ai.usage.prompt_tokens"`)
+- **operator**: Comparison operator (see below)
+- **value**: Single value for most operators
+- **values**: List of values for `in`, `not_in`, `between` operators
+- **value_type**: Type of value(s) - `"string"`, `"number"`, or `"boolean"`
+
+### Supported Operators
+
+**String Operators:**
+- `equals`, `not_equals` - Exact string match/mismatch
+- `contains`, `not_contains` - Substring match/mismatch
+- `starts_with`, `ends_with` - Prefix/suffix match
+- `in`, `not_in` - Match against list of values
+
+**Number Operators:**
+- `equals`, `not_equals` - Exact numeric match/mismatch
+- `gt`, `lt`, `gte`, `lte` - Greater than, less than, greater/less or equal
+- `between` - Range check (requires 2 values)
+- `in`, `not_in` - Match against list of values
+
+**Boolean Operators:**
+- `equals`, `not_equals` - Boolean match/mismatch
+
+**Existence Operators:**
+- `exists`, `not_exists` - Check if attribute exists (no value needed)
+
+### Filter Examples
+
+**Find expensive traces (>5000 tokens):**
+```json
+{
+  "field": "gen_ai.usage.total_tokens",
+  "operator": "gt",
+  "value": 5000,
+  "value_type": "number"
+}
+```
+
+**Filter by multiple models:**
+```json
+{
+  "field": "gen_ai.request.model",
+  "operator": "in",
+  "values": ["gpt-4", "gpt-4-turbo", "claude-3-opus"],
+  "value_type": "string"
+}
+```
+
+**Find traces with temperature between 0.7 and 1.0:**
+```json
+{
+  "field": "gen_ai.request.temperature",
+  "operator": "between",
+  "values": [0.7, 1.0],
+  "value_type": "number"
+}
+```
+
+**Find streaming requests:**
+```json
+{
+  "field": "gen_ai.request.is_streaming",
+  "operator": "equals",
+  "value": true,
+  "value_type": "boolean"
+}
+```
+
+**Check if attribute exists:**
+```json
+{
+  "field": "gen_ai.request.temperature",
+  "operator": "exists",
+  "value_type": "number"
+}
+```
+
+**Filter by service name containing "prod":**
+```json
+{
+  "field": "service.name",
+  "operator": "contains",
+  "value": "prod",
+  "value_type": "string"
+}
+```
+
+### Hybrid Filtering
+
+The server uses a hybrid filtering strategy:
+
+1. **Native Filtering**: Filters are pushed to the backend when supported
+2. **Client-Side Filtering**: Unsupported filters are applied after fetching
+
+**Backend Support:**
+
+| Backend | Supported Operators |
+|---------|---------------------|
+| **Tempo (TraceQL)** | equals, not_equals, gt, lt, gte, lte, contains (regex), in (OR logic), exists, not_exists |
+| **Traceloop** | equals, not_equals, gt, lt, gte, lte |
+| **Jaeger** | equals (via tags only) |
+
+### Combining Filters
+
+Multiple filters are combined with AND logic. Examples:
+
+**Find expensive OpenAI traces:**
+```json
+{
+  "filters": [
+    {
+      "field": "gen_ai.system",
+      "operator": "equals",
+      "value": "openai",
+      "value_type": "string"
+    },
+    {
+      "field": "gen_ai.usage.total_tokens",
+      "operator": "gt",
+      "value": 5000,
+      "value_type": "number"
+    }
+  ]
+}
+```
+
+**Find errors in production:**
+```json
+{
+  "filters": [
+    {
+      "field": "service.name",
+      "operator": "contains",
+      "value": "prod",
+      "value_type": "string"
+    },
+    {
+      "field": "status",
+      "operator": "equals",
+      "value": "ERROR",
+      "value_type": "string"
+    }
+  ]
+}
+```
+
+### Backward Compatibility
+
+Legacy simple parameters (service_name, gen_ai_model, etc.) still work and are automatically converted to filters internally. You can mix legacy parameters with explicit filters.
 
 ## Testing
 
