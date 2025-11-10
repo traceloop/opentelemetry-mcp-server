@@ -46,7 +46,7 @@ def test_build_filters_for_search() -> None:
         service_name="my-service",
         operation_name="my-operation",
         gen_ai_system="openai",
-        gen_ai_model="gpt-4",
+        gen_ai_request_model="gpt-4",
         min_duration_ms=1000,
         max_duration_ms=5000,
         has_error=True,
@@ -74,12 +74,12 @@ def test_build_filters_for_search() -> None:
             }
         )
 
-    if query.gen_ai_model:
+    if query.gen_ai_request_model:
         filters.append(
             {
                 "field": "span_attributes.gen_ai.request.model",
                 "operator": "equals",
-                "value": query.gen_ai_model,
+                "value": query.gen_ai_request_model,
             }
         )
 
