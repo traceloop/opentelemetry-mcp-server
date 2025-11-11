@@ -14,6 +14,7 @@ from opentelemetry_mcp.models import (
     FilterOperator,
     FilterType,
     SpanData,
+    SpanQuery,
     TraceData,
     TraceQuery,
 )
@@ -176,6 +177,108 @@ class TraceloopBackend(BaseBackend):
             traces = FilterEngine.apply_filters(traces, client_filters)
 
         return traces
+
+    async def search_spans(self, query: SpanQuery) -> list[SpanData]:
+        """Search for individual spans using Traceloop API.
+
+        Traceloop doesn't have a dedicated spans search API, so we search for traces
+        and then flatten to get individual spans matching the query.
+
+        Args:
+            query: Span query parameters
+
+        Returns:
+            List of matching spans (flattened from traces)
+
+        Raises:
+            httpx.HTTPError: If the API request fails
+        """
+        logger.debug(f"Searching spans with query: {query}")
+
+        # Get all filters (legacy + explicit)
+        all_filters = query.get_all_filters()
+
+        # Separate supported and unsupported filters by operator
+        supported_operators = self.get_supported_operators()
+        native_filters = [f for f in all_filters if f.operator in supported_operators]
+        client_filters = [f for f in all_filters if f.operator not in supported_operators]
+
+        # Convert native filters to Traceloop format
+        traceloop_filters = []
+        for native_filter in native_filters:
+            converted = self._filter_to_traceloop(native_filter)
+            if converted is not None:
+                traceloop_filters.append(converted)
+            else:
+                # Filter can't be sent to API, apply it client-side
+                client_filters.append(native_filter)
+                logger.debug(
+                    f"Filter for field '{native_filter.field}' not supported by API, "
+                    "will apply client-side"
+                )
+
+        if client_filters:
+            logger.info(
+                f"Will apply {len(client_filters)} span filters client-side: "
+                f"{[(f.field, f.operator.value) for f in client_filters]}"
+            )
+
+        # Build request body - fetch more traces to get enough spans
+        body = {
+            "filters": traceloop_filters,
+            "logical_operator": "and",
+            "environments": self.environments,
+            "sort_by": "timestamp",
+            "sort_order": "DESC",
+            "cursor": 0,
+            "limit": query.limit * 2,  # Fetch more traces to ensure we get enough spans
+        }
+
+        # Add time range (convert to seconds for Traceloop API)
+        if query.start_time:
+            body["from_timestamp_sec"] = int(query.start_time.timestamp())
+        else:
+            # Default to last 24 hours if not specified
+            body["from_timestamp_sec"] = int((datetime.now() - timedelta(days=1)).timestamp())
+
+        if query.end_time:
+            body["to_timestamp_sec"] = int(query.end_time.timestamp())
+        else:
+            body["to_timestamp_sec"] = int(datetime.now().timestamp())
+
+        # Make request to root-spans endpoint
+        endpoint = f"/v2/projects/{self.project_id}/traces/root-spans"
+        logger.debug(f"POST {endpoint} with body: {body}")
+
+        response = await self.client.post(endpoint, json=body)
+        response.raise_for_status()
+
+        data = response.json()
+        root_spans_data = data.get("root_spans", {})
+        root_spans = root_spans_data.get("data", [])
+
+        logger.debug(f"Found {len(root_spans)} root spans")
+
+        # Collect all spans from all traces
+        all_spans: list[SpanData] = []
+        for root_span in root_spans:
+            # Get all spans for this trace (including root)
+            trace_id = root_span.get("trace_id")
+            if trace_id:
+                try:
+                    # Fetch full trace to get all spans
+                    trace = await self.get_trace(trace_id)
+                    if trace:
+                        all_spans.extend(trace.spans)
+                except Exception as e:
+                    logger.warning(f"Failed to fetch spans for trace {trace_id}: {e}")
+
+        # Apply client-side filters to spans
+        if client_filters:
+            all_spans = FilterEngine.apply_filters(all_spans, client_filters)
+
+        # Limit the number of spans returned
+        return all_spans[: query.limit]
 
     async def get_trace(self, trace_id: str) -> TraceData:
         """Get a specific trace by ID from Traceloop.
@@ -346,7 +449,9 @@ class TraceloopBackend(BaseBackend):
             else:
                 # General mapping: gen_ai.* -> llm.*
                 field = field.replace("gen_ai.", "llm.", 1)
-            logger.debug(f"Converted filter field to Traceloop format: {filter_obj.field} -> {field}")
+            logger.debug(
+                f"Converted filter field to Traceloop format: {filter_obj.field} -> {field}"
+            )
 
         # Map field names to Traceloop API fields
         if field == "service.name":
@@ -359,6 +464,10 @@ class TraceloopBackend(BaseBackend):
             # Status filtering is not supported by Traceloop API - filter client-side
             logger.debug("Status filter not supported by Traceloop, will apply client-side")
             return None
+        elif field.startswith("traceloop."):
+            # Traceloop-specific attributes (like traceloop.span.kind) are supported directly
+            # without span_attributes. prefix
+            traceloop_field = field
         elif field.startswith("llm."):
             # LLM attributes in Traceloop don't need span_attributes. prefix
             traceloop_field = field

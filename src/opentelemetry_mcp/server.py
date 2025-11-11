@@ -15,9 +15,11 @@ from opentelemetry_mcp.config import ServerConfig
 from opentelemetry_mcp.tools import (
     errors,
     expensive_traces,
+    list_llm_tools,
     list_models,
     model_stats,
     search,
+    search_spans,
     services,
     slow_traces,
     trace,
@@ -475,6 +477,117 @@ async def get_llm_slow_traces(
         return result
     except Exception as e:
         logger.error(f"Error executing get_llm_slow_traces: {e}", exc_info=True)
+        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+
+
+@mcp.tool()
+async def search_spans_tool(
+    service_name: str | None = None,
+    operation_name: str | None = None,
+    start_time: str | None = None,
+    end_time: str | None = None,
+    min_duration_ms: int | None = None,
+    max_duration_ms: int | None = None,
+    gen_ai_system: str | None = None,
+    gen_ai_request_model: str | None = None,
+    gen_ai_response_model: str | None = None,
+    has_error: bool | None = None,
+    tags: dict[str, str] | None = None,
+    filters: list[dict[str, Any]] | None = None,
+    limit: int = 100,
+) -> str:
+    """Search for individual OpenTelemetry spans with optional filters.
+
+    Unlike search_traces, this returns individual spans rather than grouped traces,
+    which is useful for analyzing specific operations or finding spans with certain
+    characteristics (e.g., LLM tool calls with traceloop.span.kind == tool).
+
+    Args:
+        service_name: Filter by service name
+        operation_name: Filter by operation/span name
+        start_time: Start time in ISO 8601 format (e.g., 2024-01-01T00:00:00Z)
+        end_time: End time in ISO 8601 format
+        min_duration_ms: Minimum span duration in milliseconds
+        max_duration_ms: Maximum span duration in milliseconds
+        gen_ai_system: Filter by LLM provider (e.g., openai, anthropic)
+        gen_ai_request_model: Filter by requested model name (e.g., "gpt-4")
+        gen_ai_response_model: Filter by actual model used (e.g., "gpt-4-0613")
+        has_error: Filter spans with errors
+        tags: Additional tag filters as key-value pairs
+        filters: Generic filter conditions - list of filter objects with:
+            - field: Field name in dotted notation (e.g., "traceloop.span.kind")
+            - operator: Comparison operator
+            - value: Single value for most operators
+            - values: List of values for "in", "not_in", "between" operators
+            - value_type: Type of value(s) - "string", "number", or "boolean"
+        limit: Maximum number of spans to return (1-1000, default: 100)
+
+    Returns:
+        JSON string with span summaries
+
+    Example filter to find LLM tool calls:
+        {"field": "traceloop.span.kind", "operator": "equals", "value": "tool", "value_type": "string"}
+    """
+    try:
+        backend = await _get_backend()
+        result = await search_spans.search_spans(
+            backend,
+            service_name=service_name,
+            operation_name=operation_name,
+            start_time=start_time,
+            end_time=end_time,
+            min_duration_ms=min_duration_ms,
+            max_duration_ms=max_duration_ms,
+            gen_ai_system=gen_ai_system,
+            gen_ai_request_model=gen_ai_request_model,
+            gen_ai_response_model=gen_ai_response_model,
+            has_error=has_error,
+            tags=tags,
+            filters=filters,
+            limit=limit,
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error executing search_spans: {e}", exc_info=True)
+        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+
+
+@mcp.tool()
+async def list_llm_tools_tool(
+    start_time: str | None = None,
+    end_time: str | None = None,
+    service_name: str | None = None,
+    gen_ai_system: str | None = None,
+    limit: int = 1000,
+) -> str:
+    """List all LLM tools being used by identifying traceloop.span.kind == tool.
+
+    Discovers which tools/functions LLM applications are calling, grouped by tool name
+    with usage statistics.
+
+    Args:
+        start_time: Start time in ISO 8601 format (e.g., 2024-01-01T00:00:00Z)
+        end_time: End time in ISO 8601 format
+        service_name: Filter by service name
+        gen_ai_system: Filter by LLM provider (openai, anthropic, etc.)
+        limit: Maximum spans to analyze (default: 1000)
+
+    Returns:
+        JSON string with list of tools and their statistics (usage count, services, first/last seen)
+    """
+    try:
+        backend = await _get_backend()
+        result = await list_llm_tools.list_llm_tools(
+            backend,
+            start_time=start_time,
+            end_time=end_time,
+            service_name=service_name,
+            gen_ai_system=gen_ai_system,
+            limit=limit,
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error executing list_llm_tools: {e}", exc_info=True)
         return f'{{"error": "Tool execution failed: {str(e)}"}}'
 
 

@@ -6,7 +6,7 @@ from typing import Any
 import httpx
 
 from opentelemetry_mcp.attributes import HealthCheckResponse
-from opentelemetry_mcp.models import FilterOperator, TraceData, TraceQuery
+from opentelemetry_mcp.models import FilterOperator, SpanData, SpanQuery, TraceData, TraceQuery
 
 
 class BaseBackend(ABC):
@@ -70,6 +70,21 @@ class BaseBackend(ABC):
 
         Returns:
             List of matching traces with all spans
+
+        Raises:
+            Exception: If the backend query fails
+        """
+        pass
+
+    @abstractmethod
+    async def search_spans(self, query: SpanQuery) -> list[SpanData]:
+        """Search for individual spans matching the given query.
+
+        Args:
+            query: Span query parameters
+
+        Returns:
+            List of matching spans (not grouped by trace)
 
         Raises:
             Exception: If the backend query fails

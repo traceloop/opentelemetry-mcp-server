@@ -1,72 +1,91 @@
-"""Client-side filter engine for post-query filtering of traces."""
+"""Client-side filter engine for post-query filtering of traces and spans."""
 
 import logging
-from typing import Any
+from typing import Any, TypeVar, overload
 
-from opentelemetry_mcp.models import Filter, FilterOperator, FilterType, TraceData
+from opentelemetry_mcp.models import Filter, FilterOperator, FilterType, SpanData, TraceData
 
 logger = logging.getLogger(__name__)
 
+T = TypeVar("T", TraceData, SpanData)
+
 
 class FilterEngine:
-    """Client-side filter engine for applying filters to traces."""
+    """Client-side filter engine for applying filters to traces and spans."""
+
+    @overload
+    @staticmethod
+    def apply_filters(items: list[TraceData], filters: list[Filter]) -> list[TraceData]: ...
+
+    @overload
+    @staticmethod
+    def apply_filters(items: list[SpanData], filters: list[Filter]) -> list[SpanData]: ...
 
     @staticmethod
-    def apply_filters(traces: list[TraceData], filters: list[Filter]) -> list[TraceData]:
-        """Apply all filters to traces and return matching traces.
+    def apply_filters(
+        items: list[TraceData] | list[SpanData], filters: list[Filter]
+    ) -> list[TraceData] | list[SpanData]:
+        """Apply all filters to traces or spans and return matching items.
 
         Args:
-            traces: List of traces to filter
+            items: List of traces or spans to filter
             filters: List of Filter conditions (combined with AND logic)
 
         Returns:
-            Filtered list of traces matching all conditions
+            Filtered list of items matching all conditions
         """
         if not filters:
-            return traces
+            return items
 
-        filtered_traces = []
-        for trace in traces:
-            if FilterEngine._matches_all_filters(trace, filters):
-                filtered_traces.append(trace)
+        filtered_items: list[TraceData] | list[SpanData]
+        if isinstance(items[0] if items else None, TraceData):
+            filtered_items = []
+            for item in items:
+                if FilterEngine._matches_all_filters(item, filters):
+                    filtered_items.append(item)  # type: ignore[arg-type]
+        else:
+            filtered_items = []
+            for item in items:
+                if FilterEngine._matches_all_filters(item, filters):
+                    filtered_items.append(item)  # type: ignore[arg-type]
 
         logger.debug(
-            f"Client-side filtering: {len(traces)} traces -> {len(filtered_traces)} after applying {len(filters)} filters"
+            f"Client-side filtering: {len(items)} items -> {len(filtered_items)} after applying {len(filters)} filters"
         )
-        return filtered_traces
+        return filtered_items
 
     @staticmethod
-    def _matches_all_filters(trace: TraceData, filters: list[Filter]) -> bool:
-        """Check if a trace matches all filters (AND logic).
+    def _matches_all_filters(item: TraceData | SpanData, filters: list[Filter]) -> bool:
+        """Check if an item (trace or span) matches all filters (AND logic).
 
         Args:
-            trace: Trace to check
+            item: Trace or span to check
             filters: List of filters to apply
 
         Returns:
-            True if trace matches all filters
+            True if item matches all filters
         """
         for filter_obj in filters:
-            if not FilterEngine._matches_filter(trace, filter_obj):
+            if not FilterEngine._matches_filter(item, filter_obj):
                 return False
         return True
 
     @staticmethod
-    def _matches_filter(trace: TraceData, filter_obj: Filter) -> bool:
-        """Check if a trace matches a single filter.
+    def _matches_filter(item: TraceData | SpanData, filter_obj: Filter) -> bool:
+        """Check if an item (trace or span) matches a single filter.
 
         Args:
-            trace: Trace to check
+            item: Trace or span to check
             filter_obj: Filter to apply
 
         Returns:
-            True if trace matches the filter
+            True if item matches the filter
         """
         field = filter_obj.field
         operator = filter_obj.operator
 
-        # Get values from trace (may check multiple spans)
-        values = FilterEngine._get_field_values(trace, field)
+        # Get values from item (may check multiple spans for traces, single span for spans)
+        values = FilterEngine._get_field_values(item, field)
 
         # Handle existence operators
         if operator == FilterOperator.EXISTS:
@@ -82,20 +101,28 @@ class FilterEngine:
         return False
 
     @staticmethod
-    def _get_field_values(trace: TraceData, field: str) -> list[Any]:
-        """Extract values for a field from trace and its spans.
+    def _get_field_values(item: TraceData | SpanData, field: str) -> list[Any]:
+        """Extract values for a field from trace/span.
 
-        Supports both trace-level fields (duration, status, etc.) and
-        span-level fields (gen_ai.system, span attributes, etc.).
+        For TraceData: Supports both trace-level fields and span-level fields (checks all spans).
+        For SpanData: Extracts field directly from the span.
 
         Args:
-            trace: Trace to extract from
+            item: Trace or span to extract from
             field: Field name in dotted notation
 
         Returns:
-            List of values found (may be empty, or contain multiple values from different spans)
+            List of values found (may be empty, or contain multiple values from trace spans)
         """
         values: list[Any] = []
+
+        # Handle SpanData
+        if isinstance(item, SpanData):
+            span_values = FilterEngine._get_span_field_values(item, field)
+            return [v for v in span_values if v is not None]
+
+        # Handle TraceData
+        trace = item
 
         # Check trace-level fields first
         if field == "trace_id":

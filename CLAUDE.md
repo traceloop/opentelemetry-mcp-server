@@ -59,7 +59,9 @@ All trace storage backends implement the `BaseBackend` abstract interface in [op
 ```python
 class BaseBackend(ABC):
     @abstractmethod
-    async def search_traces(self, query: TraceQuery) -> list[TraceSummary]: ...
+    async def search_traces(self, query: TraceQuery) -> list[TraceData]: ...
+    @abstractmethod
+    async def search_spans(self, query: SpanQuery) -> list[SpanData]: ...
     @abstractmethod
     async def get_trace(self, trace_id: str) -> TraceData: ...
     @abstractmethod
@@ -81,6 +83,7 @@ Each MCP capability is implemented as a separate tool module in [opentelemetry_m
 
 **Core Tools:**
 - [tools/search.py](opentelemetry_mcp/tools/search.py) - Search traces with filters
+- [tools/search_spans.py](opentelemetry_mcp/tools/search_spans.py) - Search individual spans with filters
 - [tools/trace.py](opentelemetry_mcp/tools/trace.py) - Get detailed trace by ID
 - [tools/usage.py](opentelemetry_mcp/tools/usage.py) - Aggregate token usage metrics
 - [tools/services.py](opentelemetry_mcp/tools/services.py) - List available services
@@ -91,6 +94,7 @@ Each MCP capability is implemented as a separate tool module in [opentelemetry_m
 - [tools/model_stats.py](opentelemetry_mcp/tools/model_stats.py) - Performance stats for a specific model
 - [tools/expensive_traces.py](opentelemetry_mcp/tools/expensive_traces.py) - Find highest token usage traces
 - [tools/slow_traces.py](opentelemetry_mcp/tools/slow_traces.py) - Find slowest LLM traces
+- [tools/list_llm_tools.py](opentelemetry_mcp/tools/list_llm_tools.py) - List LLM tools used (via traceloop.span.kind == tool)
 
 **Critical:** All tools MUST return JSON strings (not dicts). This is required by the MCP protocol.
 
@@ -385,11 +389,11 @@ The server uses a hybrid filtering strategy:
 
 **Backend Support:**
 
-| Backend | Supported Operators |
-|---------|---------------------|
-| **Tempo (TraceQL)** | equals, not_equals, gt, lt, gte, lte, contains (regex), in (OR logic), exists, not_exists |
-| **Traceloop** | equals, not_equals, gt, lt, gte, lte |
-| **Jaeger** | equals (via tags only) |
+| Backend | Supported Operators | Notes |
+|---------|---------------------|-------|
+| **Tempo (TraceQL)** | equals, not_equals, gt, lt, gte, lte, contains (regex), in (OR logic), exists, not_exists | - |
+| **Traceloop** | equals, not_equals, gt, lt, gte, lte | - |
+| **Jaeger** | equals (via tags only) | **Requires service_name parameter** |
 
 ### Combining Filters
 
@@ -438,6 +442,126 @@ Multiple filters are combined with AND logic. Examples:
 ### Backward Compatibility
 
 Legacy simple parameters (service_name, gen_ai_model, etc.) still work and are automatically converted to filters internally. You can mix legacy parameters with explicit filters.
+
+### Backend-Specific Requirements
+
+**Jaeger Backend - service_name Required:**
+
+The Jaeger backend requires the `service_name` parameter for both `search_traces` and `search_spans` operations. This is because:
+- Jaeger's API is optimized for per-service queries
+- Querying all services would be very expensive (especially for spans)
+- Users can easily discover services first using `list_services()`
+
+**Example workflow:**
+```python
+# 1. First, list available services
+services = list_services()
+
+# 2. Then query a specific service
+traces = search_traces(service_name="my-service")
+spans = search_spans(service_name="my-service")
+```
+
+**Error message if service_name is missing:**
+```
+ValueError: Jaeger backend requires 'service_name' parameter.
+Use list_services() to see available services, then specify one with service_name parameter.
+```
+
+**Other backends (Tempo, Traceloop):** service_name is optional - they support querying across all services.
+
+## Span Search and LLM Tools Discovery
+
+### `search_spans` - Individual Span Search
+
+Unlike `search_traces` which returns grouped traces, `search_spans` returns individual spans. This is useful for analyzing specific operations or finding spans with certain characteristics.
+
+**Key Features:**
+- Search for individual spans across all traces
+- Apply filters to span-level attributes
+- Useful for finding specific LLM operations (e.g., tool calls, specific model usage)
+
+**Use Cases:**
+- Find all LLM tool calls: Filter by `traceloop.span.kind == tool`
+- Find all spans using a specific model
+- Identify spans with specific attributes or errors
+- Analyze individual operation performance
+
+**Example - Find LLM tool calls:**
+```python
+{
+  "filters": [
+    {
+      "field": "traceloop.span.kind",
+      "operator": "equals",
+      "value": "tool",
+      "value_type": "string"
+    }
+  ],
+  "limit": 100
+}
+```
+
+**Returns:** List of `SpanSummary` objects containing:
+- `trace_id`, `span_id`, `parent_span_id`
+- `operation_name`, `service_name`
+- `start_time`, `duration_ms`, `status`
+- `is_llm_span`, `gen_ai_system`, `gen_ai_model`
+- `total_tokens` (for LLM spans)
+
+### `list_llm_tools` - Discover LLM Tool Usage
+
+Automatically discovers which tools/functions LLM applications are calling by identifying spans with `traceloop.span.kind == tool`.
+
+**Key Features:**
+- Groups tool calls by tool name
+- Shows usage statistics per tool
+- Tracks which services use each tool
+- Provides first/last seen timestamps
+
+**Use Cases:**
+- Discover what tools your LLM agents are using
+- Track tool adoption across services
+- Identify most/least used tools
+- Monitor tool usage patterns over time
+
+**Parameters:**
+- `start_time`, `end_time` - Time range filter
+- `service_name` - Filter by service
+- `gen_ai_system` - Filter by LLM provider
+- `limit` - Max spans to analyze (default: 1000)
+
+**Returns:** List of tools with:
+- `tool_name` - Name of the tool/function
+- `usage_count` - Number of times called
+- `services` - List of services using this tool
+- `first_seen`, `last_seen` - Time range of usage
+
+**Example Query:** "What tools is my production service using?"
+
+**Example Response:**
+```json
+{
+  "count": 5,
+  "total_calls": 127,
+  "tools": [
+    {
+      "tool_name": "search_database",
+      "usage_count": 45,
+      "services": ["chatbot-service", "qa-service"],
+      "first_seen": "2024-01-01T10:00:00Z",
+      "last_seen": "2024-01-02T15:30:00Z"
+    },
+    {
+      "tool_name": "web_search",
+      "usage_count": 38,
+      "services": ["research-agent"],
+      "first_seen": "2024-01-01T09:00:00Z",
+      "last_seen": "2024-01-02T16:00:00Z"
+    }
+  ]
+}
+```
 
 ## Testing
 

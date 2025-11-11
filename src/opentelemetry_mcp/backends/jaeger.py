@@ -7,7 +7,7 @@ from typing import Any
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.backends.filter_engine import FilterEngine
-from opentelemetry_mcp.models import FilterOperator, SpanData, TraceData, TraceQuery
+from opentelemetry_mcp.models import FilterOperator, SpanData, SpanQuery, TraceData, TraceQuery
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +49,16 @@ class JaegerBackend(BaseBackend):
             List of matching traces
 
         Raises:
+            ValueError: If service_name is not provided
             httpx.HTTPError: If API request fails
         """
+        # Validate service_name is provided
+        if not query.service_name:
+            raise ValueError(
+                "Jaeger backend requires 'service_name' parameter. "
+                "Use list_services() to see available services, then specify one with service_name parameter."
+            )
+
         # Get all filters (legacy + explicit)
         all_filters = query.get_all_filters()
 
@@ -70,49 +78,6 @@ class JaegerBackend(BaseBackend):
                 f"Will apply {len(client_filters)} filters client-side: "
                 f"{[(f.field, f.operator.value) for f in client_filters]}"
             )
-
-        # Check if service filter is present in native filters
-        service_filters = [f for f in native_filters if f.field == "service.name"]
-
-        if not service_filters:
-            # No service specified, query all services
-            logger.debug("No service specified, querying all services")
-            services_response = await self.client.get("/api/services")
-            services_response.raise_for_status()
-            services = services_response.json().get("data", [])
-
-            all_traces = []
-            for service in services:
-                # Create a new query with the service name filter added
-                service_query = TraceQuery(
-                    service_name=service,
-                    operation_name=query.operation_name,
-                    start_time=query.start_time,
-                    end_time=query.end_time,
-                    min_duration_ms=query.min_duration_ms,
-                    max_duration_ms=query.max_duration_ms,
-                    tags=query.tags,
-                    limit=query.limit,
-                    has_error=query.has_error,
-                    gen_ai_system=query.gen_ai_system,
-                    gen_ai_request_model=query.gen_ai_request_model,
-                    gen_ai_response_model=query.gen_ai_response_model,
-                    filters=query.filters,
-                )
-
-                # Query this service
-                try:
-                    service_traces = await self._search_service_traces_with_filters(
-                        service_query, native_filters, client_filters
-                    )
-                    all_traces.extend(service_traces)
-                except Exception as e:
-                    logger.warning(f"Failed to query service {service}: {e}")
-                    continue
-
-            # Sort by start time and limit
-            all_traces.sort(key=lambda t: t.start_time, reverse=True)
-            return all_traces[: query.limit]
 
         # Single service query
         return await self._search_service_traces_with_filters(query, native_filters, client_filters)
@@ -154,6 +119,85 @@ class JaegerBackend(BaseBackend):
             traces = FilterEngine.apply_filters(traces, client_filters)
 
         return traces
+
+    async def search_spans(self, query: SpanQuery) -> list[SpanData]:
+        """Search for individual spans using Jaeger Query API.
+
+        Jaeger doesn't have a dedicated spans API, so we search for traces
+        and then flatten to get individual spans matching the query.
+
+        Args:
+            query: Span query parameters
+
+        Returns:
+            List of matching spans (flattened from traces)
+
+        Raises:
+            ValueError: If service_name is not provided
+            httpx.HTTPError: If API request fails
+        """
+        # Validate service_name is provided
+        if not query.service_name:
+            raise ValueError(
+                "Jaeger backend requires 'service_name' parameter. "
+                "Use list_services() to see available services, then specify one with service_name parameter."
+            )
+
+        # Get all filters (legacy + explicit)
+        all_filters = query.get_all_filters()
+
+        # Jaeger only supports service filtering via API
+        supported_fields = {"service.name"}
+
+        native_filters = [
+            f
+            for f in all_filters
+            if f.field in supported_fields and f.operator == FilterOperator.EQUALS
+        ]
+        client_filters = [f for f in all_filters if f not in native_filters]
+
+        if client_filters:
+            logger.info(
+                f"Will apply {len(client_filters)} span filters client-side: "
+                f"{[(f.field, f.operator.value) for f in client_filters]}"
+            )
+
+        # Convert SpanQuery to TraceQuery for Jaeger API
+        # We'll fetch more traces than needed and filter spans
+        trace_query = TraceQuery(
+            service_name=query.service_name,
+            operation_name=query.operation_name,
+            start_time=query.start_time,
+            end_time=query.end_time,
+            min_duration_ms=query.min_duration_ms,
+            max_duration_ms=query.max_duration_ms,
+            tags=query.tags,
+            limit=query.limit * 2,  # Fetch more traces to ensure we get enough spans
+            has_error=query.has_error,
+            gen_ai_system=query.gen_ai_system,
+            gen_ai_request_model=query.gen_ai_request_model,
+            gen_ai_response_model=query.gen_ai_response_model,
+            filters=query.filters,
+        )
+
+        # Search traces
+        traces = await self._search_service_traces_with_filters(
+            trace_query,
+            native_filters,
+            [],  # Don't apply client filters at trace level
+        )
+
+        # Flatten spans from all traces
+        all_spans: list[SpanData] = []
+        for trace in traces:
+            all_spans.extend(trace.spans)
+
+        # Apply client-side filters to spans
+        if client_filters:
+            all_spans = FilterEngine.apply_filters(all_spans, client_filters)
+
+        # Limit the number of spans returned
+        return all_spans[: query.limit]
 
     async def get_trace(self, trace_id: str) -> TraceData:
         """Get a specific trace by ID from Jaeger.

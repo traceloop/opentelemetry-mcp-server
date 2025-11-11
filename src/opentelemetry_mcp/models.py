@@ -533,3 +533,188 @@ class TraceSummary(BaseModel):
             total_tokens=trace.total_llm_tokens,
             has_errors=trace.has_errors,
         )
+
+
+class SpanQuery(BaseModel):
+    """Query parameters for searching individual spans."""
+
+    # Basic filters
+    service_name: str | None = None
+    operation_name: str | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    min_duration_ms: int | None = Field(default=None, ge=0)
+    max_duration_ms: int | None = Field(default=None, ge=0)
+    tags: dict[str, str] = Field(default_factory=dict)
+    limit: int = Field(default=100, ge=1, le=1000)
+    has_error: bool | None = None
+
+    # Opentelemetry-specific filters
+    gen_ai_system: str | None = None
+    gen_ai_request_model: str | None = None
+    gen_ai_response_model: str | None = None
+
+    # Generic filter system
+    filters: list[Filter] = Field(default_factory=list, description="Generic filter conditions")
+    logical_operator: Literal["AND"] = Field(
+        default="AND", description="Logical operator for combining filters (currently only AND)"
+    )
+
+    def has_filters(self) -> bool:
+        """Check if any filters are specified."""
+        return bool(
+            self.service_name
+            or self.operation_name
+            or self.min_duration_ms
+            or self.max_duration_ms
+            or self.has_error
+            or self.gen_ai_system
+            or self.gen_ai_request_model
+            or self.gen_ai_response_model
+            or self.tags
+            or self.filters
+        )
+
+    def get_all_filters(self) -> list[Filter]:
+        """Convert legacy parameters to Filter objects and combine with explicit filters.
+
+        Returns:
+            Combined list of all filters (legacy converted + explicit)
+        """
+        all_filters: list[Filter] = []
+
+        # Convert legacy parameters to filters
+        if self.service_name:
+            all_filters.append(
+                Filter(
+                    field="service.name",
+                    operator=FilterOperator.EQUALS,
+                    value=self.service_name,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.operation_name:
+            all_filters.append(
+                Filter(
+                    field="name",
+                    operator=FilterOperator.EQUALS,
+                    value=self.operation_name,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.min_duration_ms:
+            all_filters.append(
+                Filter(
+                    field="duration",
+                    operator=FilterOperator.GTE,
+                    value=self.min_duration_ms,
+                    value_type=FilterType.NUMBER,
+                )
+            )
+
+        if self.max_duration_ms:
+            all_filters.append(
+                Filter(
+                    field="duration",
+                    operator=FilterOperator.LTE,
+                    value=self.max_duration_ms,
+                    value_type=FilterType.NUMBER,
+                )
+            )
+
+        if self.has_error is not None:
+            all_filters.append(
+                Filter(
+                    field="status",
+                    operator=FilterOperator.EQUALS,
+                    value="ERROR" if self.has_error else "OK",
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.gen_ai_system:
+            all_filters.append(
+                Filter(
+                    field="gen_ai.system",
+                    operator=FilterOperator.EQUALS,
+                    value=self.gen_ai_system,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.gen_ai_request_model:
+            all_filters.append(
+                Filter(
+                    field="gen_ai.request.model",
+                    operator=FilterOperator.EQUALS,
+                    value=self.gen_ai_request_model,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        if self.gen_ai_response_model:
+            all_filters.append(
+                Filter(
+                    field="gen_ai.response.model",
+                    operator=FilterOperator.EQUALS,
+                    value=self.gen_ai_response_model,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        # Add custom tags as filters
+        for key, value in self.tags.items():
+            all_filters.append(
+                Filter(
+                    field=key,
+                    operator=FilterOperator.EQUALS,
+                    value=value,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+        # Add explicit filters
+        all_filters.extend(self.filters)
+
+        return all_filters
+
+
+class SpanSummary(BaseModel):
+    """Simplified span summary for list results."""
+
+    trace_id: str
+    span_id: str
+    parent_span_id: str | None
+    operation_name: str
+    service_name: str
+    start_time: datetime
+    duration_ms: float
+    status: Literal["OK", "ERROR", "UNSET"]
+    is_llm_span: bool = False
+    gen_ai_system: str | None = None
+    gen_ai_model: str | None = None
+    total_tokens: int | None = None
+
+    @classmethod
+    def from_span(cls, span: SpanData) -> "SpanSummary":
+        """Create summary from full span data."""
+        llm_attrs = LLMSpanAttributes.from_span(span) if span.is_llm_span else None
+
+        return cls(
+            trace_id=span.trace_id,
+            span_id=span.span_id,
+            parent_span_id=span.parent_span_id,
+            operation_name=span.operation_name,
+            service_name=span.service_name,
+            start_time=span.start_time,
+            duration_ms=span.duration_ms,
+            status=span.status,
+            is_llm_span=span.is_llm_span,
+            gen_ai_system=llm_attrs.system if llm_attrs else None,
+            gen_ai_model=(
+                llm_attrs.response_model or llm_attrs.request_model if llm_attrs else None
+            ),
+            total_tokens=llm_attrs.total_tokens if llm_attrs else None,
+        )

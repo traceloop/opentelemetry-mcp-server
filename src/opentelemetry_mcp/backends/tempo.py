@@ -12,6 +12,7 @@ from opentelemetry_mcp.models import (
     FilterOperator,
     FilterType,
     SpanData,
+    SpanQuery,
     TraceData,
     TraceQuery,
 )
@@ -136,6 +137,109 @@ class TempoBackend(BaseBackend):
             traces = FilterEngine.apply_filters(traces, client_filters)
 
         return traces
+
+    async def search_spans(self, query: SpanQuery) -> list[SpanData]:
+        """Search for individual spans using TraceQL with hybrid filtering.
+
+        Tempo doesn't have a dedicated spans API, so we search for traces
+        and then flatten to get individual spans matching the query.
+
+        Args:
+            query: Span query parameters
+
+        Returns:
+            List of matching spans (flattened from traces)
+
+        Raises:
+            httpx.HTTPError: If API request fails
+        """
+        # Get all filters (legacy + explicit)
+        all_filters = query.get_all_filters()
+
+        # Separate supported and unsupported filters
+        supported_operators = self.get_supported_operators()
+        native_filters = [f for f in all_filters if f.operator in supported_operators]
+        client_filters = [f for f in all_filters if f.operator not in supported_operators]
+
+        if client_filters:
+            logger.info(
+                f"Will apply {len(client_filters)} span filters client-side: "
+                f"{[(f.field, f.operator.value) for f in client_filters]}"
+            )
+
+        # Build TraceQL query from native filters
+        # Convert SpanQuery to TraceQuery for TraceQL building
+        trace_query = TraceQuery(
+            service_name=query.service_name,
+            operation_name=query.operation_name,
+            start_time=query.start_time,
+            end_time=query.end_time,
+            min_duration_ms=query.min_duration_ms,
+            max_duration_ms=query.max_duration_ms,
+            tags=query.tags,
+            limit=query.limit * 2,  # Fetch more traces to ensure we get enough spans
+            has_error=query.has_error,
+            gen_ai_system=query.gen_ai_system,
+            gen_ai_request_model=query.gen_ai_request_model,
+            gen_ai_response_model=query.gen_ai_response_model,
+            filters=query.filters,
+        )
+
+        traceql = self._build_traceql_from_filters(native_filters, trace_query)
+        logger.debug(f"Executing TraceQL for spans: {traceql}")
+
+        params: dict[str, str | int] = {"q": traceql, "limit": trace_query.limit}
+
+        # Tempo requires time range - default to last 24 hours if not specified
+        if query.start_time:
+            params["start"] = int(query.start_time.timestamp())
+        else:
+            from datetime import timedelta
+
+            params["start"] = int((datetime.now() - timedelta(days=1)).timestamp())
+
+        if query.end_time:
+            params["end"] = int(query.end_time.timestamp())
+        else:
+            from datetime import timedelta
+
+            params["end"] = int((datetime.now() + timedelta(hours=1)).timestamp())
+
+        response = await self.client.get("/api/search", params=params)
+        response.raise_for_status()
+
+        data = response.json()
+
+        # Fetch traces and flatten spans
+        trace_results = data if isinstance(data, list) else data.get("traces", [])
+        max_traces_to_fetch = min(len(trace_results), 50)  # Cap at 50 to avoid too many requests
+
+        if len(trace_results) > max_traces_to_fetch:
+            logger.warning(
+                f"Limiting trace fetch to {max_traces_to_fetch} out of {len(trace_results)} "
+                f"results to avoid excessive API calls"
+            )
+
+        all_spans: list[SpanData] = []
+        for trace_result in trace_results[:max_traces_to_fetch]:
+            trace_id = trace_result.get("traceID")
+            if trace_id:
+                try:
+                    trace_response = await self.client.get(f"/api/traces/{trace_id}")
+                    trace_response.raise_for_status()
+                    trace_data = trace_response.json()
+                    trace = self._parse_tempo_trace(trace_data, trace_id_hex=trace_id)
+                    if trace:
+                        all_spans.extend(trace.spans)
+                except Exception as e:
+                    logger.warning(f"Failed to fetch trace {trace_id}: {e}")
+
+        # Apply client-side filters to spans
+        if client_filters:
+            all_spans = FilterEngine.apply_filters(all_spans, client_filters)
+
+        # Limit the number of spans returned
+        return all_spans[: query.limit]
 
     async def get_trace(self, trace_id: str) -> TraceData:
         """Get a specific trace by ID from Tempo."""
