@@ -9,12 +9,12 @@ set -e  # Exit on error
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$SCRIPT_DIR"
 
-echo "Starting OpenTelemetry MCP Server from: $SCRIPT_DIR"
+echo "Starting OpenTelemetry MCP Server from: $SCRIPT_DIR" >&2
 
 # Check if uv is installed
 if ! command -v uv &> /dev/null; then
-    echo "Error: 'uv' is not installed or not in PATH"
-    echo "Please install uv: https://github.com/astral-sh/uv"
+    echo "Error: 'uv' is not installed or not in PATH" >&2
+    echo "Please install uv: https://github.com/astral-sh/uv" >&2
     exit 1
 fi
 
@@ -24,12 +24,12 @@ fi
 # Uncomment and configure ONE of the backends below:
 
 ## Jaeger (local)
-# export BACKEND_TYPE="jaeger"
-# export BACKEND_URL="http://localhost:16686"
+export BACKEND_TYPE="jaeger"
+export BACKEND_URL="http://localhost:16686"
 
 ## Traceloop (cloud)
-export BACKEND_TYPE="traceloop"
-export BACKEND_URL="https://api.traceloop.com"
+# export BACKEND_TYPE="traceloop"
+# export BACKEND_URL="https://api.traceloop.com"
 # export BACKEND_API_KEY="your-api-key-here"  # Set your API key here or via environment
 
 ## Tempo (local)
@@ -46,9 +46,9 @@ export BACKEND_URL="https://api.traceloop.com"
 # ============================================
 # Start Server
 # ============================================
-echo "Backend: $BACKEND_TYPE"
-echo "URL: $BACKEND_URL"
-echo ""
+echo "Backend: $BACKEND_TYPE" >&2
+echo "URL: $BACKEND_URL" >&2
+echo "" >&2
 
 # Start the MCP server in stdio mode (for Claude Desktop/MCP clients)
 uv run opentelemetry-mcp --transport stdio --backend "$BACKEND_TYPE" --url "$BACKEND_URL"
