@@ -2,10 +2,10 @@
 
 import json
 from collections.abc import Sequence
-from datetime import datetime
 
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.models import LLMSpanAttributes, TraceQuery
+from opentelemetry_mcp.utils import parse_iso_timestamp
 
 
 def calculate_percentiles(values: Sequence[float | int]) -> dict[str, float]:
@@ -46,8 +46,14 @@ async def get_model_stats(
     start_time: str | None = None,
     end_time: str | None = None,
     service_name: str | None = None,
+    limit: int = 1000,
 ) -> str:
     """Get detailed performance statistics for a specific model.
+
+    Note: This function uses an N+1 query pattern where it first searches for traces,
+    then fetches each trace individually to access LLM span details. This can cause
+    performance issues with large result sets. Consider using backend-side filtering
+    for model names when available to reduce the number of traces fetched.
 
     Args:
         backend: Backend instance to query
@@ -55,25 +61,19 @@ async def get_model_stats(
         start_time: Start time (ISO 8601 format)
         end_time: End time (ISO 8601 format)
         service_name: Filter by service name
+        limit: Maximum number of traces to analyze (default: 1000)
 
     Returns:
         JSON string with comprehensive model statistics
     """
     # Parse timestamps
-    start_dt = None
-    end_dt = None
+    start_dt, error = parse_iso_timestamp(start_time, "start_time")
+    if error:
+        return json.dumps({"error": error})
 
-    if start_time:
-        try:
-            start_dt = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
-        except ValueError as e:
-            return json.dumps({"error": f"Invalid start_time format: {e}"})
-
-    if end_time:
-        try:
-            end_dt = datetime.fromisoformat(end_time.replace("Z", "+00:00"))
-        except ValueError as e:
-            return json.dumps({"error": f"Invalid end_time format: {e}"})
+    end_dt, error = parse_iso_timestamp(end_time, "end_time")
+    if error:
+        return json.dumps({"error": error})
 
     try:
         # Build query to fetch traces - search for model in both request and response
@@ -84,7 +84,7 @@ async def get_model_stats(
             start_time=start_dt,
             end_time=end_dt,
             service_name=service_name,
-            limit=1000,
+            limit=limit,
         )
 
         # Search traces

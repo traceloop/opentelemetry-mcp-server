@@ -406,14 +406,24 @@ class TraceQuery(BaseModel):
             )
 
         if self.has_error is not None:
-            all_filters.append(
-                Filter(
-                    field="status",
-                    operator=FilterOperator.EQUALS,
-                    value="ERROR" if self.has_error else "OK",
-                    value_type=FilterType.STRING,
+            if self.has_error:
+                all_filters.append(
+                    Filter(
+                        field="status",
+                        operator=FilterOperator.EQUALS,
+                        value="ERROR",
+                        value_type=FilterType.STRING,
+                    )
                 )
-            )
+            else:
+                all_filters.append(
+                    Filter(
+                        field="status",
+                        operator=FilterOperator.NOT_EQUALS,
+                        value="ERROR",
+                        value_type=FilterType.STRING,
+                    )
+                )
 
         if self.gen_ai_system:
             all_filters.append(
@@ -625,14 +635,24 @@ class SpanQuery(BaseModel):
             )
 
         if self.has_error is not None:
-            all_filters.append(
-                Filter(
-                    field="status",
-                    operator=FilterOperator.EQUALS,
-                    value="ERROR" if self.has_error else "OK",
-                    value_type=FilterType.STRING,
+            if self.has_error:
+                all_filters.append(
+                    Filter(
+                        field="status",
+                        operator=FilterOperator.EQUALS,
+                        value="ERROR",
+                        value_type=FilterType.STRING,
+                    )
                 )
-            )
+            else:
+                all_filters.append(
+                    Filter(
+                        field="status",
+                        operator=FilterOperator.NOT_EQUALS,
+                        value="ERROR",
+                        value_type=FilterType.STRING,
+                    )
+                )
 
         if self.gen_ai_system:
             all_filters.append(

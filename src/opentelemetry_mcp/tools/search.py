@@ -96,22 +96,25 @@ async def search_traces(
         # Legacy mode: use gen_ai_model for request_model
         final_request_model = gen_ai_model
 
-    # Build query
-    query = TraceQuery(
-        service_name=service_name,
-        operation_name=operation_name,
-        start_time=start_dt,
-        end_time=end_dt,
-        min_duration_ms=min_duration_ms,
-        max_duration_ms=max_duration_ms,
-        gen_ai_system=gen_ai_system,
-        gen_ai_request_model=final_request_model,
-        gen_ai_response_model=final_response_model,
-        has_error=has_error,
-        tags=tags or {},
-        filters=filter_objects,
-        limit=limit,
-    )
+    try:
+        # Build query
+        query = TraceQuery(
+            service_name=service_name,
+            operation_name=operation_name,
+            start_time=start_dt,
+            end_time=end_dt,
+            min_duration_ms=min_duration_ms,
+            max_duration_ms=max_duration_ms,
+            gen_ai_system=gen_ai_system,
+            gen_ai_request_model=final_request_model,
+            gen_ai_response_model=final_response_model,
+            has_error=has_error,
+            tags=tags or {},
+            filters=filter_objects,
+            limit=limit,
+        )
+    except ValidationError as e:
+        return json.dumps({"error": f"Invalid query parameters: {e}"})
 
     try:
         # Execute search

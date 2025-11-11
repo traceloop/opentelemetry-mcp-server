@@ -18,16 +18,6 @@ dependencies = [
     "starlette~=0.50.0",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest~=8.4.0",
-    "pytest-asyncio~=1.2.0",
-    "pytest-cov~=7.0.0",
-    "mypy~=1.18.0",
-    "ruff~=0.14.0",
-    "types-click~=7.1.8",
-]
-
 [project.scripts]
 opentelemetry-mcp = "opentelemetry_mcp.server:main"
 

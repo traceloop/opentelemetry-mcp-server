@@ -48,9 +48,13 @@ ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
 # Environment variables (can be overridden at runtime)
+# Note: BACKEND_API_KEY should be provided at runtime via:
+#   - docker run -e BACKEND_API_KEY=secret
+#   - Docker Compose environment files
+#   - Kubernetes secrets
+#   - .env files mounted at runtime
 ENV BACKEND_TYPE="" \
     BACKEND_URL="" \
-    BACKEND_API_KEY="" \
     BACKEND_TIMEOUT="30" \
     LOG_LEVEL="INFO" \
     MAX_TRACES_PER_QUERY="100"

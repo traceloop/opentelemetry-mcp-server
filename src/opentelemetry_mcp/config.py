@@ -4,7 +4,7 @@ import os
 from typing import Literal
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field, HttpUrl, field_validator
+from pydantic import BaseModel, Field, HttpUrl, TypeAdapter, field_validator
 
 # Load environment variables
 load_dotenv()
@@ -92,7 +92,7 @@ class ServerConfig(BaseModel):
             self.backend.type = backend_type  # type: ignore
 
         if backend_url:
-            self.backend.url = HttpUrl(backend_url)
+            self.backend.url = TypeAdapter(HttpUrl).validate_python(backend_url)
 
         if api_key:
             self.backend.api_key = api_key

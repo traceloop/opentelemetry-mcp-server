@@ -9,7 +9,7 @@ class SpanAttributes(BaseModel):
     """
     Strongly-typed span attributes following OpenTelemetry semantic conventions.
 
-    Supports both gen_ai.* (Opentelemetry standard) and llm.* (legacy Traceloop) naming conventions
+    Supports both gen_ai.* (OpenTelemetry standard) and llm.* (legacy Traceloop) naming conventions
     through field aliases. The primary access pattern uses gen_ai.* attributes.
 
     The model allows extra fields through ConfigDict(extra='allow') to support additional

@@ -93,12 +93,22 @@ class FilterEngine:
         if operator == FilterOperator.NOT_EXISTS:
             return len(values) == 0
 
-        # For other operators, check if ANY span matches (OR logic across spans)
-        for value in values:
-            if FilterEngine._compare_value(value, filter_obj):
-                return True
+        # Handle empty values
+        if not values:
+            return False
 
-        return False
+        # For negative operators (NOT_EQUALS, NOT_IN, NOT_CONTAINS), require ALL values to satisfy the predicate
+        # For positive operators, check if ANY value matches (OR logic across spans)
+        negative_ops = {
+            FilterOperator.NOT_EQUALS,
+            FilterOperator.NOT_CONTAINS,
+            FilterOperator.NOT_IN,
+        }
+
+        if operator in negative_ops:
+            return all(FilterEngine._compare_value(value, filter_obj) for value in values)
+
+        return any(FilterEngine._compare_value(value, filter_obj) for value in values)
 
     @staticmethod
     def _get_field_values(item: TraceData | SpanData, field: str) -> list[Any]:

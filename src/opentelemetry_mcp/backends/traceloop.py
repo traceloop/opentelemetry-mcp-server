@@ -640,7 +640,7 @@ class TraceloopBackend(BaseBackend):
                 span_id=span_data["span_id"],
                 parent_span_id=span_data.get("parent_span_id"),
                 operation_name=span_data["span_name"],
-                service_name="",  # Not in detailed span response
+                service_name=raw_attrs.get("service.name", ""),
                 start_time=datetime.fromtimestamp(
                     span_data["timestamp"] / 1000
                 ),  # Convert ms to seconds
