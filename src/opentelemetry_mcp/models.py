@@ -80,6 +80,149 @@ class Filter(BaseModel):
         return self
 
 
+def _convert_legacy_params_to_filters(
+    service_name: str | None = None,
+    operation_name: str | None = None,
+    min_duration_ms: int | None = None,
+    max_duration_ms: int | None = None,
+    has_error: bool | None = None,
+    gen_ai_system: str | None = None,
+    gen_ai_request_model: str | None = None,
+    gen_ai_response_model: str | None = None,
+    tags: dict[str, str] | None = None,
+    explicit_filters: list[Filter] | None = None,
+) -> list[Filter]:
+    """Convert legacy query parameters to Filter objects and combine with explicit filters.
+
+    This helper function is used by both TraceQuery and SpanQuery to avoid code duplication.
+
+    Args:
+        service_name: Service name to filter by
+        operation_name: Operation/span name to filter by
+        min_duration_ms: Minimum duration in milliseconds
+        max_duration_ms: Maximum duration in milliseconds
+        has_error: Filter for error status (True=ERROR, False=NOT ERROR)
+        gen_ai_system: LLM provider (openai, anthropic, etc.)
+        gen_ai_request_model: Requested model name
+        gen_ai_response_model: Actual model used in response
+        tags: Custom tags to filter by (key-value pairs)
+        explicit_filters: Explicit Filter objects to append
+
+    Returns:
+        Combined list of all filters (legacy converted + explicit)
+    """
+    all_filters: list[Filter] = []
+
+    # Convert legacy parameters to filters
+    if service_name:
+        all_filters.append(
+            Filter(
+                field="service.name",
+                operator=FilterOperator.EQUALS,
+                value=service_name,
+                value_type=FilterType.STRING,
+            )
+        )
+
+    if operation_name:
+        all_filters.append(
+            Filter(
+                field="name",
+                operator=FilterOperator.EQUALS,
+                value=operation_name,
+                value_type=FilterType.STRING,
+            )
+        )
+
+    if min_duration_ms:
+        all_filters.append(
+            Filter(
+                field="duration",
+                operator=FilterOperator.GTE,
+                value=min_duration_ms,
+                value_type=FilterType.NUMBER,
+            )
+        )
+
+    if max_duration_ms:
+        all_filters.append(
+            Filter(
+                field="duration",
+                operator=FilterOperator.LTE,
+                value=max_duration_ms,
+                value_type=FilterType.NUMBER,
+            )
+        )
+
+    if has_error is not None:
+        if has_error:
+            all_filters.append(
+                Filter(
+                    field="status",
+                    operator=FilterOperator.EQUALS,
+                    value="ERROR",
+                    value_type=FilterType.STRING,
+                )
+            )
+        else:
+            all_filters.append(
+                Filter(
+                    field="status",
+                    operator=FilterOperator.NOT_EQUALS,
+                    value="ERROR",
+                    value_type=FilterType.STRING,
+                )
+            )
+
+    if gen_ai_system:
+        all_filters.append(
+            Filter(
+                field="gen_ai.system",
+                operator=FilterOperator.EQUALS,
+                value=gen_ai_system,
+                value_type=FilterType.STRING,
+            )
+        )
+
+    if gen_ai_request_model:
+        all_filters.append(
+            Filter(
+                field="gen_ai.request.model",
+                operator=FilterOperator.EQUALS,
+                value=gen_ai_request_model,
+                value_type=FilterType.STRING,
+            )
+        )
+
+    if gen_ai_response_model:
+        all_filters.append(
+            Filter(
+                field="gen_ai.response.model",
+                operator=FilterOperator.EQUALS,
+                value=gen_ai_response_model,
+                value_type=FilterType.STRING,
+            )
+        )
+
+    # Add custom tags as filters
+    if tags:
+        for key, value in tags.items():
+            all_filters.append(
+                Filter(
+                    field=key,
+                    operator=FilterOperator.EQUALS,
+                    value=value,
+                    value_type=FilterType.STRING,
+                )
+            )
+
+    # Add explicit filters
+    if explicit_filters:
+        all_filters.extend(explicit_filters)
+
+    return all_filters
+
+
 class SpanData(BaseModel):
     """OpenTelemetry span data."""
 
@@ -357,114 +500,18 @@ class TraceQuery(BaseModel):
         Returns:
             Combined list of all filters (legacy converted + explicit)
         """
-        all_filters: list[Filter] = []
-
-        # Convert legacy parameters to filters
-        if self.service_name:
-            all_filters.append(
-                Filter(
-                    field="service.name",
-                    operator=FilterOperator.EQUALS,
-                    value=self.service_name,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        if self.operation_name:
-            all_filters.append(
-                Filter(
-                    field="name",
-                    operator=FilterOperator.EQUALS,
-                    value=self.operation_name,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        if self.min_duration_ms:
-            all_filters.append(
-                Filter(
-                    field="duration",
-                    operator=FilterOperator.GTE,
-                    value=self.min_duration_ms,
-                    value_type=FilterType.NUMBER,
-                )
-            )
-
-        if self.max_duration_ms:
-            all_filters.append(
-                Filter(
-                    field="duration",
-                    operator=FilterOperator.LTE,
-                    value=self.max_duration_ms,
-                    value_type=FilterType.NUMBER,
-                )
-            )
-
-        if self.has_error is not None:
-            if self.has_error:
-                all_filters.append(
-                    Filter(
-                        field="status",
-                        operator=FilterOperator.EQUALS,
-                        value="ERROR",
-                        value_type=FilterType.STRING,
-                    )
-                )
-            else:
-                all_filters.append(
-                    Filter(
-                        field="status",
-                        operator=FilterOperator.NOT_EQUALS,
-                        value="ERROR",
-                        value_type=FilterType.STRING,
-                    )
-                )
-
-        if self.gen_ai_system:
-            all_filters.append(
-                Filter(
-                    field="gen_ai.system",
-                    operator=FilterOperator.EQUALS,
-                    value=self.gen_ai_system,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        if self.gen_ai_request_model:
-            all_filters.append(
-                Filter(
-                    field="gen_ai.request.model",
-                    operator=FilterOperator.EQUALS,
-                    value=self.gen_ai_request_model,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        if self.gen_ai_response_model:
-            all_filters.append(
-                Filter(
-                    field="gen_ai.response.model",
-                    operator=FilterOperator.EQUALS,
-                    value=self.gen_ai_response_model,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        # Add custom tags as filters
-        for key, value in self.tags.items():
-            all_filters.append(
-                Filter(
-                    field=key,
-                    operator=FilterOperator.EQUALS,
-                    value=value,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        # Add explicit filters
-        all_filters.extend(self.filters)
-
-        return all_filters
+        return _convert_legacy_params_to_filters(
+            service_name=self.service_name,
+            operation_name=self.operation_name,
+            min_duration_ms=self.min_duration_ms,
+            max_duration_ms=self.max_duration_ms,
+            has_error=self.has_error,
+            gen_ai_system=self.gen_ai_system,
+            gen_ai_request_model=self.gen_ai_request_model,
+            gen_ai_response_model=self.gen_ai_response_model,
+            tags=self.tags if self.tags else None,
+            explicit_filters=self.filters,
+        )
 
     def to_backend_params(self) -> dict[str, str | int]:
         """Convert query to backend-specific parameters."""
@@ -586,114 +633,18 @@ class SpanQuery(BaseModel):
         Returns:
             Combined list of all filters (legacy converted + explicit)
         """
-        all_filters: list[Filter] = []
-
-        # Convert legacy parameters to filters
-        if self.service_name:
-            all_filters.append(
-                Filter(
-                    field="service.name",
-                    operator=FilterOperator.EQUALS,
-                    value=self.service_name,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        if self.operation_name:
-            all_filters.append(
-                Filter(
-                    field="name",
-                    operator=FilterOperator.EQUALS,
-                    value=self.operation_name,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        if self.min_duration_ms:
-            all_filters.append(
-                Filter(
-                    field="duration",
-                    operator=FilterOperator.GTE,
-                    value=self.min_duration_ms,
-                    value_type=FilterType.NUMBER,
-                )
-            )
-
-        if self.max_duration_ms:
-            all_filters.append(
-                Filter(
-                    field="duration",
-                    operator=FilterOperator.LTE,
-                    value=self.max_duration_ms,
-                    value_type=FilterType.NUMBER,
-                )
-            )
-
-        if self.has_error is not None:
-            if self.has_error:
-                all_filters.append(
-                    Filter(
-                        field="status",
-                        operator=FilterOperator.EQUALS,
-                        value="ERROR",
-                        value_type=FilterType.STRING,
-                    )
-                )
-            else:
-                all_filters.append(
-                    Filter(
-                        field="status",
-                        operator=FilterOperator.NOT_EQUALS,
-                        value="ERROR",
-                        value_type=FilterType.STRING,
-                    )
-                )
-
-        if self.gen_ai_system:
-            all_filters.append(
-                Filter(
-                    field="gen_ai.system",
-                    operator=FilterOperator.EQUALS,
-                    value=self.gen_ai_system,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        if self.gen_ai_request_model:
-            all_filters.append(
-                Filter(
-                    field="gen_ai.request.model",
-                    operator=FilterOperator.EQUALS,
-                    value=self.gen_ai_request_model,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        if self.gen_ai_response_model:
-            all_filters.append(
-                Filter(
-                    field="gen_ai.response.model",
-                    operator=FilterOperator.EQUALS,
-                    value=self.gen_ai_response_model,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        # Add custom tags as filters
-        for key, value in self.tags.items():
-            all_filters.append(
-                Filter(
-                    field=key,
-                    operator=FilterOperator.EQUALS,
-                    value=value,
-                    value_type=FilterType.STRING,
-                )
-            )
-
-        # Add explicit filters
-        all_filters.extend(self.filters)
-
-        return all_filters
+        return _convert_legacy_params_to_filters(
+            service_name=self.service_name,
+            operation_name=self.operation_name,
+            min_duration_ms=self.min_duration_ms,
+            max_duration_ms=self.max_duration_ms,
+            has_error=self.has_error,
+            gen_ai_system=self.gen_ai_system,
+            gen_ai_request_model=self.gen_ai_request_model,
+            gen_ai_response_model=self.gen_ai_response_model,
+            tags=self.tags if self.tags else None,
+            explicit_filters=self.filters,
+        )
 
 
 class SpanSummary(BaseModel):
