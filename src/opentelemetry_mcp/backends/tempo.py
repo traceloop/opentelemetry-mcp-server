@@ -156,10 +156,28 @@ class TempoBackend(BaseBackend):
         # Get all filters (legacy + explicit)
         all_filters = query.get_all_filters()
 
-        # Separate supported and unsupported filters
+        # For span queries, we need to be careful about which filters to push to TraceQL
+        # TraceQL works at the trace level, so span-level filters will match traces that
+        # have AT LEAST ONE span matching the condition, then return ALL spans from those traces.
+        # Therefore, span attribute filters should be applied client-side.
+
+        # Filters that can be pushed to TraceQL for span search:
+        # - service.name (trace-level)
+        # - duration (can filter traces by duration)
+        # - status (can filter traces by status)
+
+        # Filters that MUST be applied client-side:
+        # - Span attributes (gen_ai.*, http.*, etc.) - would match entire trace
+        # - operation_name - would match trace if ANY span has that operation
+
+        trace_level_fields = {"service.name", "duration", "duration_ms", "status"}
+
         supported_operators = self.get_supported_operators()
-        native_filters = [f for f in all_filters if f.operator in supported_operators]
-        client_filters = [f for f in all_filters if f.operator not in supported_operators]
+        native_filters = [
+            f for f in all_filters
+            if f.operator in supported_operators and f.field in trace_level_fields
+        ]
+        client_filters = [f for f in all_filters if f not in native_filters]
 
         if client_filters:
             logger.info(
@@ -246,7 +264,8 @@ class TempoBackend(BaseBackend):
         response = await self.client.get(f"/api/traces/{trace_id}")
         response.raise_for_status()
         data = response.json()
-        trace = self._parse_tempo_trace(data)
+        # Pass trace_id_hex to ensure consistent trace ID format (hex instead of base64)
+        trace = self._parse_tempo_trace(data, trace_id_hex=trace_id)
         if not trace:
             raise ValueError(f"Failed to parse trace {trace_id}")
         return trace
