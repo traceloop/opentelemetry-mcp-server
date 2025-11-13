@@ -105,11 +105,6 @@ class SpanData(BaseModel):
         return self.attributes.gen_ai_system
 
     @property
-    def gen_ai_model(self) -> str | None:
-        """Get the LLM model name."""
-        return self.attributes.gen_ai_request_model or self.attributes.gen_ai_response_model
-
-    @property
     def has_error(self) -> bool:
         """Check if span has an error status."""
         return self.status == "ERROR"
@@ -714,7 +709,6 @@ class SpanSummary(BaseModel):
     status: Literal["OK", "ERROR", "UNSET"]
     is_llm_span: bool = False
     gen_ai_system: str | None = None
-    gen_ai_model: str | None = None
     total_tokens: int | None = None
 
     @classmethod
@@ -733,8 +727,5 @@ class SpanSummary(BaseModel):
             status=span.status,
             is_llm_span=span.is_llm_span,
             gen_ai_system=llm_attrs.system if llm_attrs else None,
-            gen_ai_model=(
-                llm_attrs.response_model or llm_attrs.request_model if llm_attrs else None
-            ),
             total_tokens=llm_attrs.total_tokens if llm_attrs else None,
         )

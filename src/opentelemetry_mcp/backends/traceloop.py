@@ -526,10 +526,15 @@ class TraceloopBackend(BaseBackend):
         }
         traceloop_value_type = value_type_map.get(filter_obj.value_type, "string")
 
+        if traceloop_value_type == "boolean":
+            serialized_value = "true" if value else "false"
+        else:
+            serialized_value = str(value)
+
         return {
             "field": traceloop_field,
             "operator": traceloop_operator,
-            "value": str(value),
+            "value": serialized_value,
             "value_type": traceloop_value_type,
         }
 

@@ -14,7 +14,6 @@ async def get_llm_usage(
     end_time: str | None = None,
     service_name: str | None = None,
     gen_ai_system: str | None = None,
-    gen_ai_model: str | None = None,
     gen_ai_request_model: str | None = None,
     gen_ai_response_model: str | None = None,
     limit: int = 1000,
@@ -27,7 +26,6 @@ async def get_llm_usage(
         end_time: End time (ISO 8601 format)
         service_name: Filter by service name
         gen_ai_system: Filter by LLM provider (openai, anthropic, etc.)
-        gen_ai_model: DEPRECATED - Use gen_ai_request_model or gen_ai_response_model
         gen_ai_request_model: Filter by requested model name
         gen_ai_response_model: Filter by actual model used
         limit: Maximum number of traces to analyze (default: 1000)
@@ -44,22 +42,14 @@ async def get_llm_usage(
     if error:
         return json.dumps({"error": error})
 
-    # Handle backward compatibility for gen_ai_model
-    final_request_model = gen_ai_request_model
-    final_response_model = gen_ai_response_model
-
-    if gen_ai_model and not gen_ai_request_model and not gen_ai_response_model:
-        # Legacy mode: use gen_ai_model for request_model
-        final_request_model = gen_ai_model
-
     # Build query to find LLM traces
     query = TraceQuery(
         service_name=service_name,
         start_time=start_dt,
         end_time=end_dt,
         gen_ai_system=gen_ai_system,
-        gen_ai_request_model=final_request_model,
-        gen_ai_response_model=final_response_model,
+        gen_ai_request_model=gen_ai_request_model,
+        gen_ai_response_model=gen_ai_response_model,
         limit=limit,
     )
 
@@ -85,7 +75,8 @@ async def get_llm_usage(
             "filters": {
                 "service_name": service_name,
                 "gen_ai_system": gen_ai_system,
-                "gen_ai_model": gen_ai_model,
+                "gen_ai_request_model": gen_ai_request_model,
+                "gen_ai_response_model": gen_ai_response_model,
             },
             "summary": {
                 "total_requests": metrics.request_count,

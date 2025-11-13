@@ -124,7 +124,6 @@ async def search_traces(
     min_duration_ms: int | None = None,
     max_duration_ms: int | None = None,
     gen_ai_system: str | None = None,
-    gen_ai_model: str | None = None,
     gen_ai_request_model: str | None = None,
     gen_ai_response_model: str | None = None,
     has_error: bool | None = None,
@@ -144,7 +143,6 @@ async def search_traces(
         min_duration_ms: Minimum trace duration in milliseconds (legacy)
         max_duration_ms: Maximum trace duration in milliseconds (legacy)
         gen_ai_system: Filter by LLM provider (legacy - e.g., openai, anthropic)
-        gen_ai_model: DEPRECATED - Use gen_ai_request_model or gen_ai_response_model
         gen_ai_request_model: Filter by requested model name (e.g., gpt-4)
         gen_ai_response_model: Filter by actual model used (e.g., gpt-4-0613)
         has_error: Filter traces with errors (legacy)
@@ -185,7 +183,6 @@ async def search_traces(
             min_duration_ms=min_duration_ms,
             max_duration_ms=max_duration_ms,
             gen_ai_system=gen_ai_system,
-            gen_ai_model=gen_ai_model,
             gen_ai_request_model=gen_ai_request_model,
             gen_ai_response_model=gen_ai_response_model,
             has_error=has_error,
@@ -226,7 +223,6 @@ async def get_llm_usage(
     end_time: str | None = None,
     service_name: str | None = None,
     gen_ai_system: str | None = None,
-    gen_ai_model: str | None = None,
     gen_ai_request_model: str | None = None,
     gen_ai_response_model: str | None = None,
     limit: int = 1000,
@@ -240,7 +236,6 @@ async def get_llm_usage(
         end_time: End time in ISO 8601 format
         service_name: Filter by service name
         gen_ai_system: Filter by LLM provider
-        gen_ai_model: DEPRECATED - Use gen_ai_request_model or gen_ai_response_model
         gen_ai_request_model: Filter by requested model name
         gen_ai_response_model: Filter by actual model used
         limit: Maximum traces to analyze (default: 1000)
@@ -256,7 +251,6 @@ async def get_llm_usage(
             end_time=end_time,
             service_name=service_name,
             gen_ai_system=gen_ai_system,
-            gen_ai_model=gen_ai_model,
             gen_ai_request_model=gen_ai_request_model,
             gen_ai_response_model=gen_ai_response_model,
             limit=limit,

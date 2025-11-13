@@ -19,7 +19,6 @@ async def search_traces(
     min_duration_ms: int | None = None,
     max_duration_ms: int | None = None,
     gen_ai_system: str | None = None,
-    gen_ai_model: str | None = None,
     gen_ai_request_model: str | None = None,
     gen_ai_response_model: str | None = None,
     has_error: bool | None = None,
@@ -40,7 +39,6 @@ async def search_traces(
         min_duration_ms: Minimum trace duration in milliseconds (legacy parameter)
         max_duration_ms: Maximum trace duration in milliseconds (legacy parameter)
         gen_ai_system: Filter by LLM provider (legacy parameter)
-        gen_ai_model: DEPRECATED - Use gen_ai_request_model or gen_ai_response_model
         gen_ai_request_model: Filter by requested model name
         gen_ai_response_model: Filter by actual model used
         has_error: Filter traces with errors (legacy parameter)
@@ -80,15 +78,6 @@ async def search_traces(
         except Exception as e:
             return json.dumps({"error": f"Failed to parse filters: {e}"})
 
-    # Handle backward compatibility: if gen_ai_model is provided but not the new params,
-    # use it for request_model (legacy behavior)
-    final_request_model = gen_ai_request_model
-    final_response_model = gen_ai_response_model
-
-    if gen_ai_model and not gen_ai_request_model and not gen_ai_response_model:
-        # Legacy mode: use gen_ai_model for request_model
-        final_request_model = gen_ai_model
-
     try:
         # Build query
         query = TraceQuery(
@@ -99,8 +88,8 @@ async def search_traces(
             min_duration_ms=min_duration_ms,
             max_duration_ms=max_duration_ms,
             gen_ai_system=gen_ai_system,
-            gen_ai_request_model=final_request_model,
-            gen_ai_response_model=final_response_model,
+            gen_ai_request_model=gen_ai_request_model,
+            gen_ai_response_model=gen_ai_response_model,
             has_error=has_error,
             tags=tags or {},
             filters=filter_objects,

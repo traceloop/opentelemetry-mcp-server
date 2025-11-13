@@ -53,9 +53,7 @@ class BackendConfig(BaseModel):
         try:
             timeout = float(timeout_str)
         except (ValueError, TypeError) as e:
-            logger.warning(
-                f"Invalid BACKEND_TIMEOUT value '{timeout_str}': {e}. Using default: 30"
-            )
+            logger.warning(f"Invalid BACKEND_TIMEOUT value '{timeout_str}': {e}. Using default: 30")
             timeout = 30.0
 
         return cls(
@@ -72,7 +70,7 @@ class ServerConfig(BaseModel):
 
     backend: BackendConfig
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
-    max_traces_per_query: int = Field(default=100, ge=1, le=1000)
+    max_traces_per_query: int = Field(default=500, ge=1, le=1000)
 
     @classmethod
     def from_env(cls) -> "ServerConfig":
@@ -84,12 +82,12 @@ class ServerConfig(BaseModel):
         )
 
         # Parse max_traces_per_query with validation
-        max_traces_str = os.getenv("MAX_TRACES_PER_QUERY", "100")
+        max_traces_str = os.getenv("MAX_TRACES_PER_QUERY", "500")
         try:
             max_traces_per_query = int(max_traces_str)
         except (ValueError, TypeError) as e:
             logger.warning(
-                f"Invalid MAX_TRACES_PER_QUERY value '{max_traces_str}': {e}. Using default: 100"
+                f"Invalid MAX_TRACES_PER_QUERY value '{max_traces_str}': {e}. Using default: 500"
             )
             max_traces_per_query = 500
 

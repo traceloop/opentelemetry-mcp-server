@@ -233,7 +233,7 @@ Find traces with highest token usage for cost optimization.
 - `limit` - Number of traces to return (default: 10)
 - `start_time`, `end_time` - Time range filter
 - `min_tokens` - Minimum token threshold
-- `service_name`, `gen_ai_model` - Filters
+- `service_name`, `gen_ai_request_model`, `gen_ai_response_model` - Filters
 
 **Returns:** Top N traces sorted by total tokens with breakdown (prompt/completion/total)
 
@@ -251,7 +251,7 @@ Find slowest LLM traces by duration to identify latency bottlenecks.
 - `limit` - Number of traces to return (default: 10)
 - `start_time`, `end_time` - Time range filter
 - `min_duration_ms` - Minimum duration threshold
-- `service_name`, `gen_ai_model` - Filters
+- `service_name`, `gen_ai_request_model`, `gen_ai_response_model` - Filters
 
 **Returns:** Top N traces sorted by duration with token counts and model info
 
@@ -441,7 +441,7 @@ Multiple filters are combined with AND logic. Examples:
 
 ### Backward Compatibility
 
-Legacy simple parameters (service_name, gen_ai_model, etc.) still work and are automatically converted to filters internally. You can mix legacy parameters with explicit filters.
+Legacy simple parameters (service_name, gen_ai_request_model, gen_ai_response_model, etc.) still work and are automatically converted to filters internally. You can mix legacy parameters with explicit filters.
 
 ### Backend-Specific Requirements
 
@@ -506,7 +506,7 @@ Unlike `search_traces` which returns grouped traces, `search_spans` returns indi
 - `trace_id`, `span_id`, `parent_span_id`
 - `operation_name`, `service_name`
 - `start_time`, `duration_ms`, `status`
-- `is_llm_span`, `gen_ai_system`, `gen_ai_model`
+- `is_llm_span`, `gen_ai_system`
 - `total_tokens` (for LLM spans)
 
 ### `list_llm_tools` - Discover LLM Tool Usage

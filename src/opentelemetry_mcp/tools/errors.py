@@ -98,7 +98,11 @@ async def find_errors(
                 if span.is_llm_span:
                     error_info["is_llm_error"] = True
                     llm_provider = span.gen_ai_system
-                    llm_model = span.gen_ai_model
+                    # Get model from request or response model
+                    llm_model = (
+                        span.attributes.gen_ai_request_model
+                        or span.attributes.gen_ai_response_model
+                    )
                     error_info["llm_provider"] = str(llm_provider) if llm_provider else None
                     error_info["llm_model"] = str(llm_model) if llm_model else None
 
