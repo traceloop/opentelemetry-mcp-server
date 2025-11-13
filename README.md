@@ -181,18 +181,60 @@ The HTTP server will be accessible at `http://localhost:8000/sse` by default.
 
 ### Integrating with Claude Desktop
 
-Add to your Claude Desktop MCP configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+Configure the MCP server in your Claude Desktop config file:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+#### Why Two Configuration Approaches?
+
+This server supports **3 different backends** (Jaeger, Tempo, Traceloop). We provide two integration methods to suit different use cases:
+
+- **Wrapper Script** (`start_locally.sh`) → Easy backend switching for development/testing
+- **Direct Configuration** → Standard MCP pattern, better for production or single-backend setups
+
+Choose the approach that fits your workflow. See [Best Practices](#best-practices-choosing-an-approach) below for guidance.
+
+#### Option 1: Using start_locally.sh (Recommended for Development)
+
+**Best for:** Frequent backend switching, local development, testing multiple backends
 
 ```json
 {
   "mcpServers": {
-    "openllmetry": {
+    "opentelemetry-mcp": {
+      "command": "/absolute/path/to/opentelemetry-mcp-server/start_locally.sh"
+    }
+  }
+}
+```
+
+**Pros:**
+- Switch backends by editing one file (`start_locally.sh`)
+- Centralized configuration
+- Includes validation (checks if `uv` is installed)
+
+**Cons:**
+- Requires absolute path
+- macOS/Linux only (no Windows support yet)
+
+**To switch backends:** Edit `start_locally.sh` and uncomment your preferred backend section.
+
+#### Option 2: Direct Configuration (Standard MCP Pattern)
+
+**Best for:** Production, single backend, Windows users, following MCP ecosystem conventions
+
+##### Jaeger Backend (Local)
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp-jaeger": {
       "command": "uv",
       "args": [
         "--directory",
-        "/path/to/openllmetry-mcp",
+        "/absolute/path/to/opentelemetry-mcp-server",
         "run",
-        "openllmetry-mcp"
+        "opentelemetry-mcp"
       ],
       "env": {
         "BACKEND_TYPE": "jaeger",
@@ -202,6 +244,89 @@ Add to your Claude Desktop MCP configuration (`~/Library/Application Support/Cla
   }
 }
 ```
+
+##### Tempo Backend (Local)
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp-tempo": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/opentelemetry-mcp-server",
+        "run",
+        "opentelemetry-mcp"
+      ],
+      "env": {
+        "BACKEND_TYPE": "tempo",
+        "BACKEND_URL": "http://localhost:3200"
+      }
+    }
+  }
+}
+```
+
+##### Traceloop Backend (Cloud)
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp-traceloop": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/opentelemetry-mcp-server",
+        "run",
+        "opentelemetry-mcp"
+      ],
+      "env": {
+        "BACKEND_TYPE": "traceloop",
+        "BACKEND_URL": "https://api.traceloop.com",
+        "BACKEND_API_KEY": "your_traceloop_api_key_here"
+      }
+    }
+  }
+}
+```
+
+**Pros:**
+- Standard MCP ecosystem pattern
+- Works on all platforms (Windows/macOS/Linux)
+- Can configure multiple backends simultaneously (use different server names)
+- No wrapper script dependency
+
+**Cons:**
+- Must edit JSON config to switch backends
+- Backend configuration split between script and config file
+
+**Tip:** You can configure multiple backends at once (e.g., `opentelemetry-mcp-jaeger` and `opentelemetry-mcp-tempo`) and Claude will show both as available MCP servers.
+
+### Best Practices: Choosing an Approach
+
+| Scenario | Recommended Approach | Why |
+|----------|---------------------|-----|
+| **Development & Testing** | Wrapper Script (`start_locally.sh`) | Easy to switch backends, centralized config |
+| **Testing multiple backends** | Wrapper Script | Edit one file to switch, no JSON editing |
+| **Production deployment** | Direct Configuration | Standard MCP pattern, explicit configuration |
+| **Single backend only** | Direct Configuration | Simpler, no wrapper needed |
+| **Windows users** | Direct Configuration | Wrapper script not yet supported on Windows |
+| **macOS/Linux users** | Either approach | Choose based on your workflow |
+| **Multiple backends simultaneously** | Direct Configuration | Configure all backends with different names |
+| **Shared team configuration** | Direct Configuration | More portable, follows MCP conventions |
+
+**General Guidelines:**
+
+- **Start with the wrapper script** if you're testing different backends or doing local development
+- **Switch to direct configuration** once you've settled on a backend for production use
+- **On Windows**, use direct configuration (wrapper script support coming soon)
+- **For CI/CD**, use direct configuration with environment variables
+- **For shared teams**, document the direct configuration approach for consistency
+
+**Platform Support:**
+
+- **macOS/Linux**: Both approaches fully supported
+- **Windows**: Direct configuration only (PRs welcome for `.bat`/`.ps1` wrapper scripts!)
 
 ## Tools Reference
 
