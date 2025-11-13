@@ -181,14 +181,13 @@ class TraceloopBackend(BaseBackend):
     async def search_spans(self, query: SpanQuery) -> list[SpanData]:
         """Search for individual spans using Traceloop API.
 
-        Traceloop doesn't have a dedicated spans search API, so we search for traces
-        and then flatten to get individual spans matching the query.
+        Uses the direct spans search endpoint to query individual spans.
 
         Args:
             query: Span query parameters
 
         Returns:
-            List of matching spans (flattened from traces)
+            List of matching spans
 
         Raises:
             httpx.HTTPError: If the API request fails
@@ -223,7 +222,7 @@ class TraceloopBackend(BaseBackend):
                 f"{[(f.field, f.operator.value) for f in client_filters]}"
             )
 
-        # Build request body - fetch more traces to get enough spans
+        # Build request body
         body = {
             "filters": traceloop_filters,
             "logical_operator": "and",
@@ -231,7 +230,7 @@ class TraceloopBackend(BaseBackend):
             "sort_by": "timestamp",
             "sort_order": "DESC",
             "cursor": 0,
-            "limit": query.limit * 2,  # Fetch more traces to ensure we get enough spans
+            "limit": query.limit,
         }
 
         # Add time range (convert to seconds for Traceloop API)
@@ -246,38 +245,65 @@ class TraceloopBackend(BaseBackend):
         else:
             body["to_timestamp_sec"] = int(datetime.now().timestamp())
 
-        # Make request to root-spans endpoint
-        endpoint = f"/v2/projects/{self.project_id}/traces/root-spans"
+        # Make request to spans endpoint
+        endpoint = f"/v2/projects/{self.project_id}/spans"
         logger.debug(f"POST {endpoint} with body: {body}")
 
         response = await self.client.post(endpoint, json=body)
         response.raise_for_status()
 
         data = response.json()
-        root_spans_data = data.get("root_spans", {})
-        root_spans = root_spans_data.get("data", [])
+        spans_data = data.get("spans", {})
+        spans_list = spans_data.get("data", [])
 
-        logger.debug(f"Found {len(root_spans)} root spans")
+        logger.debug(f"Found {len(spans_list)} spans")
 
-        # Collect all spans from all traces
+        # Convert spans to SpanData objects
         all_spans: list[SpanData] = []
-        for root_span in root_spans:
-            # Get all spans for this trace (including root)
-            trace_id = root_span.get("trace_id")
-            if trace_id:
-                try:
-                    # Fetch full trace to get all spans
-                    trace = await self.get_trace(trace_id)
-                    if trace:
-                        all_spans.extend(trace.spans)
-                except Exception as e:
-                    logger.warning(f"Failed to fetch spans for trace {trace_id}: {e}")
+        for span_data in spans_list:
+            try:
+                # Extract and transform span attributes from llm.* to gen_ai.* format
+                raw_attrs = span_data.get("span_attributes", {})
+                transformed_attrs = self._transform_llm_attributes_to_gen_ai(raw_attrs)
+
+                # Create strongly-typed SpanAttributes
+                span_attributes = SpanAttributes(**transformed_attrs)
+
+                # Transform events if present
+                events_data = span_data.get("events", [])
+                events = [
+                    SpanEvent(
+                        name=event.get("name", ""),
+                        timestamp=event.get("timestamp", 0),
+                        attributes=event.get("attributes", {}),
+                    )
+                    for event in events_data
+                ]
+
+                span = SpanData(
+                    trace_id=span_data["trace_id"],
+                    span_id=span_data["span_id"],
+                    parent_span_id=span_data.get("parent_span_id"),
+                    operation_name=span_data["span_name"],
+                    service_name=raw_attrs.get("service.name", ""),
+                    start_time=datetime.fromtimestamp(
+                        span_data["timestamp"] / 1000
+                    ),  # Convert ms to seconds
+                    duration_ms=float(span_data["duration"]),
+                    status=self._status_code_to_status(span_data.get("status_code", "UNSET")),
+                    attributes=span_attributes,
+                    events=events,
+                )
+
+                all_spans.append(span)
+            except Exception as e:
+                logger.warning(f"Failed to parse span {span_data.get('span_id')}: {e}")
 
         # Apply client-side filters to spans
         if client_filters:
             all_spans = FilterEngine.apply_filters(all_spans, client_filters)
 
-        # Limit the number of spans returned
+        # Return up to the limit requested
         return all_spans[: query.limit]
 
     async def get_trace(self, trace_id: str) -> TraceData:
