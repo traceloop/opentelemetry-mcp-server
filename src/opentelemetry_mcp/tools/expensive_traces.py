@@ -1,10 +1,10 @@
 """Expensive traces tool implementation."""
 
 import json
-from datetime import datetime
 
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.models import LLMSpanAttributes, TraceQuery
+from opentelemetry_mcp.utils import parse_iso_timestamp
 
 
 async def get_expensive_traces(
@@ -33,20 +33,13 @@ async def get_expensive_traces(
         JSON string with top N most expensive traces
     """
     # Parse timestamps
-    start_dt = None
-    end_dt = None
+    start_dt, error = parse_iso_timestamp(start_time, "start_time")
+    if error:
+        return json.dumps({"error": error})
 
-    if start_time:
-        try:
-            start_dt = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
-        except ValueError as e:
-            return json.dumps({"error": f"Invalid start_time format: {e}"})
-
-    if end_time:
-        try:
-            end_dt = datetime.fromisoformat(end_time.replace("Z", "+00:00"))
-        except ValueError as e:
-            return json.dumps({"error": f"Invalid end_time format: {e}"})
+    end_dt, error = parse_iso_timestamp(end_time, "end_time")
+    if error:
+        return json.dumps({"error": error})
 
     try:
         # Build query to fetch traces (use larger limit to find top N)

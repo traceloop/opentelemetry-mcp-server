@@ -1,10 +1,13 @@
 """Configuration management for Opentelemetry MCP Server."""
 
+import logging
 import os
 from typing import Literal
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, HttpUrl, TypeAdapter, field_validator
+
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -45,11 +48,21 @@ class BackendConfig(BaseModel):
         environments_str = os.getenv("BACKEND_ENVIRONMENTS", "prd")
         environments = [env.strip() for env in environments_str.split(",") if env.strip()]
 
+        # Parse timeout with validation
+        timeout_str = os.getenv("BACKEND_TIMEOUT", "30")
+        try:
+            timeout = float(timeout_str)
+        except (ValueError, TypeError) as e:
+            logger.warning(
+                f"Invalid BACKEND_TIMEOUT value '{timeout_str}': {e}. Using default: 30"
+            )
+            timeout = 30.0
+
         return cls(
             type=backend_type,  # type: ignore
             url=backend_url,  # type: ignore
             api_key=os.getenv("BACKEND_API_KEY"),
-            timeout=float(os.getenv("BACKEND_TIMEOUT", "30")),
+            timeout=timeout,
             environments=environments,
         )
 
@@ -69,10 +82,21 @@ class ServerConfig(BaseModel):
         log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = (
             log_level_str if log_level_str in valid_levels else "INFO"  # type: ignore[assignment]
         )
+
+        # Parse max_traces_per_query with validation
+        max_traces_str = os.getenv("MAX_TRACES_PER_QUERY", "100")
+        try:
+            max_traces_per_query = int(max_traces_str)
+        except (ValueError, TypeError) as e:
+            logger.warning(
+                f"Invalid MAX_TRACES_PER_QUERY value '{max_traces_str}': {e}. Using default: 100"
+            )
+            max_traces_per_query = 500
+
         return cls(
             backend=BackendConfig.from_env(),
             log_level=log_level,
-            max_traces_per_query=int(os.getenv("MAX_TRACES_PER_QUERY", "100")),
+            max_traces_per_query=max_traces_per_query,
         )
 
     def apply_cli_overrides(

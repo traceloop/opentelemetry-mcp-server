@@ -54,7 +54,7 @@ class TraceloopBackend(BaseBackend):
         self.project_id = "default"
 
         # Store environments for all API requests
-        self.environments = environments if environments else ["production"]
+        self.environments = environments if environments else ["prd"]
 
     def _create_headers(self) -> dict[str, str]:
         """Create headers for Traceloop API requests.
