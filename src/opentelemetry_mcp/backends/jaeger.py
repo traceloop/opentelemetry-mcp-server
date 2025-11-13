@@ -263,7 +263,7 @@ class JaegerBackend(BaseBackend):
         response.raise_for_status()
 
         data = response.json()
-        return [op.get("name") for op in data.get("data", []) if op.get("name")]
+        return [str(op) for op in data.get("data", [])]
 
     async def health_check(self) -> HealthCheckResponse:
         """Check Jaeger backend health.
@@ -313,10 +313,13 @@ class JaegerBackend(BaseBackend):
                 logger.warning(f"Trace {trace_id} has no spans")
                 return None
 
+            # Get processes dictionary from trace level
+            processes = trace_data.get("processes", {})
+
             # Parse all spans
             spans: list[SpanData] = []
             for span_data in spans_data:
-                span = self._parse_jaeger_span(span_data)
+                span = self._parse_jaeger_span(span_data, processes)
                 if span:
                     spans.append(span)
 
@@ -359,11 +362,14 @@ class JaegerBackend(BaseBackend):
             logger.error(f"Error parsing trace: {e}")
             return None
 
-    def _parse_jaeger_span(self, span_data: dict[str, Any]) -> SpanData | None:
+    def _parse_jaeger_span(
+        self, span_data: dict[str, Any], processes: dict[str, Any]
+    ) -> SpanData | None:
         """Parse Jaeger span JSON to SpanData model.
 
         Args:
             span_data: Raw Jaeger span data
+            processes: Process/service mapping from trace level
 
         Returns:
             Parsed SpanData or None if parsing fails
@@ -390,7 +396,6 @@ class JaegerBackend(BaseBackend):
 
             # Get process/service info
             process_id = span_data.get("processID")
-            processes = span_data.get("processes", {})
             service_name = "unknown"
 
             if process_id and process_id in processes:
