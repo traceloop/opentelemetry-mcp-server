@@ -134,7 +134,7 @@ def _convert_legacy_params_to_filters(
             )
         )
 
-    if min_duration_ms:
+    if min_duration_ms is not None:
         all_filters.append(
             Filter(
                 field="duration",
