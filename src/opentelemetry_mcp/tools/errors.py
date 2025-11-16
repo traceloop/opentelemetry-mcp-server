@@ -3,6 +3,8 @@
 import json
 from typing import Any
 
+from pydantic import ValidationError
+
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.models import TraceQuery, TraceSummary
 from opentelemetry_mcp.utils import parse_iso_timestamp
@@ -37,13 +39,16 @@ async def find_errors(
         return json.dumps({"error": error})
 
     # Build query with error filter
-    query = TraceQuery(
-        service_name=service_name,
-        start_time=start_dt,
-        end_time=end_dt,
-        has_error=True,
-        limit=limit,
-    )
+    try:
+        query = TraceQuery(
+            service_name=service_name,
+            start_time=start_dt,
+            end_time=end_dt,
+            has_error=True,
+            limit=limit,
+        )
+    except ValidationError as e:
+        return json.dumps({"error": f"Invalid query parameters: {e}"})
 
     try:
         # Search for error traces

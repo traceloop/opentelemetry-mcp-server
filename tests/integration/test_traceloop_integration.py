@@ -427,7 +427,7 @@ class TestTraceloopFilters:
             Filter(
                 field="duration_ms",
                 operator=FilterOperator.GT,
-                value=5,
+                value=50,
                 value_type=FilterType.NUMBER,
             ),
         ]

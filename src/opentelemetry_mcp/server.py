@@ -1,5 +1,6 @@
 """Opentelemetry MCP Server - Main entry point."""
 
+import json
 import logging
 import sys
 from typing import Any
@@ -31,6 +32,23 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+
+def _handle_tool_error(tool_name: str, error: Exception) -> str:
+    """Centralized error handler for tool functions.
+
+    Logs the error with traceback and returns properly escaped JSON.
+
+    Args:
+        tool_name: Name of the tool that encountered the error
+        error: The exception that was raised
+
+    Returns:
+        JSON string with error message
+    """
+    logger.error(f"Error executing {tool_name}: {error}", exc_info=True)
+    return json.dumps({"error": f"Tool execution failed: {str(error)}"})
+
 
 # Global backend instance
 _backend: BaseBackend | None = None
@@ -192,8 +210,7 @@ async def search_traces(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing search_traces: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("search_traces", e)
 
 
 @mcp.tool()
@@ -213,8 +230,7 @@ async def get_trace(trace_id: str) -> str:
         result = await trace.get_trace(backend, trace_id=trace_id)
         return result
     except Exception as e:
-        logger.error(f"Error executing get_trace: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("get_trace", e)
 
 
 @mcp.tool()
@@ -257,8 +273,7 @@ async def get_llm_usage(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing get_llm_usage: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("get_llm_usage", e)
 
 
 @mcp.tool()
@@ -273,8 +288,7 @@ async def list_services() -> str:
         result = await services.list_services(backend)
         return result
     except Exception as e:
-        logger.error(f"Error executing list_services: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("list_services", e)
 
 
 @mcp.tool()
@@ -308,8 +322,7 @@ async def find_errors(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing find_errors: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("find_errors", e)
 
 
 @mcp.tool()
@@ -346,8 +359,7 @@ async def list_llm_models(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing list_llm_models: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("list_llm_models", e)
 
 
 @mcp.tool()
@@ -382,8 +394,7 @@ async def get_llm_model_stats(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing get_llm_model_stats: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("get_llm_model_stats", e)
 
 
 @mcp.tool()
@@ -426,8 +437,7 @@ async def get_llm_expensive_traces(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing get_llm_expensive_traces: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("get_llm_expensive_traces", e)
 
 
 @mcp.tool()
@@ -470,8 +480,7 @@ async def get_llm_slow_traces(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing get_llm_slow_traces: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("get_llm_slow_traces", e)
 
 
 @mcp.tool()
@@ -542,8 +551,7 @@ async def search_spans_tool(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing search_spans: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("search_spans_tool", e)
 
 
 @mcp.tool()
@@ -581,8 +589,7 @@ async def list_llm_tools_tool(
         )
         return result
     except Exception as e:
-        logger.error(f"Error executing list_llm_tools: {e}", exc_info=True)
-        return f'{{"error": "Tool execution failed: {str(e)}"}}'
+        return _handle_tool_error("list_llm_tools_tool", e)
 
 
 @click.command()
