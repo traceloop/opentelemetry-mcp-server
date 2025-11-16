@@ -1,0 +1,37 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces/00000000000000000000000000000000
+  response:
+    body:
+      string: '{"data":null,"total":0,"limit":0,"offset":0,"errors":[{"code":404,"msg":"trace
+        not found"}]}
+
+        '
+    headers:
+      Content-Length:
+      - '93'
+      Content-Type:
+      - text/plain; charset=utf-8
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-4d4da0cf1565eed923c630f2a84b3662-97afeea557395a84-01
+      X-Content-Type-Options:
+      - nosniff
+    status:
+      code: 404
+      message: Not Found
+version: 1

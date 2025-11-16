@@ -1,0 +1,62 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services
+  response:
+    body:
+      string: '{"data":["model-comparison","jaeger","travel-agent-demo","trace-analyzer-agent"],"total":4,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-6e2f7ccff0cde8072da5213918d85cec-0197bf6e453fd94a-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces?service=model-comparison&limit=10
+  response:
+    body:
+      string: '{"data":[],"total":0,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-1ff9bfaeecbe29179f55f65d4701daaa-9ee4d212397b7562-01
+    status:
+      code: 200
+      message: OK
+version: 1

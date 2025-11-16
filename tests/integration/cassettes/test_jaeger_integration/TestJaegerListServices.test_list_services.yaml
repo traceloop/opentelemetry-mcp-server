@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services
+  response:
+    body:
+      string: '{"data":["jaeger","travel-agent-demo","trace-analyzer-agent","model-comparison"],"total":4,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-7c94e399de79b37042e789c86ca5de50-1fd480fa282ec584-01
+    status:
+      code: 200
+      message: OK
+version: 1

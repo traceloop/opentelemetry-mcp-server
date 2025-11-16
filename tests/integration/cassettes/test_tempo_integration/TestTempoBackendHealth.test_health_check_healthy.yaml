@@ -1,0 +1,33 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:3200
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3200/api/search?q=%7B%7D&limit=1
+  response:
+    body:
+      string: '{"traces":[{"traceID":"6ce0a0129015a826c7f54b78275cfe37","rootServiceName":"travel-agent-demo2","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763042290335056000","durationMs":165781,"spanSet":{"spans":[{"spanID":"40cddd148de5e768","startTimeUnixNano":"1763042290335056000","durationNanos":"165781359000"},{"spanID":"de23a8a7bea8dd2c","startTimeUnixNano":"1763042290336958000","durationNanos":"165779362000"},{"spanID":"1a273c93a6725233","startTimeUnixNano":"1763042433338440000","durationNanos":"22771507000"}],"matched":28},"spanSets":[{"spans":[{"spanID":"40cddd148de5e768","startTimeUnixNano":"1763042290335056000","durationNanos":"165781359000"},{"spanID":"de23a8a7bea8dd2c","startTimeUnixNano":"1763042290336958000","durationNanos":"165779362000"},{"spanID":"1a273c93a6725233","startTimeUnixNano":"1763042433338440000","durationNanos":"22771507000"}],"matched":28}],"serviceStats":{"travel-agent-demo2":{"spanCount":28}}}],"metrics":{"inspectedBytes":"42386","completedJobs":1,"totalJobs":1}}'
+    headers:
+      Content-Length:
+      - '1006'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 14:12:44 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,62 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services
+  response:
+    body:
+      string: '{"data":["trace-analyzer-agent","model-comparison","jaeger","travel-agent-demo"],"total":4,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-cfdc176f3764b26957339bc03a2af19c-d0e1472d51618cbc-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services/trace-analyzer-agent/operations
+  response:
+    body:
+      string: '{"data":["openai.chat","tools/list.mcp","initialize.mcp","search_traces.tool"],"total":4,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '124'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-1fc35582dd0d4177e3454a10deeb6299-374737f04c714489-01
+    status:
+      code: 200
+      message: OK
+version: 1

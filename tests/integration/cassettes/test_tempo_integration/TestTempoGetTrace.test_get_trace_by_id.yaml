@@ -1,0 +1,239 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:3200
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3200/api/search?q=%7B%7D&limit=1
+  response:
+    body:
+      string: '{"traces":[{"traceID":"42ff472d7feb6215bec0cf4e350675b2","rootServiceName":"travel-agent-demo","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763042187232503000","durationMs":10109,"spanSet":{"spans":[{"spanID":"34fcf1bb3fafa39e","startTimeUnixNano":"1763042187236891000","durationNanos":"2223290000"},{"spanID":"267fb9e41508b20f","startTimeUnixNano":"1763042192790536000","durationNanos":"4551608000"},{"spanID":"a94b4056fdcc5ab8","startTimeUnixNano":"1763042187234430000","durationNanos":"10107769000"}],"matched":10},"spanSets":[{"spans":[{"spanID":"34fcf1bb3fafa39e","startTimeUnixNano":"1763042187236891000","durationNanos":"2223290000"},{"spanID":"267fb9e41508b20f","startTimeUnixNano":"1763042192790536000","durationNanos":"4551608000"},{"spanID":"a94b4056fdcc5ab8","startTimeUnixNano":"1763042187234430000","durationNanos":"10107769000"}],"matched":10}],"serviceStats":{"travel-agent-demo":{"spanCount":10}}}],"metrics":{"totalBlocks":2,"completedJobs":1,"totalJobs":5,"totalBlockBytes":"120658"}}'
+    headers:
+      Content-Length:
+      - '1013'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 14:12:45 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:3200
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3200/api/traces/42ff472d7feb6215bec0cf4e350675b2
+  response:
+    body:
+      string: '{"batches":[{"resource":{"attributes":[{"key":"telemetry.sdk.language","value":{"stringValue":"python"}},{"key":"telemetry.sdk.name","value":{"stringValue":"opentelemetry"}},{"key":"telemetry.sdk.version","value":{"stringValue":"1.38.0"}},{"key":"service.name","value":{"stringValue":"travel-agent-demo"}}]},"scopeSpans":[{"scope":{"name":"opentelemetry.instrumentation.openai_agents","version":"0.47.5"},"spans":[{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"NPzxuz+vo54=","parentSpanId":"qUtAVv3MWrg=","name":"openai.response","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042187236891000","endTimeUnixNano":"1763042189460181000","attributes":[{"key":"llm.request.type","value":{"stringValue":"response"}},{"key":"gen_ai.system","value":{"stringValue":"openai"}},{"key":"gen_ai.operation.name","value":{"stringValue":"response"}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}},{"key":"gen_ai.prompt.0.role","value":{"stringValue":"user"}},{"key":"gen_ai.prompt.0.content","value":{"stringValue":"I
+        want to visit New York for 7 days with a moderate budget. I love history.
+        Create me an itinerary."}},{"key":"llm.request.functions.0.name","value":{"stringValue":"search_destinations"}},{"key":"llm.request.functions.0.description","value":{"stringValue":"Search
+        for travel destinations by region or subregion using REST Countries API."}},{"key":"llm.request.functions.0.parameters","value":{"stringValue":"{\"properties\":
+        {\"region\": {\"default\": \"\", \"description\": \"Region to search (e.g.,
+        \\\"Europe\\\", \\\"Asia\\\", \\\"Americas\\\")\", \"title\": \"Region\",
+        \"type\": \"string\"}, \"subregion\": {\"default\": \"\", \"description\":
+        \"Subregion to search (e.g., \\\"Southern Europe\\\", \\\"Southeast Asia\\\")\",
+        \"title\": \"Subregion\", \"type\": \"string\"}}, \"title\": \"search_destinations_args\",
+        \"type\": \"object\", \"additionalProperties\": false, \"required\": [\"region\",
+        \"subregion\"]}"}},{"key":"llm.request.functions.1.name","value":{"stringValue":"get_location_coordinates"}},{"key":"llm.request.functions.1.description","value":{"stringValue":"Get
+        coordinates for a location using Nominatim (OpenStreetMap) API."}},{"key":"llm.request.functions.1.parameters","value":{"stringValue":"{\"properties\":
+        {\"location_name\": {\"description\": \"Name of the city or location\", \"title\":
+        \"Location Name\", \"type\": \"string\"}}, \"required\": [\"location_name\"],
+        \"title\": \"get_location_coordinates_args\", \"type\": \"object\", \"additionalProperties\":
+        false}"}},{"key":"llm.request.functions.2.name","value":{"stringValue":"get_weather_forecast"}},{"key":"llm.request.functions.2.description","value":{"stringValue":"Get
+        current weather and 7-day forecast using Open-Meteo API (no API key required)."}},{"key":"llm.request.functions.2.parameters","value":{"stringValue":"{\"properties\":
+        {\"location_name\": {\"description\": \"Name of the location\", \"title\":
+        \"Location Name\", \"type\": \"string\"}, \"latitude\": {\"description\":
+        \"Latitude coordinate\", \"title\": \"Latitude\", \"type\": \"number\"}, \"longitude\":
+        {\"description\": \"Longitude coordinate\", \"title\": \"Longitude\", \"type\":
+        \"number\"}}, \"required\": [\"location_name\", \"latitude\", \"longitude\"],
+        \"title\": \"get_weather_forecast_args\", \"type\": \"object\", \"additionalProperties\":
+        false}"}},{"key":"llm.request.functions.3.name","value":{"stringValue":"get_destination_info"}},{"key":"llm.request.functions.3.description","value":{"stringValue":"Get
+        information about a destination from Wikipedia API."}},{"key":"llm.request.functions.3.parameters","value":{"stringValue":"{\"properties\":
+        {\"destination_name\": {\"description\": \"Name of the destination\", \"title\":
+        \"Destination Name\", \"type\": \"string\"}}, \"required\": [\"destination_name\"],
+        \"title\": \"get_destination_info_args\", \"type\": \"object\", \"additionalProperties\":
+        false}"}},{"key":"llm.request.functions.4.name","value":{"stringValue":"calculate_travel_distance"}},{"key":"llm.request.functions.4.description","value":{"stringValue":"Calculate
+        distance and estimated flight time between two locations.\nUses Haversine
+        formula for distance calculation."}},{"key":"llm.request.functions.4.parameters","value":{"stringValue":"{\"properties\":
+        {\"from_location\": {\"description\": \"Starting location name\", \"title\":
+        \"From Location\", \"type\": \"string\"}, \"to_location\": {\"description\":
+        \"Destination location name\", \"title\": \"To Location\", \"type\": \"string\"},
+        \"from_lat\": {\"description\": \"Starting latitude\", \"title\": \"From Lat\",
+        \"type\": \"number\"}, \"from_lon\": {\"description\": \"Starting longitude\",
+        \"title\": \"From Lon\", \"type\": \"number\"}, \"to_lat\": {\"description\":
+        \"Destination latitude\", \"title\": \"To Lat\", \"type\": \"number\"}, \"to_lon\":
+        {\"description\": \"Destination longitude\", \"title\": \"To Lon\", \"type\":
+        \"number\"}}, \"required\": [\"from_location\", \"to_location\", \"from_lat\",
+        \"from_lon\", \"to_lat\", \"to_lon\"], \"title\": \"calculate_travel_distance_args\",
+        \"type\": \"object\", \"additionalProperties\": false}"}},{"key":"llm.request.functions.5.name","value":{"stringValue":"create_itinerary"}},{"key":"llm.request.functions.5.description","value":{"stringValue":"Create
+        a detailed day-by-day travel itinerary using AI."}},{"key":"llm.request.functions.5.parameters","value":{"stringValue":"{\"properties\":
+        {\"destination\": {\"description\": \"Main destination for the trip\", \"title\":
+        \"Destination\", \"type\": \"string\"}, \"duration_days\": {\"description\":
+        \"Number of days for the trip\", \"title\": \"Duration Days\", \"type\": \"integer\"},
+        \"budget\": {\"description\": \"Budget level (budget, moderate, luxury)\",
+        \"title\": \"Budget\", \"type\": \"string\"}, \"interests\": {\"description\":
+        \"Traveler interests (e.g., food, history, nature)\", \"title\": \"Interests\",
+        \"type\": \"string\"}, \"weather_info\": {\"default\": \"\", \"description\":
+        \"Weather forecast information (optional)\", \"title\": \"Weather Info\",
+        \"type\": \"string\"}, \"destination_details\": {\"default\": \"\", \"description\":
+        \"Additional destination details (optional)\", \"title\": \"Destination Details\",
+        \"type\": \"string\"}}, \"required\": [\"destination\", \"duration_days\",
+        \"budget\", \"interests\", \"weather_info\", \"destination_details\"], \"title\":
+        \"create_itinerary_args\", \"type\": \"object\", \"additionalProperties\":
+        false}"}},{"key":"gen_ai.request.temperature","value":{"doubleValue":1}},{"key":"gen_ai.request.top_p","value":{"doubleValue":1}},{"key":"gen_ai.request.model","value":{"stringValue":"gpt-4o-2024-08-06"}},{"key":"gen_ai.completion.0.role","value":{"stringValue":"assistant"}},{"key":"gen_ai.completion.0.finish_reason","value":{"stringValue":"tool_calls"}},{"key":"gen_ai.completion.0.tool_calls.0.name","value":{"stringValue":"get_location_coordinates"}},{"key":"gen_ai.completion.0.tool_calls.0.arguments","value":{"stringValue":"{\"location_name\":\"New
+        York\"}"}},{"key":"gen_ai.completion.0.tool_calls.0.id","value":{"stringValue":"call_M6Cz1ZtgBBRVhPAKwGhP4HkH"}},{"key":"gen_ai.completion.1.role","value":{"stringValue":"assistant"}},{"key":"gen_ai.completion.1.finish_reason","value":{"stringValue":"tool_calls"}},{"key":"gen_ai.completion.1.tool_calls.0.name","value":{"stringValue":"get_destination_info"}},{"key":"gen_ai.completion.1.tool_calls.0.arguments","value":{"stringValue":"{\"destination_name\":\"New
+        York\"}"}},{"key":"gen_ai.completion.1.tool_calls.0.id","value":{"stringValue":"call_XjU0qIs2w9toMdl7I78qNPRd"}},{"key":"gen_ai.completion.2.role","value":{"stringValue":"assistant"}},{"key":"gen_ai.completion.2.finish_reason","value":{"stringValue":"tool_calls"}},{"key":"gen_ai.completion.2.tool_calls.0.name","value":{"stringValue":"get_weather_forecast"}},{"key":"gen_ai.completion.2.tool_calls.0.arguments","value":{"stringValue":"{\"location_name\":\"New
+        York\",\"latitude\":40.7128,\"longitude\":-74.006}"}},{"key":"gen_ai.completion.2.tool_calls.0.id","value":{"stringValue":"call_vW1iVMpxm4W5VAjz3uvhFwxl"}},{"key":"gen_ai.usage.prompt_tokens","value":{"intValue":"313"}},{"key":"gen_ai.usage.completion_tokens","value":{"intValue":"81"}},{"key":"llm.usage.total_tokens","value":{"intValue":"394"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"Jn+55BUIsg8=","parentSpanId":"qUtAVv3MWrg=","name":"openai.response","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042192790536000","endTimeUnixNano":"1763042197342144000","attributes":[{"key":"llm.request.type","value":{"stringValue":"response"}},{"key":"gen_ai.system","value":{"stringValue":"openai"}},{"key":"gen_ai.operation.name","value":{"stringValue":"response"}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"qUtAVv3MWrg=","parentSpanId":"i9g02JupVjo=","name":"Travel
+        Planner Agent.agent","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042187234430000","endTimeUnixNano":"1763042197342199000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"agent"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"i9g02JupVjo=","name":"Agent
+        Workflow","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042187232503000","endTimeUnixNano":"1763042197342213000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"workflow"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.workflow.name","value":{"stringValue":"Agent
+        Workflow"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"ndtaGw2O47w=","parentSpanId":"qUtAVv3MWrg=","name":"get_destination_info.tool","kind":"SPAN_KIND_INTERNAL","startTimeUnixNano":"1763042189461414000","endTimeUnixNano":"1763042192787831000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"tool"}},{"key":"gen_ai.tool.name","value":{"stringValue":"get_destination_info"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.completion.tool.name","value":{"stringValue":"get_destination_info"}},{"key":"gen_ai.completion.tool.type","value":{"stringValue":"FunctionTool"}},{"key":"gen_ai.completion.tool.strict_json_schema","value":{"boolValue":true}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"lAvl8cSGCdQ=","parentSpanId":"qUtAVv3MWrg=","name":"get_weather_forecast.tool","kind":"SPAN_KIND_INTERNAL","startTimeUnixNano":"1763042189461614000","endTimeUnixNano":"1763042192787979000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"tool"}},{"key":"gen_ai.tool.name","value":{"stringValue":"get_weather_forecast"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.completion.tool.name","value":{"stringValue":"get_weather_forecast"}},{"key":"gen_ai.completion.tool.type","value":{"stringValue":"FunctionTool"}},{"key":"gen_ai.completion.tool.strict_json_schema","value":{"boolValue":true}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"DRPQ4fXYGOk=","parentSpanId":"qUtAVv3MWrg=","name":"get_location_coordinates.tool","kind":"SPAN_KIND_INTERNAL","startTimeUnixNano":"1763042189461045000","endTimeUnixNano":"1763042192788272000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"tool"}},{"key":"gen_ai.tool.name","value":{"stringValue":"get_location_coordinates"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.completion.tool.name","value":{"stringValue":"get_location_coordinates"}},{"key":"gen_ai.completion.tool.type","value":{"stringValue":"FunctionTool"}},{"key":"gen_ai.completion.tool.strict_json_schema","value":{"boolValue":true}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}}]},{"scope":{"name":"opentelemetry.instrumentation.requests","version":"0.59b0"},"spans":[{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"gvjOX9XKnIQ=","parentSpanId":"ndtaGw2O47w=","name":"GET","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042189966888000","endTimeUnixNano":"1763042190649032000","attributes":[{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}},{"key":"http.method","value":{"stringValue":"GET"}},{"key":"http.url","value":{"stringValue":"https://en.wikipedia.org/api/rest_v1/page/summary/New%20York"}},{"key":"http.status_code","value":{"intValue":"200"}}],"status":{}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"Vd7J6WeIkI0=","parentSpanId":"lAvl8cSGCdQ=","name":"GET","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042190650755000","endTimeUnixNano":"1763042191744238000","attributes":[{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}},{"key":"http.method","value":{"stringValue":"GET"}},{"key":"http.url","value":{"stringValue":"https://api.open-meteo.com/v1/forecast?latitude=40.7128\u0026longitude=-74.006\u0026current=temperature_2m%2Crelative_humidity_2m%2Cwind_speed_10m%2Cweather_code\u0026daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum\u0026timezone=auto\u0026forecast_days=7"}},{"key":"http.status_code","value":{"intValue":"200"}}],"status":{}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"QO7ZImsbB1g=","parentSpanId":"DRPQ4fXYGOk=","name":"GET","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042191747300000","endTimeUnixNano":"1763042192786263000","attributes":[{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}},{"key":"http.method","value":{"stringValue":"GET"}},{"key":"http.url","value":{"stringValue":"https://nominatim.openstreetmap.org/search?q=New+York\u0026format=json\u0026limit=1"}},{"key":"http.status_code","value":{"intValue":"200"}}],"status":{}}]}]}]}'
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 14:12:45 GMT
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-length:
+      - '14143'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:3200
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3200/api/traces/42ff472d7feb6215bec0cf4e350675b2
+  response:
+    body:
+      string: '{"batches":[{"resource":{"attributes":[{"key":"telemetry.sdk.language","value":{"stringValue":"python"}},{"key":"telemetry.sdk.name","value":{"stringValue":"opentelemetry"}},{"key":"telemetry.sdk.version","value":{"stringValue":"1.38.0"}},{"key":"service.name","value":{"stringValue":"travel-agent-demo"}}]},"scopeSpans":[{"scope":{"name":"opentelemetry.instrumentation.openai_agents","version":"0.47.5"},"spans":[{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"NPzxuz+vo54=","parentSpanId":"qUtAVv3MWrg=","name":"openai.response","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042187236891000","endTimeUnixNano":"1763042189460181000","attributes":[{"key":"llm.request.type","value":{"stringValue":"response"}},{"key":"gen_ai.system","value":{"stringValue":"openai"}},{"key":"gen_ai.operation.name","value":{"stringValue":"response"}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}},{"key":"gen_ai.prompt.0.role","value":{"stringValue":"user"}},{"key":"gen_ai.prompt.0.content","value":{"stringValue":"I
+        want to visit New York for 7 days with a moderate budget. I love history.
+        Create me an itinerary."}},{"key":"llm.request.functions.0.name","value":{"stringValue":"search_destinations"}},{"key":"llm.request.functions.0.description","value":{"stringValue":"Search
+        for travel destinations by region or subregion using REST Countries API."}},{"key":"llm.request.functions.0.parameters","value":{"stringValue":"{\"properties\":
+        {\"region\": {\"default\": \"\", \"description\": \"Region to search (e.g.,
+        \\\"Europe\\\", \\\"Asia\\\", \\\"Americas\\\")\", \"title\": \"Region\",
+        \"type\": \"string\"}, \"subregion\": {\"default\": \"\", \"description\":
+        \"Subregion to search (e.g., \\\"Southern Europe\\\", \\\"Southeast Asia\\\")\",
+        \"title\": \"Subregion\", \"type\": \"string\"}}, \"title\": \"search_destinations_args\",
+        \"type\": \"object\", \"additionalProperties\": false, \"required\": [\"region\",
+        \"subregion\"]}"}},{"key":"llm.request.functions.1.name","value":{"stringValue":"get_location_coordinates"}},{"key":"llm.request.functions.1.description","value":{"stringValue":"Get
+        coordinates for a location using Nominatim (OpenStreetMap) API."}},{"key":"llm.request.functions.1.parameters","value":{"stringValue":"{\"properties\":
+        {\"location_name\": {\"description\": \"Name of the city or location\", \"title\":
+        \"Location Name\", \"type\": \"string\"}}, \"required\": [\"location_name\"],
+        \"title\": \"get_location_coordinates_args\", \"type\": \"object\", \"additionalProperties\":
+        false}"}},{"key":"llm.request.functions.2.name","value":{"stringValue":"get_weather_forecast"}},{"key":"llm.request.functions.2.description","value":{"stringValue":"Get
+        current weather and 7-day forecast using Open-Meteo API (no API key required)."}},{"key":"llm.request.functions.2.parameters","value":{"stringValue":"{\"properties\":
+        {\"location_name\": {\"description\": \"Name of the location\", \"title\":
+        \"Location Name\", \"type\": \"string\"}, \"latitude\": {\"description\":
+        \"Latitude coordinate\", \"title\": \"Latitude\", \"type\": \"number\"}, \"longitude\":
+        {\"description\": \"Longitude coordinate\", \"title\": \"Longitude\", \"type\":
+        \"number\"}}, \"required\": [\"location_name\", \"latitude\", \"longitude\"],
+        \"title\": \"get_weather_forecast_args\", \"type\": \"object\", \"additionalProperties\":
+        false}"}},{"key":"llm.request.functions.3.name","value":{"stringValue":"get_destination_info"}},{"key":"llm.request.functions.3.description","value":{"stringValue":"Get
+        information about a destination from Wikipedia API."}},{"key":"llm.request.functions.3.parameters","value":{"stringValue":"{\"properties\":
+        {\"destination_name\": {\"description\": \"Name of the destination\", \"title\":
+        \"Destination Name\", \"type\": \"string\"}}, \"required\": [\"destination_name\"],
+        \"title\": \"get_destination_info_args\", \"type\": \"object\", \"additionalProperties\":
+        false}"}},{"key":"llm.request.functions.4.name","value":{"stringValue":"calculate_travel_distance"}},{"key":"llm.request.functions.4.description","value":{"stringValue":"Calculate
+        distance and estimated flight time between two locations.\nUses Haversine
+        formula for distance calculation."}},{"key":"llm.request.functions.4.parameters","value":{"stringValue":"{\"properties\":
+        {\"from_location\": {\"description\": \"Starting location name\", \"title\":
+        \"From Location\", \"type\": \"string\"}, \"to_location\": {\"description\":
+        \"Destination location name\", \"title\": \"To Location\", \"type\": \"string\"},
+        \"from_lat\": {\"description\": \"Starting latitude\", \"title\": \"From Lat\",
+        \"type\": \"number\"}, \"from_lon\": {\"description\": \"Starting longitude\",
+        \"title\": \"From Lon\", \"type\": \"number\"}, \"to_lat\": {\"description\":
+        \"Destination latitude\", \"title\": \"To Lat\", \"type\": \"number\"}, \"to_lon\":
+        {\"description\": \"Destination longitude\", \"title\": \"To Lon\", \"type\":
+        \"number\"}}, \"required\": [\"from_location\", \"to_location\", \"from_lat\",
+        \"from_lon\", \"to_lat\", \"to_lon\"], \"title\": \"calculate_travel_distance_args\",
+        \"type\": \"object\", \"additionalProperties\": false}"}},{"key":"llm.request.functions.5.name","value":{"stringValue":"create_itinerary"}},{"key":"llm.request.functions.5.description","value":{"stringValue":"Create
+        a detailed day-by-day travel itinerary using AI."}},{"key":"llm.request.functions.5.parameters","value":{"stringValue":"{\"properties\":
+        {\"destination\": {\"description\": \"Main destination for the trip\", \"title\":
+        \"Destination\", \"type\": \"string\"}, \"duration_days\": {\"description\":
+        \"Number of days for the trip\", \"title\": \"Duration Days\", \"type\": \"integer\"},
+        \"budget\": {\"description\": \"Budget level (budget, moderate, luxury)\",
+        \"title\": \"Budget\", \"type\": \"string\"}, \"interests\": {\"description\":
+        \"Traveler interests (e.g., food, history, nature)\", \"title\": \"Interests\",
+        \"type\": \"string\"}, \"weather_info\": {\"default\": \"\", \"description\":
+        \"Weather forecast information (optional)\", \"title\": \"Weather Info\",
+        \"type\": \"string\"}, \"destination_details\": {\"default\": \"\", \"description\":
+        \"Additional destination details (optional)\", \"title\": \"Destination Details\",
+        \"type\": \"string\"}}, \"required\": [\"destination\", \"duration_days\",
+        \"budget\", \"interests\", \"weather_info\", \"destination_details\"], \"title\":
+        \"create_itinerary_args\", \"type\": \"object\", \"additionalProperties\":
+        false}"}},{"key":"gen_ai.request.temperature","value":{"doubleValue":1}},{"key":"gen_ai.request.top_p","value":{"doubleValue":1}},{"key":"gen_ai.request.model","value":{"stringValue":"gpt-4o-2024-08-06"}},{"key":"gen_ai.completion.0.role","value":{"stringValue":"assistant"}},{"key":"gen_ai.completion.0.finish_reason","value":{"stringValue":"tool_calls"}},{"key":"gen_ai.completion.0.tool_calls.0.name","value":{"stringValue":"get_location_coordinates"}},{"key":"gen_ai.completion.0.tool_calls.0.arguments","value":{"stringValue":"{\"location_name\":\"New
+        York\"}"}},{"key":"gen_ai.completion.0.tool_calls.0.id","value":{"stringValue":"call_M6Cz1ZtgBBRVhPAKwGhP4HkH"}},{"key":"gen_ai.completion.1.role","value":{"stringValue":"assistant"}},{"key":"gen_ai.completion.1.finish_reason","value":{"stringValue":"tool_calls"}},{"key":"gen_ai.completion.1.tool_calls.0.name","value":{"stringValue":"get_destination_info"}},{"key":"gen_ai.completion.1.tool_calls.0.arguments","value":{"stringValue":"{\"destination_name\":\"New
+        York\"}"}},{"key":"gen_ai.completion.1.tool_calls.0.id","value":{"stringValue":"call_XjU0qIs2w9toMdl7I78qNPRd"}},{"key":"gen_ai.completion.2.role","value":{"stringValue":"assistant"}},{"key":"gen_ai.completion.2.finish_reason","value":{"stringValue":"tool_calls"}},{"key":"gen_ai.completion.2.tool_calls.0.name","value":{"stringValue":"get_weather_forecast"}},{"key":"gen_ai.completion.2.tool_calls.0.arguments","value":{"stringValue":"{\"location_name\":\"New
+        York\",\"latitude\":40.7128,\"longitude\":-74.006}"}},{"key":"gen_ai.completion.2.tool_calls.0.id","value":{"stringValue":"call_vW1iVMpxm4W5VAjz3uvhFwxl"}},{"key":"gen_ai.usage.prompt_tokens","value":{"intValue":"313"}},{"key":"gen_ai.usage.completion_tokens","value":{"intValue":"81"}},{"key":"llm.usage.total_tokens","value":{"intValue":"394"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"Jn+55BUIsg8=","parentSpanId":"qUtAVv3MWrg=","name":"openai.response","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042192790536000","endTimeUnixNano":"1763042197342144000","attributes":[{"key":"llm.request.type","value":{"stringValue":"response"}},{"key":"gen_ai.system","value":{"stringValue":"openai"}},{"key":"gen_ai.operation.name","value":{"stringValue":"response"}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"qUtAVv3MWrg=","parentSpanId":"i9g02JupVjo=","name":"Travel
+        Planner Agent.agent","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042187234430000","endTimeUnixNano":"1763042197342199000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"agent"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"i9g02JupVjo=","name":"Agent
+        Workflow","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042187232503000","endTimeUnixNano":"1763042197342213000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"workflow"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.workflow.name","value":{"stringValue":"Agent
+        Workflow"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"ndtaGw2O47w=","parentSpanId":"qUtAVv3MWrg=","name":"get_destination_info.tool","kind":"SPAN_KIND_INTERNAL","startTimeUnixNano":"1763042189461414000","endTimeUnixNano":"1763042192787831000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"tool"}},{"key":"gen_ai.tool.name","value":{"stringValue":"get_destination_info"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.completion.tool.name","value":{"stringValue":"get_destination_info"}},{"key":"gen_ai.completion.tool.type","value":{"stringValue":"FunctionTool"}},{"key":"gen_ai.completion.tool.strict_json_schema","value":{"boolValue":true}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"lAvl8cSGCdQ=","parentSpanId":"qUtAVv3MWrg=","name":"get_weather_forecast.tool","kind":"SPAN_KIND_INTERNAL","startTimeUnixNano":"1763042189461614000","endTimeUnixNano":"1763042192787979000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"tool"}},{"key":"gen_ai.tool.name","value":{"stringValue":"get_weather_forecast"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.completion.tool.name","value":{"stringValue":"get_weather_forecast"}},{"key":"gen_ai.completion.tool.type","value":{"stringValue":"FunctionTool"}},{"key":"gen_ai.completion.tool.strict_json_schema","value":{"boolValue":true}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"DRPQ4fXYGOk=","parentSpanId":"qUtAVv3MWrg=","name":"get_location_coordinates.tool","kind":"SPAN_KIND_INTERNAL","startTimeUnixNano":"1763042189461045000","endTimeUnixNano":"1763042192788272000","attributes":[{"key":"traceloop.span.kind","value":{"stringValue":"tool"}},{"key":"gen_ai.tool.name","value":{"stringValue":"get_location_coordinates"}},{"key":"gen_ai.system","value":{"stringValue":"openai_agents"}},{"key":"gen_ai.completion.tool.name","value":{"stringValue":"get_location_coordinates"}},{"key":"gen_ai.completion.tool.type","value":{"stringValue":"FunctionTool"}},{"key":"gen_ai.completion.tool.strict_json_schema","value":{"boolValue":true}},{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}}],"status":{"code":"STATUS_CODE_OK"}}]},{"scope":{"name":"opentelemetry.instrumentation.requests","version":"0.59b0"},"spans":[{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"gvjOX9XKnIQ=","parentSpanId":"ndtaGw2O47w=","name":"GET","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042189966888000","endTimeUnixNano":"1763042190649032000","attributes":[{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}},{"key":"http.method","value":{"stringValue":"GET"}},{"key":"http.url","value":{"stringValue":"https://en.wikipedia.org/api/rest_v1/page/summary/New%20York"}},{"key":"http.status_code","value":{"intValue":"200"}}],"status":{}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"Vd7J6WeIkI0=","parentSpanId":"lAvl8cSGCdQ=","name":"GET","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042190650755000","endTimeUnixNano":"1763042191744238000","attributes":[{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}},{"key":"http.method","value":{"stringValue":"GET"}},{"key":"http.url","value":{"stringValue":"https://api.open-meteo.com/v1/forecast?latitude=40.7128\u0026longitude=-74.006\u0026current=temperature_2m%2Crelative_humidity_2m%2Cwind_speed_10m%2Cweather_code\u0026daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum\u0026timezone=auto\u0026forecast_days=7"}},{"key":"http.status_code","value":{"intValue":"200"}}],"status":{}},{"traceId":"Qv9HLX/rYhW+wM9ONQZ1sg==","spanId":"QO7ZImsbB1g=","parentSpanId":"DRPQ4fXYGOk=","name":"GET","kind":"SPAN_KIND_CLIENT","startTimeUnixNano":"1763042191747300000","endTimeUnixNano":"1763042192786263000","attributes":[{"key":"gen_ai.agent.name","value":{"stringValue":"Travel
+        Planner Agent"}},{"key":"http.method","value":{"stringValue":"GET"}},{"key":"http.url","value":{"stringValue":"https://nominatim.openstreetmap.org/search?q=New+York\u0026format=json\u0026limit=1"}},{"key":"http.status_code","value":{"intValue":"200"}}],"status":{}}]}]}]}'
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 14:12:45 GMT
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      content-length:
+      - '14143'
+    status:
+      code: 200
+      message: OK
+version: 1

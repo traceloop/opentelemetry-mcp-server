@@ -1,0 +1,68 @@
+[project]
+name = "opentelemetry-mcp"
+version = "0.1.0"
+description = "MCP server for querying OpenTelemetry traces from LLM applications with Opentelemetry support"
+authors = [
+    {name = "Doron Kopit", email = "doron@traceloop.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp~=1.20.0",
+    "fastmcp~=2.13.0",
+    "pydantic~=2.12.0",
+    "httpx~=0.28.0",
+    "python-dotenv~=1.2.0",
+    "click~=8.3.0",
+    "uvicorn~=0.38.0",
+    "starlette~=0.50.0",
+]
+
+[project.scripts]
+opentelemetry-mcp = "opentelemetry_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest~=8.4.0",
+    "pytest-asyncio~=1.2.0",
+    "pytest-cov~=7.0.0",
+    "pytest-recording~=0.13.0",
+    "mypy~=1.18.0",
+    "ruff~=0.14.0",
+    "types-click~=7.1.8",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["opentelemetry_mcp"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "--cov=opentelemetry_mcp --cov-report=term-missing"
+markers = [
+    "unit: Fast unit tests with mocks",
+    "integration: Integration tests with real backends using VCR recordings",
+    "vcr: Tests using VCR cassette recordings",
+]

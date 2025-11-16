@@ -1,0 +1,30 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:3200
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3200/api/traces/00000000000000000000000000000000
+  response:
+    body:
+      string: ''
+    headers:
+      Content-Length:
+      - '0'
+      Date:
+      - Thu, 13 Nov 2025 14:12:45 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 404
+      message: Not Found
+version: 1

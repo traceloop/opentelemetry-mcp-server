@@ -1,0 +1,152 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services
+  response:
+    body:
+      string: '{"data":["jaeger","travel-agent-demo","trace-analyzer-agent","model-comparison"],"total":4,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-16c3b3432a1bb1713b73b65649e4cf1b-8abd41baaa2226ff-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces?service=jaeger&limit=5&tags=%7B%22gen_ai.request.model%22%3A+%22gpt-4%22%7D
+  response:
+    body:
+      string: '{"data":[],"total":0,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-8dd9fa5862ae7aca4f3a63ec10c64985-3b56fdcb25ff2a7d-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces?service=jaeger&limit=5&tags=%7B%22gen_ai.request.model%22%3A+%22gpt-3.5-turbo%22%7D
+  response:
+    body:
+      string: '{"data":[],"total":0,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-281f88a5a93f22b67aa881deaddf3b3d-fe45fab3141113b9-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces?service=jaeger&limit=5&tags=%7B%22gen_ai.request.model%22%3A+%22claude-3%22%7D
+  response:
+    body:
+      string: '{"data":[],"total":0,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-c56fb4d841d47633922378d74e180ae1-4e3c507e7a22d083-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces?service=jaeger&limit=5&tags=%7B%22gen_ai.request.model%22%3A+%22claude-2%22%7D
+  response:
+    body:
+      string: '{"data":[],"total":0,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-a8b676e68ae1edff6fbed9230e9809b3-98e056573faa05e1-01
+    status:
+      code: 200
+      message: OK
+version: 1

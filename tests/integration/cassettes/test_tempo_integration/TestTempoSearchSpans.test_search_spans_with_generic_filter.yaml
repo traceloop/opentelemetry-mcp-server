@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:3200
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3200/api/search?q=%7B+span.duration_ms+%3E+10+%7D&limit=40
+  response:
+    body:
+      string: '{"traces":[],"metrics":{"inspectedBytes":"66363","totalBlocks":2,"completedJobs":5,"totalJobs":5,"totalBlockBytes":"120658"}}'
+    headers:
+      Content-Length:
+      - '125'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 14:12:46 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+version: 1

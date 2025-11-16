@@ -1,0 +1,93 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services
+  response:
+    body:
+      string: '{"data":["travel-agent-demo","trace-analyzer-agent","model-comparison","jaeger"],"total":4,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:21:09 GMT
+      Traceresponse:
+      - 00-c2e2c71900653c2f00e9101acefa0f89-b3dca305188716fb-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services/travel-agent-demo/operations
+  response:
+    body:
+      string: '{"data":["create_itinerary.tool","Travel Planner Agent.agent","search_destinations.tool","get_destination_info.tool","openai.response","GET","get_location_coordinates.tool","get_weather_forecast.tool","Agent
+        Workflow","openai.chat"],"total":10,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '279'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:21:09 GMT
+      Traceresponse:
+      - 00-394351f4dd250053960e5c2bc151a736-169ec2e699e71163-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces?service=travel-agent-demo&operation=create_itinerary.tool&limit=40
+  response:
+    body:
+      string: '{"data":[],"total":0,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '56'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:21:09 GMT
+      Traceresponse:
+      - 00-ca5a6417fe22fb1417b94f2b91c572cf-c78db0afc54da70b-01
+    status:
+      code: 200
+      message: OK
+version: 1

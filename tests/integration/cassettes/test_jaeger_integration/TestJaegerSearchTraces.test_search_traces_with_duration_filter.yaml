@@ -1,0 +1,64 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services
+  response:
+    body:
+      string: '{"data":["jaeger","travel-agent-demo","trace-analyzer-agent","model-comparison"],"total":4,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-5c7a3fc3e6efbcbbb0ac04a8ef263952-fd79d3f40323d0d5-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces?service=jaeger&minDuration=100ms&limit=10
+  response:
+    body:
+      string: '{"data":[{"traceID":"1d734c967c68f583f71156dcdfeaa552","spans":[{"traceID":"1d734c967c68f583f71156dcdfeaa552","spanID":"f3db609a4e0724b0","operationName":"/api/traces","references":[],"startTime":1762875022462143,"duration":174013,"tags":[{"key":"client.address","type":"string","value":"192.168.65.1"},{"key":"http.request.method","type":"string","value":"GET"},{"key":"http.response.body.size","type":"int64","value":1294085},{"key":"http.response.status_code","type":"int64","value":200},{"key":"http.route","type":"string","value":"/api/traces"},{"key":"network.peer.address","type":"string","value":"192.168.65.1"},{"key":"network.peer.port","type":"int64","value":24296},{"key":"network.protocol.version","type":"string","value":"1.1"},{"key":"otel.scope.name","type":"string","value":"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"},{"key":"otel.scope.version","type":"string","value":"0.62.0"},{"key":"server.address","type":"string","value":"localhost"},{"key":"server.port","type":"int64","value":16686},{"key":"span.kind","type":"string","value":"server"},{"key":"url.path","type":"string","value":"/api/traces"},{"key":"url.scheme","type":"string","value":"http"},{"key":"user_agent.original","type":"string","value":"Mozilla/5.0
+        (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)
+        Chrome/141.0.0.0 Safari/537.36"}],"logs":[],"processID":"p1","warnings":null}],"processes":{"p1":{"serviceName":"jaeger","tags":[{"key":"host.name","type":"string","value":"9e02ac46f7f5"},{"key":"os.type","type":"string","value":"linux"},{"key":"telemetry.sdk.language","type":"string","value":"go"},{"key":"telemetry.sdk.name","type":"string","value":"opentelemetry"},{"key":"telemetry.sdk.version","type":"string","value":"1.37.0"}]}},"warnings":null}],"total":0,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '1833'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-0c5a2fe92e66ffb04b862b82d4b8d8e8-1e73faa7cbc6226e-01
+    status:
+      code: 200
+      message: OK
+version: 1

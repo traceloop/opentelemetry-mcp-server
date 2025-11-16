@@ -1,0 +1,69 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:3200
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3200/api/search?q=%7B%7D&limit=1000
+  response:
+    body:
+      string: '{"traces":[{"traceID":"bec9c8df1c3a22a134e4c9c7aa0f0ce3","rootServiceName":"travel-agent-demo2","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763042458122243000","durationMs":78773,"spanSet":{"spans":[{"spanID":"86d3b7d7fc6340dd","startTimeUnixNano":"1763042458122243000","durationNanos":"78773159000"},{"spanID":"d211646049b4a400","startTimeUnixNano":"1763042458123662000","durationNanos":"78771654000"},{"spanID":"1524b568cb6ea388","startTimeUnixNano":"1763042521888311000","durationNanos":"15005374000"}],"matched":23},"spanSets":[{"spans":[{"spanID":"86d3b7d7fc6340dd","startTimeUnixNano":"1763042458122243000","durationNanos":"78773159000"},{"spanID":"d211646049b4a400","startTimeUnixNano":"1763042458123662000","durationNanos":"78771654000"},{"spanID":"1524b568cb6ea388","startTimeUnixNano":"1763042521888311000","durationNanos":"15005374000"}],"matched":23}],"serviceStats":{"travel-agent-demo2":{"spanCount":23}}},{"traceID":"6ce0a0129015a826c7f54b78275cfe37","rootServiceName":"travel-agent-demo2","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763042290335056000","durationMs":165781,"spanSet":{"spans":[{"spanID":"40cddd148de5e768","startTimeUnixNano":"1763042290335056000","durationNanos":"165781359000"},{"spanID":"de23a8a7bea8dd2c","startTimeUnixNano":"1763042290336958000","durationNanos":"165779362000"},{"spanID":"1a273c93a6725233","startTimeUnixNano":"1763042433338440000","durationNanos":"22771507000"}],"matched":28},"spanSets":[{"spans":[{"spanID":"40cddd148de5e768","startTimeUnixNano":"1763042290335056000","durationNanos":"165781359000"},{"spanID":"de23a8a7bea8dd2c","startTimeUnixNano":"1763042290336958000","durationNanos":"165779362000"},{"spanID":"1a273c93a6725233","startTimeUnixNano":"1763042433338440000","durationNanos":"22771507000"}],"matched":28}],"serviceStats":{"travel-agent-demo2":{"spanCount":28}}},{"traceID":"b37b4c7727a54482f8c71cb88799c108","rootServiceName":"travel-agent-demo2","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763042214208334000","durationMs":74124,"spanSet":{"spans":[{"spanID":"5fa5e00f3beedbfa","startTimeUnixNano":"1763042214208334000","durationNanos":"74124100000"},{"spanID":"ca47c89257b27e7f","startTimeUnixNano":"1763042214208605000","durationNanos":"74123748000"},{"spanID":"b6529d259784e9cd","startTimeUnixNano":"1763042274303621000","durationNanos":"14027779000"}],"matched":18},"spanSets":[{"spans":[{"spanID":"5fa5e00f3beedbfa","startTimeUnixNano":"1763042214208334000","durationNanos":"74124100000"},{"spanID":"ca47c89257b27e7f","startTimeUnixNano":"1763042214208605000","durationNanos":"74123748000"},{"spanID":"b6529d259784e9cd","startTimeUnixNano":"1763042274303621000","durationNanos":"14027779000"}],"matched":18}],"serviceStats":{"travel-agent-demo2":{"spanCount":18}}},{"traceID":"42ff472d7feb6215bec0cf4e350675b2","rootServiceName":"travel-agent-demo","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763042187232503000","durationMs":10109,"spanSet":{"spans":[{"spanID":"34fcf1bb3fafa39e","startTimeUnixNano":"1763042187236891000","durationNanos":"2223290000"},{"spanID":"267fb9e41508b20f","startTimeUnixNano":"1763042192790536000","durationNanos":"4551608000"},{"spanID":"a94b4056fdcc5ab8","startTimeUnixNano":"1763042187234430000","durationNanos":"10107769000"}],"matched":10},"spanSets":[{"spans":[{"spanID":"34fcf1bb3fafa39e","startTimeUnixNano":"1763042187236891000","durationNanos":"2223290000"},{"spanID":"267fb9e41508b20f","startTimeUnixNano":"1763042192790536000","durationNanos":"4551608000"},{"spanID":"a94b4056fdcc5ab8","startTimeUnixNano":"1763042187234430000","durationNanos":"10107769000"}],"matched":10}],"serviceStats":{"travel-agent-demo":{"spanCount":10}}},{"traceID":"9a8cb895bee63fabb705329a05ced33b","rootServiceName":"travel-agent-demo","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763042057714246000","durationMs":127512,"spanSet":{"spans":[{"spanID":"5551aa3f766587f2","startTimeUnixNano":"1763042057714246000","durationNanos":"127512595000"},{"spanID":"79b2308a07bfb7f2","startTimeUnixNano":"1763042057715150000","durationNanos":"127511610000"},{"spanID":"5e6305e10575b792","startTimeUnixNano":"1763042160420265000","durationNanos":"24803777000"}],"matched":28},"spanSets":[{"spans":[{"spanID":"5551aa3f766587f2","startTimeUnixNano":"1763042057714246000","durationNanos":"127512595000"},{"spanID":"79b2308a07bfb7f2","startTimeUnixNano":"1763042057715150000","durationNanos":"127511610000"},{"spanID":"5e6305e10575b792","startTimeUnixNano":"1763042160420265000","durationNanos":"24803777000"}],"matched":28}],"serviceStats":{"travel-agent-demo":{"spanCount":28}}},{"traceID":"693bde2879b745ff467c20bf9cd2ea7a","rootServiceName":"travel-agent-demo","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763041984002122000","durationMs":71704,"spanSet":{"spans":[{"spanID":"a40a5bd0bb0e49fd","startTimeUnixNano":"1763041984002122000","durationNanos":"71704252000"},{"spanID":"4f2f38eb1a1c1cfb","startTimeUnixNano":"1763041984003244000","durationNanos":"71703000000"},{"spanID":"af80719f2b3c023b","startTimeUnixNano":"1763042004652154000","durationNanos":"38440688000"}],"matched":22},"spanSets":[{"spans":[{"spanID":"a40a5bd0bb0e49fd","startTimeUnixNano":"1763041984002122000","durationNanos":"71704252000"},{"spanID":"4f2f38eb1a1c1cfb","startTimeUnixNano":"1763041984003244000","durationNanos":"71703000000"},{"spanID":"af80719f2b3c023b","startTimeUnixNano":"1763042004652154000","durationNanos":"38440688000"}],"matched":22}],"serviceStats":{"travel-agent-demo":{"spanCount":22}}},{"traceID":"eed63641fc3ffa3ea40a166e2604edd2","rootServiceName":"travel-agent-demo","rootTraceName":"Agent
+        Workflow","startTimeUnixNano":"1763041894306563000","durationMs":87687,"spanSet":{"spans":[{"spanID":"9037e85da82b3669","startTimeUnixNano":"1763041894306563000","durationNanos":"87687739000"},{"spanID":"e6dea808d575c76e","startTimeUnixNano":"1763041894306752000","durationNanos":"87687465000"},{"spanID":"08f0f0f47faddd6d","startTimeUnixNano":"1763041900556562000","durationNanos":"9125062000"}],"matched":17},"spanSets":[{"spans":[{"spanID":"9037e85da82b3669","startTimeUnixNano":"1763041894306563000","durationNanos":"87687739000"},{"spanID":"e6dea808d575c76e","startTimeUnixNano":"1763041894306752000","durationNanos":"87687465000"},{"spanID":"08f0f0f47faddd6d","startTimeUnixNano":"1763041900556562000","durationNanos":"9125062000"}],"matched":17}],"serviceStats":{"travel-agent-demo":{"spanCount":17}}}],"metrics":{"inspectedBytes":"43192","totalBlocks":2,"completedJobs":5,"totalJobs":5,"totalBlockBytes":"120658"}}'
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 14:12:47 GMT
+      Vary:
+      - Accept-Encoding
+      content-length:
+      - '6560'
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:3200
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3200/api/search?q=%7B+resource.service.name+%3D+%22travel-agent-demo%22+%26%26+span.duration_ms+%3E+50+%7D&limit=10
+  response:
+    body:
+      string: '{"traces":[],"metrics":{"inspectedBytes":"59731","totalBlocks":2,"completedJobs":5,"totalJobs":5,"totalBlockBytes":"120658"}}'
+    headers:
+      Content-Length:
+      - '125'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 14:12:47 GMT
+      Vary:
+      - Accept-Encoding
+    status:
+      code: 200
+      message: OK
+version: 1

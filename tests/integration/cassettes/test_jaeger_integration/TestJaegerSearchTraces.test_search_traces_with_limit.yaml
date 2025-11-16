@@ -1,0 +1,68 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/services
+  response:
+    body:
+      string: '{"data":["jaeger","travel-agent-demo","trace-analyzer-agent","model-comparison"],"total":4,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Length:
+      - '126'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-70c6f8b89e705908bacf2f11586c1acb-c4e89b54d2a70286-01
+    status:
+      code: 200
+      message: OK
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - localhost:16686
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:16686/api/traces?service=jaeger&limit=5
+  response:
+    body:
+      string: '{"data":[{"traceID":"0a133b2ffa5d05faf89fe1f489cb020e","spans":[{"traceID":"0a133b2ffa5d05faf89fe1f489cb020e","spanID":"8a526433ee1e70cb","operationName":"/api/services","references":[],"startTime":1763038908559873,"duration":1576,"tags":[{"key":"client.address","type":"string","value":"192.168.65.1"},{"key":"http.request.method","type":"string","value":"GET"},{"key":"http.response.body.size","type":"int64","value":126},{"key":"http.response.status_code","type":"int64","value":200},{"key":"http.route","type":"string","value":"/api/services"},{"key":"network.peer.address","type":"string","value":"192.168.65.1"},{"key":"network.peer.port","type":"int64","value":35425},{"key":"network.protocol.version","type":"string","value":"1.1"},{"key":"otel.scope.name","type":"string","value":"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"},{"key":"otel.scope.version","type":"string","value":"0.62.0"},{"key":"server.address","type":"string","value":"localhost"},{"key":"server.port","type":"int64","value":16686},{"key":"span.kind","type":"string","value":"server"},{"key":"url.path","type":"string","value":"/api/services"},{"key":"url.scheme","type":"string","value":"http"},{"key":"user_agent.original","type":"string","value":"python-httpx/0.28.1"}],"logs":[],"processID":"p1","warnings":null}],"processes":{"p1":{"serviceName":"jaeger","tags":[{"key":"host.name","type":"string","value":"9e02ac46f7f5"},{"key":"os.type","type":"string","value":"linux"},{"key":"telemetry.sdk.language","type":"string","value":"go"},{"key":"telemetry.sdk.name","type":"string","value":"opentelemetry"},{"key":"telemetry.sdk.version","type":"string","value":"1.37.0"}]}},"warnings":null},{"traceID":"f32788bf0c0139422b6740730014efc0","spans":[{"traceID":"f32788bf0c0139422b6740730014efc0","spanID":"ca4b20e4ff3f8cc1","operationName":"/api/services","references":[],"startTime":1763038796964414,"duration":18396,"tags":[{"key":"client.address","type":"string","value":"192.168.65.1"},{"key":"http.request.method","type":"string","value":"GET"},{"key":"http.response.body.size","type":"int64","value":126},{"key":"http.response.status_code","type":"int64","value":200},{"key":"http.route","type":"string","value":"/api/services"},{"key":"network.peer.address","type":"string","value":"192.168.65.1"},{"key":"network.peer.port","type":"int64","value":42204},{"key":"network.protocol.version","type":"string","value":"1.1"},{"key":"otel.scope.name","type":"string","value":"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"},{"key":"otel.scope.version","type":"string","value":"0.62.0"},{"key":"server.address","type":"string","value":"localhost"},{"key":"server.port","type":"int64","value":16686},{"key":"span.kind","type":"string","value":"server"},{"key":"url.path","type":"string","value":"/api/services"},{"key":"url.scheme","type":"string","value":"http"},{"key":"user_agent.original","type":"string","value":"curl/8.7.1"}],"logs":[],"processID":"p1","warnings":null}],"processes":{"p1":{"serviceName":"jaeger","tags":[{"key":"host.name","type":"string","value":"9e02ac46f7f5"},{"key":"os.type","type":"string","value":"linux"},{"key":"telemetry.sdk.language","type":"string","value":"go"},{"key":"telemetry.sdk.name","type":"string","value":"opentelemetry"},{"key":"telemetry.sdk.version","type":"string","value":"1.37.0"}]}},"warnings":null},{"traceID":"1a5a797a62b4258d0b8c27fa6dce775e","spans":[{"traceID":"1a5a797a62b4258d0b8c27fa6dce775e","spanID":"8dc83b377228723b","operationName":"/api/services/{service}/operations","references":[],"startTime":1762875058548803,"duration":388,"tags":[{"key":"client.address","type":"string","value":"192.168.65.1"},{"key":"http.request.method","type":"string","value":"GET"},{"key":"http.response.body.size","type":"int64","value":279},{"key":"http.response.status_code","type":"int64","value":200},{"key":"http.route","type":"string","value":"/api/services/{service}/operations"},{"key":"network.peer.address","type":"string","value":"192.168.65.1"},{"key":"network.peer.port","type":"int64","value":54309},{"key":"network.protocol.version","type":"string","value":"1.1"},{"key":"otel.scope.name","type":"string","value":"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"},{"key":"otel.scope.version","type":"string","value":"0.62.0"},{"key":"server.address","type":"string","value":"localhost"},{"key":"server.port","type":"int64","value":16686},{"key":"span.kind","type":"string","value":"server"},{"key":"url.path","type":"string","value":"/api/services/travel-agent-demo/operations"},{"key":"url.scheme","type":"string","value":"http"},{"key":"user_agent.original","type":"string","value":"Mozilla/5.0
+        (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)
+        Chrome/141.0.0.0 Safari/537.36"}],"logs":[],"processID":"p1","warnings":null}],"processes":{"p1":{"serviceName":"jaeger","tags":[{"key":"host.name","type":"string","value":"9e02ac46f7f5"},{"key":"os.type","type":"string","value":"linux"},{"key":"telemetry.sdk.language","type":"string","value":"go"},{"key":"telemetry.sdk.name","type":"string","value":"opentelemetry"},{"key":"telemetry.sdk.version","type":"string","value":"1.37.0"}]}},"warnings":null},{"traceID":"062e848dd2141f687dc0c075740a9336","spans":[{"traceID":"062e848dd2141f687dc0c075740a9336","spanID":"0a2140ec63099743","operationName":"/api/services","references":[],"startTime":1762875058549455,"duration":154,"tags":[{"key":"client.address","type":"string","value":"192.168.65.1"},{"key":"http.request.method","type":"string","value":"GET"},{"key":"http.response.body.size","type":"int64","value":126},{"key":"http.response.status_code","type":"int64","value":200},{"key":"http.route","type":"string","value":"/api/services"},{"key":"network.peer.address","type":"string","value":"192.168.65.1"},{"key":"network.peer.port","type":"int64","value":48931},{"key":"network.protocol.version","type":"string","value":"1.1"},{"key":"otel.scope.name","type":"string","value":"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"},{"key":"otel.scope.version","type":"string","value":"0.62.0"},{"key":"server.address","type":"string","value":"localhost"},{"key":"server.port","type":"int64","value":16686},{"key":"span.kind","type":"string","value":"server"},{"key":"url.path","type":"string","value":"/api/services"},{"key":"url.scheme","type":"string","value":"http"},{"key":"user_agent.original","type":"string","value":"Mozilla/5.0
+        (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)
+        Chrome/141.0.0.0 Safari/537.36"}],"logs":[],"processID":"p1","warnings":null}],"processes":{"p1":{"serviceName":"jaeger","tags":[{"key":"host.name","type":"string","value":"9e02ac46f7f5"},{"key":"os.type","type":"string","value":"linux"},{"key":"telemetry.sdk.language","type":"string","value":"go"},{"key":"telemetry.sdk.name","type":"string","value":"opentelemetry"},{"key":"telemetry.sdk.version","type":"string","value":"1.37.0"}]}},"warnings":null},{"traceID":"7c99e184607854405c6b7c710237cc9a","spans":[{"traceID":"7c99e184607854405c6b7c710237cc9a","spanID":"9a30289749f7cb28","operationName":"/api/metrics/latencies","references":[],"startTime":1762875056854574,"duration":932,"tags":[{"key":"client.address","type":"string","value":"192.168.65.1"},{"key":"error","type":"bool","value":true},{"key":"http.request.method","type":"string","value":"GET"},{"key":"http.response.body.size","type":"int64","value":116},{"key":"http.response.status_code","type":"int64","value":501},{"key":"http.route","type":"string","value":"/api/metrics/latencies"},{"key":"network.peer.address","type":"string","value":"192.168.65.1"},{"key":"network.peer.port","type":"int64","value":37987},{"key":"network.protocol.version","type":"string","value":"1.1"},{"key":"otel.scope.name","type":"string","value":"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"},{"key":"otel.scope.version","type":"string","value":"0.62.0"},{"key":"otel.status_code","type":"string","value":"ERROR"},{"key":"server.address","type":"string","value":"localhost"},{"key":"server.port","type":"int64","value":16686},{"key":"span.kind","type":"string","value":"server"},{"key":"url.path","type":"string","value":"/api/metrics/latencies"},{"key":"url.scheme","type":"string","value":"http"},{"key":"user_agent.original","type":"string","value":"Mozilla/5.0
+        (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)
+        Chrome/141.0.0.0 Safari/537.36"}],"logs":[],"processID":"p1","warnings":null}],"processes":{"p1":{"serviceName":"jaeger","tags":[{"key":"host.name","type":"string","value":"9e02ac46f7f5"},{"key":"os.type","type":"string","value":"linux"},{"key":"telemetry.sdk.language","type":"string","value":"go"},{"key":"telemetry.sdk.name","type":"string","value":"opentelemetry"},{"key":"telemetry.sdk.version","type":"string","value":"1.37.0"}]}},"warnings":null}],"total":0,"limit":0,"offset":0,"errors":null}'
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Nov 2025 13:02:18 GMT
+      Traceresponse:
+      - 00-8bdc182b4384896942954e452bd6d3e3-219454ae416d1a15-01
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1
