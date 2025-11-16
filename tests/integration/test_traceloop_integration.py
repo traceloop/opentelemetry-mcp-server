@@ -75,7 +75,7 @@ class TestTraceloopServiceOperations:
             pytest.skip("No services available for testing")
 
         # Get operations for the first service
-        service_name = services[0]
+        service_name = services[-1]
         operations = await traceloop_backend.get_service_operations(service_name)
 
         # Should return a list of operation names
@@ -118,7 +118,7 @@ class TestTraceloopSearchTraces:
         if len(services) == 0:
             pytest.skip("No services available for testing")
 
-        service_name = services[0]
+        service_name = services[-1]
         query = TraceQuery(service_name=service_name, limit=10)
 
         traces = await traceloop_backend.search_traces(query)
@@ -199,30 +199,22 @@ class TestTraceloopSearchTraces:
             assert trace.duration_ms > 50
 
     @pytest.mark.vcr
-    async def test_search_traces_with_llm_model_filter(
+    async def test_search_spans_with_llm_model_filter(
         self, traceloop_backend: TraceloopBackend
     ) -> None:
         """Test trace search filtered by LLM model."""
-        query = TraceQuery(gen_ai_request_model="gpt-4o", limit=10)
+        query = SpanQuery(gen_ai_request_model="gpt-4o-mini", limit=200)
 
-        traces = await traceloop_backend.search_traces(query)
+        spans = await traceloop_backend.search_spans(query)
 
         # Skip if no matching traces found (test data may not have gpt-4 traces)
-        if len(traces) == 0:
-            pytest.skip("No traces with gpt-4o model found in test data")
+        if len(spans) == 0:
+            pytest.skip("No traces with gpt-4o-mini model found in test data")
 
         # Verify all returned traces have the correct model
-        for trace in traces:
+        for span in spans:
             # Check if any span has the requested model
-            llm_spans = [s for s in trace.spans if s.is_llm_span]
-            if llm_spans:
-                models = [
-                    s.attributes.gen_ai_request_model or s.attributes.llm_request_model
-                    for s in llm_spans
-                ]
-                assert any("gpt-4o" in str(m) for m in models if m), (
-                    f"Expected gpt-4o in models but found: {models}"
-                )
+            assert span.attributes.gen_ai_request_model == "gpt-4o-mini"
 
 
 @pytest.mark.integration
@@ -289,7 +281,7 @@ class TestTraceloopSearchSpans:
         if len(services) == 0:
             pytest.skip("No services available for testing")
 
-        service_name = services[0]
+        service_name = services[-1]
         query = SpanQuery(service_name=service_name, limit=20)
 
         spans = await traceloop_backend.search_spans(query)
@@ -310,16 +302,14 @@ class TestTraceloopSearchSpans:
         assert len(spans) <= limit
 
     @pytest.mark.vcr
-    async def test_search_spans_with_operation(
-        self, traceloop_backend: TraceloopBackend
-    ) -> None:
+    async def test_search_spans_with_operation(self, traceloop_backend: TraceloopBackend) -> None:
         """Test span search filtered by operation name."""
         services = await traceloop_backend.list_services()
 
         if len(services) == 0:
             pytest.skip("No services available for testing")
 
-        service_name = services[0]
+        service_name = services[-1]
         operations = await traceloop_backend.get_service_operations(service_name)
 
         if len(operations) == 0:
@@ -390,9 +380,7 @@ class TestTraceloopLLMSpans:
             assert span.is_llm_span
 
     @pytest.mark.vcr
-    async def test_search_spans_by_llm_system(
-        self, traceloop_backend: TraceloopBackend
-    ) -> None:
+    async def test_search_spans_by_llm_system(self, traceloop_backend: TraceloopBackend) -> None:
         """Test searching spans by LLM system/provider."""
         # Search for OpenAI spans
         query = SpanQuery(gen_ai_system="openai", limit=20)
@@ -418,9 +406,7 @@ class TestTraceloopFilters:
     """Test Traceloop filter capabilities."""
 
     @pytest.mark.vcr
-    async def test_search_with_multiple_filters(
-        self, traceloop_backend: TraceloopBackend
-    ) -> None:
+    async def test_search_with_multiple_filters(self, traceloop_backend: TraceloopBackend) -> None:
         """Test trace search with multiple filter conditions combined with AND."""
         # Get a service first
         services = await traceloop_backend.list_services()
@@ -428,7 +414,7 @@ class TestTraceloopFilters:
         if len(services) == 0:
             pytest.skip("No services available for testing")
 
-        service_name = services[0]
+        service_name = services[-1]
 
         # Combine service filter with duration filter
         filters = [
@@ -441,7 +427,7 @@ class TestTraceloopFilters:
             Filter(
                 field="duration_ms",
                 operator=FilterOperator.GT,
-                value=50,
+                value=5,
                 value_type=FilterType.NUMBER,
             ),
         ]

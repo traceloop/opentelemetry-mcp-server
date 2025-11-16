@@ -132,9 +132,7 @@ class TestJaegerSearchTraces:
             assert operation_name in operation_names
 
     @pytest.mark.vcr
-    async def test_search_traces_with_duration_filter(
-        self, jaeger_backend: JaegerBackend
-    ) -> None:
+    async def test_search_traces_with_duration_filter(self, jaeger_backend: JaegerBackend) -> None:
         """Test trace search with minimum duration filter."""
         services = await jaeger_backend.list_services()
         assert len(services) > 0
@@ -166,9 +164,7 @@ class TestJaegerSearchTraces:
             assert any(span.has_error for span in trace.spans)
 
     @pytest.mark.vcr
-    async def test_search_traces_with_generic_filter(
-        self, jaeger_backend: JaegerBackend
-    ) -> None:
+    async def test_search_traces_with_generic_filter(self, jaeger_backend: JaegerBackend) -> None:
         """Test trace search with generic filter conditions."""
         services = await jaeger_backend.list_services()
         assert len(services) > 0
@@ -341,9 +337,7 @@ class TestJaegerLLMSpans:
             assert span.attributes.gen_ai_system is not None
 
     @pytest.mark.vcr
-    async def test_search_traces_with_llm_model_filter(
-        self, jaeger_backend: JaegerBackend
-    ) -> None:
+    async def test_search_traces_with_llm_model_filter(self, jaeger_backend: JaegerBackend) -> None:
         """Test trace search with LLM model filter."""
         services = await jaeger_backend.list_services()
         assert len(services) > 0

@@ -174,7 +174,8 @@ class TempoBackend(BaseBackend):
 
         supported_operators = self.get_supported_operators()
         native_filters = [
-            f for f in all_filters
+            f
+            for f in all_filters
             if f.operator in supported_operators and f.field in trace_level_fields
         ]
         client_filters = [f for f in all_filters if f not in native_filters]

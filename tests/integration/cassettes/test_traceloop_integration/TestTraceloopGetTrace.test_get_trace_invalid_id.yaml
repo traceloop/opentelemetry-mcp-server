@@ -1,0 +1,32 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - localhost:3001
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3001/v2/projects/default/traces/invalid-trace-id-12345/spans
+  response:
+    body:
+      string: '{"spans":null}'
+    headers:
+      Content-Length:
+      - '14'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 16 Nov 2025 11:10:20 GMT
+    status:
+      code: 200
+      message: OK
+version: 1

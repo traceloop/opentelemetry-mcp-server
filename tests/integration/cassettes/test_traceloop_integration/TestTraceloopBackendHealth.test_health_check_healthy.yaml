@@ -1,0 +1,864 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - localhost:3001
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: http://localhost:3001/v2/warehouse/spans
+  response:
+    body:
+      string: "{\"spans\":{\"data\":[{\"environment\":\"prd\",\"timestamp\":1759641806226,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"50e984b24aca0983\",\"parent_span_id\":\"619fdd77f34264b2\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.vendor\":\"openai_agents\",\"openai.agent.handoff0\":\"{\\\"name\\\":
+        \\\"unknown\\\", \\\"instructions\\\": \\\"No instructions\\\"}\",\"traceloop.span.kind\":\"agent\"},\"duration\":2432,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641806225,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"619fdd77f34264b2\",\"parent_span_id\":\"\",\"trace_state\":\"\",\"span_name\":\"Agent
+        Workflow\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.vendor\":\"openai_agents\",\"llm.workflow.name\":\"Agent
+        Workflow\",\"traceloop.span.kind\":\"workflow\"},\"duration\":14650,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641806229,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"c1388b2257f2255a\",\"parent_span_id\":\"50e984b24aca0983\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Handoff
+        to the Recipe Editor Agent agent to handle the request. \",\"llm.request.functions.0.name\":\"transfer_to_recipe_editor_agent\",\"llm.request.functions.0.parameters\":\"{\\\"additionalProperties\\\":
+        false, \\\"type\\\": \\\"object\\\", \\\"properties\\\": {}, \\\"required\\\":
+        []}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"14\",\"llm.usage.prompt_tokens\":\"223\",\"llm.usage.total_tokens\":\"237\",\"llm.vendor\":\"openai\"},\"duration\":2427,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Suggest
+        a easy recipe using beans.\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{}\",\"llm.completions.0.tool_calls.0.id\":\"call_qdO0akN8okpuweAurb3VQoIF\",\"llm.completions.0.tool_calls.0.name\":\"transfer_to_recipe_editor_agent\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641808659,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"92b0e5cabe1ec98c\",\"parent_span_id\":\"98796e9d5aac59ba\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"18\",\"llm.usage.prompt_tokens\":\"480\",\"llm.usage.total_tokens\":\"498\",\"llm.vendor\":\"openai\"},\"duration\":2574,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Suggest
+        a easy recipe using beans.\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"query\\\":\\\"easy
+        bean recipe\\\"}\",\"llm.completions.0.tool_calls.0.id\":\"call_hmdTUoebIMnu7eCAlWdXh3RB\",\"llm.completions.0.tool_calls.0.name\":\"search_recipes\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641808658,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"98796e9d5aac59ba\",\"parent_span_id\":\"619fdd77f34264b2\",\"trace_state\":\"\",\"span_name\":\"Recipe
+        Editor Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"agent\"},\"duration\":12217,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641808657,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"9d21fba405112390\",\"parent_span_id\":\"50e984b24aca0983\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent \u2192 unknown.handoff\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.handoff.from_agent\":\"Main Chat Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"handoff\"},\"duration\":0,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641811247,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"00a30aa405e2dc57\",\"parent_span_id\":\"11150e3f443324ef\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_560af6e559\",\"llm.request.max_tokens\":\"500\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.temperature\":\"0.100000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CNBVUnZGCLOcxMoKm3Ft3pAmetiLl\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"32\",\"llm.usage.prompt_tokens\":\"738\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"770\",\"llm.vendor\":\"openai\"},\"duration\":2060,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are a helpful recipe search assistant that returns only valid JSON.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are a recipe search expert. Given a user's search query and a list of available
+        recipes,\\nidentify which recipes are most relevant to the user's request.\\n\\nUser's
+        search query: \\\"easy bean recipe\\\"\\n\\nAvailable recipes:\\n[\\n  {\\n
+        \   \\\"id\\\": \\\"spaghetti_carbonara\\\",\\n    \\\"name\\\": \\\"Spaghetti
+        Carbonara\\\",\\n    \\\"ingredients\\\": [\\n      \\\"400g spaghetti\\\",\\n
+        \     \\\"200g pancetta or guanciale\\\",\\n      \\\"4 large eggs\\\",\\n
+        \     \\\"100g Pecorino Romano cheese, grated\\\",\\n      \\\"2 cloves garlic\\\"\\n
+        \   ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"10 minutes\\\",\\n    \\\"cook_time\\\": \\\"15 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chicken_tikka_masala\\\",\\n    \\\"name\\\":
+        \\\"Chicken Tikka Masala\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        chicken breast, cubed\\\",\\n      \\\"200ml plain yogurt\\\",\\n      \\\"2
+        tsp garam masala\\\",\\n      \\\"1 tsp turmeric\\\",\\n      \\\"1 onion,
+        diced\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"45 minutes\\\",\\n    \\\"cook_time\\\": \\\"30 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chocolate_chip_cookies\\\",\\n    \\\"name\\\":
+        \\\"Classic Chocolate Chip Cookies\\\",\\n    \\\"ingredients\\\": [\\n      \\\"225g
+        butter, softened\\\",\\n      \\\"200g brown sugar\\\",\\n      \\\"100g white
+        sugar\\\",\\n      \\\"2 large eggs\\\",\\n      \\\"1 tsp vanilla extract\\\"\\n
+        \   ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"10 minutes\\\",\\n    \\\"servings\\\":
+        24\\n  },\\n  {\\n    \\\"id\\\": \\\"beef_stir_fry\\\",\\n    \\\"name\\\":
+        \\\"Beef and Vegetable Stir Fry\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        beef sirloin, sliced thin\\\",\\n      \\\"2 tbsp vegetable oil\\\",\\n      \\\"1
+        bell pepper, sliced\\\",\\n      \\\"1 onion, sliced\\\",\\n      \\\"200g
+        broccoli florets\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"8
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  },\\n  {\\n    \\\"id\\\": \\\"caesar_salad\\\",\\n
+        \   \\\"name\\\": \\\"Classic Caesar Salad\\\",\\n    \\\"ingredients\\\":
+        [\\n      \\\"2 heads romaine lettuce, chopped\\\",\\n      \\\"1/2 cup mayonnaise\\\",\\n
+        \     \\\"2 tbsp lemon juice\\\",\\n      \\\"2 cloves garlic, minced\\\",\\n
+        \     \\\"1 tsp Dijon mustard\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"0
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  }\\n]\\n\\nPlease analyze the query
+        and return a JSON response with the following format:\\n{\\n    \\\"relevant_recipe_ids\\\":
+        [\\\"recipe_id1\\\", \\\"recipe_id2\\\", ...],\\n    \\\"reasoning\\\": \\\"Brief
+        explanation of why these recipes match the query\\\"\\n}\\n\\nConsider:\\n-
+        Ingredient matches (exact or similar)\\n- Cuisine type preferences\\n- Cooking
+        method preferences\\n- Dietary restrictions (vegetarian, vegan, gluten-free,
+        etc.)\\n- Meal type (breakfast, lunch, dinner, dessert)\\n- Difficulty level
+        or time preferences\\n- Flavor profiles (spicy, sweet, savory, etc.)\\n\\nReturn
+        only the JSON response, no additional text.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\n
+        \   \\\"relevant_recipe_ids\\\": [],\\n    \\\"reasoning\\\": \\\"No available
+        recipes contain beans or match the user's request for an easy bean recipe.\\\"\\n}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641811235,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"11150e3f443324ef\",\"parent_span_id\":\"98796e9d5aac59ba\",\"trace_state\":\"\",\"span_name\":\"search_recipes.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.tool.name\":\"search_recipes\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":2073,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"search_recipes\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641813309,\"trace_id\":\"862bb246ff5863b395d03ec5498ebb3b\",\"span_id\":\"4c005cb848a36338\",\"parent_span_id\":\"98796e9d5aac59ba\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"233\",\"llm.usage.prompt_tokens\":\"553\",\"llm.usage.total_tokens\":\"786\",\"llm.vendor\":\"openai\"},\"duration\":7564,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Suggest
+        a easy recipe using beans.\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"It
+        seems that I couldn't find a pre-existing recipe specifically for an easy
+        bean dish. However, I can suggest a simple recipe for you:\\n\\n### Easy Bean
+        Salad\\n\\n#### Ingredients:\\n- 1 can (15 oz) of mixed beans, drained and
+        rinsed\\n- 1/4 cup of diced red onion\\n- 1/2 cup of chopped cucumber\\n-
+        1/2 cup of cherry tomatoes, halved\\n- 2 tablespoons of olive oil\\n- 1 tablespoon
+        of lemon juice\\n- Salt and pepper to taste\\n- Optional: chopped fresh parsley
+        or cilantro\\n\\n#### Instructions:\\n1. Combine the beans, red onion, cucumber,
+        and cherry tomatoes in a large bowl.\\n2. Drizzle with olive oil and lemon
+        juice.\\n3. Season with salt and pepper, and toss everything together.\\n4.
+        Garnish with fresh parsley or cilantro if desired.\\n5. Serve immediately
+        or refrigerate for an hour to let the flavors meld.\\n\\nThis salad is refreshing,
+        nutritious, and can be prepared in just a few minutes. Feel free to adjust
+        the vegetables based on what's available or add some feta cheese for extra
+        flavor. Enjoy!\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641821886,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"2b31a9ee37f6a4cd\",\"parent_span_id\":\"522c24f5729d0055\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.vendor\":\"openai_agents\",\"openai.agent.handoff0\":\"{\\\"name\\\":
+        \\\"unknown\\\", \\\"instructions\\\": \\\"No instructions\\\"}\",\"traceloop.span.kind\":\"agent\"},\"duration\":1586,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641821885,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"522c24f5729d0055\",\"parent_span_id\":\"\",\"trace_state\":\"\",\"span_name\":\"Agent
+        Workflow\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.vendor\":\"openai_agents\",\"llm.workflow.name\":\"Agent
+        Workflow\",\"traceloop.span.kind\":\"workflow\"},\"duration\":24027,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641821887,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"f276fd8e9e9e61bd\",\"parent_span_id\":\"2b31a9ee37f6a4cd\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Handoff
+        to the Recipe Editor Agent agent to handle the request. \",\"llm.request.functions.0.name\":\"transfer_to_recipe_editor_agent\",\"llm.request.functions.0.parameters\":\"{\\\"additionalProperties\\\":
+        false, \\\"type\\\": \\\"object\\\", \\\"properties\\\": {}, \\\"required\\\":
+        []}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"14\",\"llm.usage.prompt_tokens\":\"227\",\"llm.usage.total_tokens\":\"241\",\"llm.vendor\":\"openai\"},\"duration\":1584,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Can
+        you recommend a vegan version of beef stir fry?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{}\",\"llm.completions.0.tool_calls.0.id\":\"call_ZeYfj9dNHSBuKWMweWfgNeGa\",\"llm.completions.0.tool_calls.0.name\":\"transfer_to_recipe_editor_agent\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641823473,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"bfc9e674dc7d6f42\",\"parent_span_id\":\"522c24f5729d0055\",\"trace_state\":\"\",\"span_name\":\"Recipe
+        Editor Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"agent\"},\"duration\":22439,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641823473,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"caa9ca8621ab408d\",\"parent_span_id\":\"bfc9e674dc7d6f42\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"19\",\"llm.usage.prompt_tokens\":\"484\",\"llm.usage.total_tokens\":\"503\",\"llm.vendor\":\"openai\"},\"duration\":1201,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Can
+        you recommend a vegan version of beef stir fry?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"query\\\":\\\"beef
+        stir fry\\\"}\",\"llm.completions.0.tool_calls.0.id\":\"call_pTzAS8tBpOMAKEHGQh09MXbu\",\"llm.completions.0.tool_calls.0.name\":\"search_recipes\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641823472,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"d9ed550ff7b9d5c3\",\"parent_span_id\":\"2b31a9ee37f6a4cd\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent \u2192 unknown.handoff\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.handoff.from_agent\":\"Main Chat Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"handoff\"},\"duration\":0,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641824675,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"55917e76d7782477\",\"parent_span_id\":\"bfc9e674dc7d6f42\",\"trace_state\":\"\",\"span_name\":\"search_recipes.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.tool.name\":\"search_recipes\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":2810,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"search_recipes\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641824689,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"c889d7a7a3553c9e\",\"parent_span_id\":\"55917e76d7782477\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_51db84afab\",\"llm.request.max_tokens\":\"500\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.temperature\":\"0.100000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CNBVhcdZ521WOeJ0vz9BILpUujTcm\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"63\",\"llm.usage.prompt_tokens\":\"739\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"802\",\"llm.vendor\":\"openai\"},\"duration\":2797,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are a helpful recipe search assistant that returns only valid JSON.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are a recipe search expert. Given a user's search query and a list of available
+        recipes,\\nidentify which recipes are most relevant to the user's request.\\n\\nUser's
+        search query: \\\"beef stir fry\\\"\\n\\nAvailable recipes:\\n[\\n  {\\n    \\\"id\\\":
+        \\\"spaghetti_carbonara\\\",\\n    \\\"name\\\": \\\"Spaghetti Carbonara\\\",\\n
+        \   \\\"ingredients\\\": [\\n      \\\"400g spaghetti\\\",\\n      \\\"200g
+        pancetta or guanciale\\\",\\n      \\\"4 large eggs\\\",\\n      \\\"100g
+        Pecorino Romano cheese, grated\\\",\\n      \\\"2 cloves garlic\\\"\\n    ],\\n
+        \   \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\": \\\"10
+        minutes\\\",\\n    \\\"cook_time\\\": \\\"15 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chicken_tikka_masala\\\",\\n    \\\"name\\\":
+        \\\"Chicken Tikka Masala\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        chicken breast, cubed\\\",\\n      \\\"200ml plain yogurt\\\",\\n      \\\"2
+        tsp garam masala\\\",\\n      \\\"1 tsp turmeric\\\",\\n      \\\"1 onion,
+        diced\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"45 minutes\\\",\\n    \\\"cook_time\\\": \\\"30 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chocolate_chip_cookies\\\",\\n    \\\"name\\\":
+        \\\"Classic Chocolate Chip Cookies\\\",\\n    \\\"ingredients\\\": [\\n      \\\"225g
+        butter, softened\\\",\\n      \\\"200g brown sugar\\\",\\n      \\\"100g white
+        sugar\\\",\\n      \\\"2 large eggs\\\",\\n      \\\"1 tsp vanilla extract\\\"\\n
+        \   ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"10 minutes\\\",\\n    \\\"servings\\\":
+        24\\n  },\\n  {\\n    \\\"id\\\": \\\"beef_stir_fry\\\",\\n    \\\"name\\\":
+        \\\"Beef and Vegetable Stir Fry\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        beef sirloin, sliced thin\\\",\\n      \\\"2 tbsp vegetable oil\\\",\\n      \\\"1
+        bell pepper, sliced\\\",\\n      \\\"1 onion, sliced\\\",\\n      \\\"200g
+        broccoli florets\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"8
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  },\\n  {\\n    \\\"id\\\": \\\"caesar_salad\\\",\\n
+        \   \\\"name\\\": \\\"Classic Caesar Salad\\\",\\n    \\\"ingredients\\\":
+        [\\n      \\\"2 heads romaine lettuce, chopped\\\",\\n      \\\"1/2 cup mayonnaise\\\",\\n
+        \     \\\"2 tbsp lemon juice\\\",\\n      \\\"2 cloves garlic, minced\\\",\\n
+        \     \\\"1 tsp Dijon mustard\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"0
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  }\\n]\\n\\nPlease analyze the query
+        and return a JSON response with the following format:\\n{\\n    \\\"relevant_recipe_ids\\\":
+        [\\\"recipe_id1\\\", \\\"recipe_id2\\\", ...],\\n    \\\"reasoning\\\": \\\"Brief
+        explanation of why these recipes match the query\\\"\\n}\\n\\nConsider:\\n-
+        Ingredient matches (exact or similar)\\n- Cuisine type preferences\\n- Cooking
+        method preferences\\n- Dietary restrictions (vegetarian, vegan, gluten-free,
+        etc.)\\n- Meal type (breakfast, lunch, dinner, dessert)\\n- Difficulty level
+        or time preferences\\n- Flavor profiles (spicy, sweet, savory, etc.)\\n\\nReturn
+        only the JSON response, no additional text.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\n
+        \   \\\"relevant_recipe_ids\\\": [\\\"beef_stir_fry\\\"],\\n    \\\"reasoning\\\":
+        \\\"The recipe 'Beef and Vegetable Stir Fry' directly matches the user's query
+        for 'beef stir fry' as it includes beef as the main ingredient and is prepared
+        using a stir-frying method.\\\"\\n}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641827487,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"0932aaa631d44f75\",\"parent_span_id\":\"bfc9e674dc7d6f42\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"245\",\"llm.usage.prompt_tokens\":\"822\",\"llm.usage.total_tokens\":\"1067\",\"llm.vendor\":\"openai\"},\"duration\":3568,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Can
+        you recommend a vegan version of beef stir fry?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"recipe\\\":{\\\"id\\\":\\\"beef_stir_fry\\\",\\\"name\\\":\\\"Beef
+        and Vegetable Stir Fry\\\",\\\"ingredients\\\":[\\\"500g beef sirloin, sliced
+        thin\\\",\\\"2 tbsp vegetable oil\\\",\\\"1 bell pepper, sliced\\\",\\\"1
+        onion, sliced\\\",\\\"200g broccoli florets\\\",\\\"2 carrots, sliced\\\",\\\"3
+        cloves garlic, minced\\\",\\\"2 tbsp soy sauce\\\",\\\"1 tbsp oyster sauce\\\",\\\"1
+        tsp sesame oil\\\",\\\"1 tsp cornstarch\\\",\\\"2 tbsp water\\\",\\\"Green
+        onions for garnish\\\"],\\\"instructions\\\":[\\\"Heat wok or large pan over
+        high heat\\\",\\\"Add oil and beef, stir-fry for 2-3 minutes\\\",\\\"Remove
+        beef and set aside\\\",\\\"Add vegetables to pan, stir-fry for 3-4 minutes\\\",\\\"Add
+        garlic and cook for 30 seconds\\\",\\\"Return beef to pan\\\",\\\"Mix soy
+        sauce, oyster sauce, sesame oil, cornstarch and water\\\",\\\"Add sauce to
+        pan, stir for 1 minute until thickened\\\",\\\"Garnish with green onions and
+        serve with rice\\\"],\\\"prep_time\\\":\\\"15 minutes\\\",\\\"cook_time\\\":\\\"8
+        minutes\\\",\\\"servings\\\":4},\\\"modification_request\\\":\\\"Create a
+        vegan version of this stir fry recipe.\\\"}\",\"llm.completions.0.tool_calls.0.id\":\"call_M6WnWsUvmTWk2suNqLJ3vV6N\",\"llm.completions.0.tool_calls.0.name\":\"plan_and_apply_recipe_modifications\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641831069,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"c3a2d090c61f966a\",\"parent_span_id\":\"e1172324e3a2f4e7\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_560af6e559\",\"llm.request.max_tokens\":\"1500\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.structured_output_schema\":\"{\\\"$defs\\\":
+        {\\\"ModifiedRecipeData\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\":
+        \\\"Id\\\", \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"ModifiedRecipeData\\\",
+        \\\"type\\\": \\\"object\\\"}}, \\\"properties\\\": {\\\"modified_recipe\\\":
+        {\\\"$ref\\\": \\\"#/$defs/ModifiedRecipeData\\\"}, \\\"changes_made\\\":
+        {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\": \\\"Changes
+        Made\\\", \\\"type\\\": \\\"array\\\"}, \\\"modification_reasoning\\\": {\\\"title\\\":
+        \\\"Modification Reasoning\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"modified_recipe\\\", \\\"changes_made\\\", \\\"modification_reasoning\\\"],
+        \\\"title\\\": \\\"RecipeModificationResult\\\", \\\"type\\\": \\\"object\\\"}\",\"llm.request.temperature\":\"0.300000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CNBVoW1woJI2k7WQYltvtp43LaOqE\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"371\",\"llm.usage.prompt_tokens\":\"653\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"1024\",\"llm.vendor\":\"openai\"},\"duration\":8363,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are an expert chef and recipe developer who modifies recipes based on user
+        requests.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are an expert chef and recipe developer. You need to modify an existing recipe
+        based on a user's request.\\n\\nOriginal Recipe:\\nName: Beef and Vegetable
+        Stir Fry\\nIngredients: [\\n  \\\"500g beef sirloin, sliced thin\\\",\\n  \\\"2
+        tbsp vegetable oil\\\",\\n  \\\"1 bell pepper, sliced\\\",\\n  \\\"1 onion,
+        sliced\\\",\\n  \\\"200g broccoli florets\\\",\\n  \\\"2 carrots, sliced\\\",\\n
+        \ \\\"3 cloves garlic, minced\\\",\\n  \\\"2 tbsp soy sauce\\\",\\n  \\\"1
+        tbsp oyster sauce\\\",\\n  \\\"1 tsp sesame oil\\\",\\n  \\\"1 tsp cornstarch\\\",\\n
+        \ \\\"2 tbsp water\\\",\\n  \\\"Green onions for garnish\\\"\\n]\\nInstructions:
+        [\\n  \\\"Heat wok or large pan over high heat\\\",\\n  \\\"Add oil and beef,
+        stir-fry for 2-3 minutes\\\",\\n  \\\"Remove beef and set aside\\\",\\n  \\\"Add
+        vegetables to pan, stir-fry for 3-4 minutes\\\",\\n  \\\"Add garlic and cook
+        for 30 seconds\\\",\\n  \\\"Return beef to pan\\\",\\n  \\\"Mix soy sauce,
+        oyster sauce, sesame oil, cornstarch and water\\\",\\n  \\\"Add sauce to pan,
+        stir for 1 minute until thickened\\\",\\n  \\\"Garnish with green onions and
+        serve with rice\\\"\\n]\\nPrep Time: 15 minutes\\nCook Time: 8 minutes\\nServings:
+        4\\n\\nUser's Modification Request: \\\"Create a vegan version of this stir
+        fry recipe.\\\"\\n\\nPlease create a modified version of this recipe that
+        incorporates the user's request. Consider:\\n- Ingredient substitutions (vegetarian/vegan,
+        gluten-free, allergies, etc.)\\n- Scaling (doubling, halving, different serving
+        sizes)\\n- Cooking method changes (faster, slower, different techniques)\\n-
+        Flavor modifications (spicier, less salty, sweeter, etc.)\\n- Dietary restrictions
+        and preferences\\n- Seasonal ingredient swaps\\n- Nutritional improvements\\n\\nMake
+        sure all ingredients have proper quantities and units. Keep the essence of
+        the original recipe while making\\nthe requested modifications. Be creative
+        but practical.\\n\\nProvide a clear list of what changes you made and explain
+        your reasoning for the modifications.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\\"modified_recipe\\\":{\\\"id\\\":\\\"vegan-beef-vegetable-stir-fry\\\",\\\"name\\\":\\\"Vegan
+        Vegetable Stir Fry\\\",\\\"ingredients\\\":[\\\"500g firm tofu, pressed and
+        cubed\\\",\\\"2 tbsp vegetable oil\\\",\\\"1 bell pepper, sliced\\\",\\\"1
+        onion, sliced\\\",\\\"200g broccoli florets\\\",\\\"2 carrots, sliced\\\",\\\"3
+        cloves garlic, minced\\\",\\\"2 tbsp soy sauce (or tamari for gluten-free)\\\",\\\"1
+        tbsp hoisin sauce\\\",\\\"1 tsp sesame oil\\\",\\\"1 tsp cornstarch\\\",\\\"2
+        tbsp water\\\",\\\"Green onions for garnish\\\"],\\\"instructions\\\":[\\\"Heat
+        wok or large pan over high heat\\\",\\\"Add oil and tofu, stir-fry for 5-7
+        minutes until golden brown\\\",\\\"Remove tofu and set aside\\\",\\\"Add vegetables
+        to pan, stir-fry for 3-4 minutes\\\",\\\"Add garlic and cook for 30 seconds\\\",\\\"Return
+        tofu to pan\\\",\\\"Mix soy sauce, hoisin sauce, sesame oil, cornstarch and
+        water\\\",\\\"Add sauce to pan, stir for 1 minute until thickened\\\",\\\"Garnish
+        with green onions and serve with rice\\\"],\\\"prep_time\\\":\\\"15 minutes\\\",\\\"cook_time\\\":\\\"10
+        minutes\\\",\\\"servings\\\":4},\\\"changes_made\\\":[\\\"Replaced beef sirloin
+        with firm tofu to create a vegan protein source.\\\",\\\"Substituted oyster
+        sauce with hoisin sauce for a vegan-friendly option.\\\",\\\"Adjusted cooking
+        time for tofu to ensure it is cooked properly and achieves a golden color.\\\"],\\\"modification_reasoning\\\":\\\"The
+        user requested a vegan version of the stir fry, so I replaced the beef with
+        firm tofu, which provides a good source of protein and maintains the texture
+        needed for a stir fry. I also substituted oyster sauce with hoisin sauce to
+        keep the dish flavorful while ensuring it remains vegan. The cooking method
+        was slightly adjusted to accommodate the tofu, allowing it to brown properly
+        before adding the vegetables.\\\"}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641831056,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"e1172324e3a2f4e7\",\"parent_span_id\":\"bfc9e674dc7d6f42\",\"trace_state\":\"\",\"span_name\":\"plan_and_apply_recipe_modifications.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.tool.name\":\"plan_and_apply_recipe_modifications\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":8377,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"plan_and_apply_recipe_modifications\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641839434,\"trace_id\":\"55c1042da3f3cd03c46329868dac2d17\",\"span_id\":\"861684e12f27ffd0\",\"parent_span_id\":\"bfc9e674dc7d6f42\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"373\",\"llm.usage.prompt_tokens\":\"1710\",\"llm.usage.total_tokens\":\"2083\",\"llm.vendor\":\"openai\"},\"duration\":6477,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Can
+        you recommend a vegan version of beef stir fry?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"Here's
+        a vegan version of the traditional beef stir fry, now called **Vegan Vegetable
+        Stir Fry**:\\n\\n### Ingredients:\\n- 500g firm tofu, pressed and cubed\\n-
+        2 tbsp vegetable oil\\n- 1 bell pepper, sliced\\n- 1 onion, sliced\\n- 200g
+        broccoli florets\\n- 2 carrots, sliced\\n- 3 cloves garlic, minced\\n- 2 tbsp
+        soy sauce (or tamari for gluten-free)\\n- 1 tbsp hoisin sauce\\n- 1 tsp sesame
+        oil\\n- 1 tsp cornstarch\\n- 2 tbsp water\\n- Green onions for garnish\\n\\n###
+        Instructions:\\n1. **Heat** a wok or large pan over high heat.\\n2. **Add**
+        oil and tofu, stir-fry for 5-7 minutes until golden brown. Remove tofu and
+        set aside.\\n3. **Add** the vegetables to the pan, stir-fry for 3-4 minutes.\\n4.
+        **Add** garlic and cook for 30 seconds.\\n5. **Return** tofu to the pan.\\n6.
+        **Mix** soy sauce, hoisin sauce, sesame oil, cornstarch, and water.\\n7. **Add**
+        the sauce to the pan, stir for 1 minute until thickened.\\n8. **Garnish**
+        with green onions and serve with rice.\\n\\n### Changes Made:\\n- Replaced
+        beef with firm tofu for a vegan protein source.\\n- Substituted oyster sauce
+        with hoisin sauce to keep it vegan-friendly.\\n- Adjusted cooking time to
+        ensure the tofu achieves a golden color.\\n\\n### Cooking Tips:\\n- Ensure
+        the tofu is well-pressed to remove excess water before cooking; this helps
+        it crisp up.\\n- Customize your stir fry by adding other vegetables like mushrooms
+        or snap peas.\\n\\nEnjoy your vegan stir fry! \U0001F331\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641846922,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"5e751de92673e2ce\",\"parent_span_id\":\"\",\"trace_state\":\"\",\"span_name\":\"Agent
+        Workflow\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.vendor\":\"openai_agents\",\"llm.workflow.name\":\"Agent
+        Workflow\",\"traceloop.span.kind\":\"workflow\"},\"duration\":13996,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641846922,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"934783d1985190e7\",\"parent_span_id\":\"5e751de92673e2ce\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.vendor\":\"openai_agents\",\"openai.agent.handoff0\":\"{\\\"name\\\":
+        \\\"unknown\\\", \\\"instructions\\\": \\\"No instructions\\\"}\",\"traceloop.span.kind\":\"agent\"},\"duration\":1701,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641846923,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"a59392eac423e9dd\",\"parent_span_id\":\"934783d1985190e7\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Handoff
+        to the Recipe Editor Agent agent to handle the request. \",\"llm.request.functions.0.name\":\"transfer_to_recipe_editor_agent\",\"llm.request.functions.0.parameters\":\"{\\\"additionalProperties\\\":
+        false, \\\"type\\\": \\\"object\\\", \\\"properties\\\": {}, \\\"required\\\":
+        []}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"14\",\"llm.usage.prompt_tokens\":\"226\",\"llm.usage.total_tokens\":\"240\",\"llm.vendor\":\"openai\"},\"duration\":1699,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Do
+        you know any recipes for a healthy snack?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{}\",\"llm.completions.0.tool_calls.0.id\":\"call_LQTrOtGKfQkmCLtGx6FI8krZ\",\"llm.completions.0.tool_calls.0.name\":\"transfer_to_recipe_editor_agent\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641848624,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"36e4da70bdc030f4\",\"parent_span_id\":\"934783d1985190e7\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent \u2192 unknown.handoff\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.handoff.from_agent\":\"Main Chat Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"handoff\"},\"duration\":0,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641848624,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"4c8fa1dde6aa5253\",\"parent_span_id\":\"5e751de92673e2ce\",\"trace_state\":\"\",\"span_name\":\"Recipe
+        Editor Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"agent\"},\"duration\":12293,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641848625,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"52d25c4cf707e18b\",\"parent_span_id\":\"4c8fa1dde6aa5253\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"17\",\"llm.usage.prompt_tokens\":\"483\",\"llm.usage.total_tokens\":\"500\",\"llm.vendor\":\"openai\"},\"duration\":2330,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Do
+        you know any recipes for a healthy snack?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"query\\\":\\\"healthy
+        snack\\\"}\",\"llm.completions.0.tool_calls.0.id\":\"call_jC1hE6ySUzMRV2XQEeAJ12V9\",\"llm.completions.0.tool_calls.0.name\":\"search_recipes\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641850956,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"48ba636bfd7b19ac\",\"parent_span_id\":\"4c8fa1dde6aa5253\",\"trace_state\":\"\",\"span_name\":\"search_recipes.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.tool.name\":\"search_recipes\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":2793,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"search_recipes\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641850970,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"dc955ecbaf6445e0\",\"parent_span_id\":\"48ba636bfd7b19ac\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_560af6e559\",\"llm.request.max_tokens\":\"500\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.temperature\":\"0.100000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CNBW7vE9xXHOfZ03iexEufGeocF60\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"85\",\"llm.usage.prompt_tokens\":\"737\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"822\",\"llm.vendor\":\"openai\"},\"duration\":2779,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are a helpful recipe search assistant that returns only valid JSON.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are a recipe search expert. Given a user's search query and a list of available
+        recipes,\\nidentify which recipes are most relevant to the user's request.\\n\\nUser's
+        search query: \\\"healthy snack\\\"\\n\\nAvailable recipes:\\n[\\n  {\\n    \\\"id\\\":
+        \\\"spaghetti_carbonara\\\",\\n    \\\"name\\\": \\\"Spaghetti Carbonara\\\",\\n
+        \   \\\"ingredients\\\": [\\n      \\\"400g spaghetti\\\",\\n      \\\"200g
+        pancetta or guanciale\\\",\\n      \\\"4 large eggs\\\",\\n      \\\"100g
+        Pecorino Romano cheese, grated\\\",\\n      \\\"2 cloves garlic\\\"\\n    ],\\n
+        \   \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\": \\\"10
+        minutes\\\",\\n    \\\"cook_time\\\": \\\"15 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chicken_tikka_masala\\\",\\n    \\\"name\\\":
+        \\\"Chicken Tikka Masala\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        chicken breast, cubed\\\",\\n      \\\"200ml plain yogurt\\\",\\n      \\\"2
+        tsp garam masala\\\",\\n      \\\"1 tsp turmeric\\\",\\n      \\\"1 onion,
+        diced\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"45 minutes\\\",\\n    \\\"cook_time\\\": \\\"30 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chocolate_chip_cookies\\\",\\n    \\\"name\\\":
+        \\\"Classic Chocolate Chip Cookies\\\",\\n    \\\"ingredients\\\": [\\n      \\\"225g
+        butter, softened\\\",\\n      \\\"200g brown sugar\\\",\\n      \\\"100g white
+        sugar\\\",\\n      \\\"2 large eggs\\\",\\n      \\\"1 tsp vanilla extract\\\"\\n
+        \   ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"10 minutes\\\",\\n    \\\"servings\\\":
+        24\\n  },\\n  {\\n    \\\"id\\\": \\\"beef_stir_fry\\\",\\n    \\\"name\\\":
+        \\\"Vegan Vegetable Stir Fry\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        firm tofu, pressed and cubed\\\",\\n      \\\"2 tbsp vegetable oil\\\",\\n
+        \     \\\"1 bell pepper, sliced\\\",\\n      \\\"1 onion, sliced\\\",\\n      \\\"200g
+        broccoli florets\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"10
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  },\\n  {\\n    \\\"id\\\": \\\"caesar_salad\\\",\\n
+        \   \\\"name\\\": \\\"Classic Caesar Salad\\\",\\n    \\\"ingredients\\\":
+        [\\n      \\\"2 heads romaine lettuce, chopped\\\",\\n      \\\"1/2 cup mayonnaise\\\",\\n
+        \     \\\"2 tbsp lemon juice\\\",\\n      \\\"2 cloves garlic, minced\\\",\\n
+        \     \\\"1 tsp Dijon mustard\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"0
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  }\\n]\\n\\nPlease analyze the query
+        and return a JSON response with the following format:\\n{\\n    \\\"relevant_recipe_ids\\\":
+        [\\\"recipe_id1\\\", \\\"recipe_id2\\\", ...],\\n    \\\"reasoning\\\": \\\"Brief
+        explanation of why these recipes match the query\\\"\\n}\\n\\nConsider:\\n-
+        Ingredient matches (exact or similar)\\n- Cuisine type preferences\\n- Cooking
+        method preferences\\n- Dietary restrictions (vegetarian, vegan, gluten-free,
+        etc.)\\n- Meal type (breakfast, lunch, dinner, dessert)\\n- Difficulty level
+        or time preferences\\n- Flavor profiles (spicy, sweet, savory, etc.)\\n\\nReturn
+        only the JSON response, no additional text.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\n
+        \   \\\"relevant_recipe_ids\\\": [\\\"beef_stir_fry\\\", \\\"caesar_salad\\\"],\\n
+        \   \\\"reasoning\\\": \\\"Both recipes are healthy options. The Vegan Vegetable
+        Stir Fry is plant-based and low in calories, making it a great healthy snack.
+        The Classic Caesar Salad, while it contains mayonnaise, can be made healthier
+        by adjusting the ingredients, and it is a light option suitable for snacking.\\\"\\n}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641853751,\"trace_id\":\"8d802ad4d3948ea805d15a2037085db7\",\"span_id\":\"9002825e9892eeda\",\"parent_span_id\":\"4c8fa1dde6aa5253\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"529\",\"llm.usage.prompt_tokens\":\"1028\",\"llm.usage.total_tokens\":\"1557\",\"llm.vendor\":\"openai\"},\"duration\":7165,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Do
+        you know any recipes for a healthy snack?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"Here
+        are two healthy snack recipes for you:\\n\\n1. **Vegan Vegetable Stir Fry**\\n
+        \  - **Ingredients:**\\n     - 500g firm tofu, pressed and cubed\\n     -
+        2 tbsp vegetable oil\\n     - 1 bell pepper, sliced\\n     - 1 onion, sliced\\n
+        \    - 200g broccoli florets\\n     - 2 carrots, sliced\\n     - 3 cloves
+        garlic, minced\\n     - 2 tbsp soy sauce (or tamari for gluten-free)\\n     -
+        1 tbsp hoisin sauce\\n     - 1 tsp sesame oil\\n     - 1 tsp cornstarch\\n
+        \    - 2 tbsp water\\n     - Green onions for garnish\\n   - **Instructions:**\\n
+        \    1. Heat wok or large pan over high heat.\\n     2. Add oil and tofu,
+        stir-fry for 5-7 minutes until golden brown.\\n     3. Remove tofu and set
+        aside.\\n     4. Add vegetables to pan, stir-fry for 3-4 minutes.\\n     5.
+        Add garlic and cook for 30 seconds.\\n     6. Return tofu to pan.\\n     7.
+        Mix soy sauce, hoisin sauce, sesame oil, cornstarch, and water.\\n     8.
+        Add sauce to pan, stir for 1 minute until thickened.\\n     9. Garnish with
+        green onions and serve with rice.\\n\\n2. **Classic Caesar Salad**\\n   -
+        **Ingredients:**\\n     - 2 heads romaine lettuce, chopped\\n     - 1/2 cup
+        mayonnaise\\n     - 2 tbsp lemon juice\\n     - 2 cloves garlic, minced\\n
+        \    - 1 tsp Dijon mustard\\n     - 1 tsp Worcestershire sauce\\n     - 1/2
+        cup Parmesan cheese, grated\\n     - 2 anchovy fillets, minced (optional)\\n
+        \    - 1 cup croutons\\n     - Black pepper\\n     - Salt\\n   - **Instructions:**\\n
+        \    1. Wash and dry romaine lettuce thoroughly.\\n     2. Whisk mayonnaise,
+        lemon juice, garlic, and mustard.\\n     3. Add Worcestershire sauce and anchovies
+        if using.\\n     4. Season dressing with salt and pepper.\\n     5. Toss lettuce
+        with dressing.\\n     6. Add most of the Parmesan cheese and toss.\\n     7.
+        Top with croutons and remaining cheese.\\n     8. Serve immediately.\\n\\nBoth
+        recipes are healthy options, with the stir fry being plant-based and low in
+        calories, making it a great healthy snack. Enjoy!\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641861930,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"83cf00ed27dff763\",\"parent_span_id\":\"de7353505339709d\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Handoff
+        to the Recipe Editor Agent agent to handle the request. \",\"llm.request.functions.0.name\":\"transfer_to_recipe_editor_agent\",\"llm.request.functions.0.parameters\":\"{\\\"additionalProperties\\\":
+        false, \\\"type\\\": \\\"object\\\", \\\"properties\\\": {}, \\\"required\\\":
+        []}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"14\",\"llm.usage.prompt_tokens\":\"224\",\"llm.usage.total_tokens\":\"238\",\"llm.vendor\":\"openai\"},\"duration\":1659,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"What
+        are some vegan recipes for snack?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{}\",\"llm.completions.0.tool_calls.0.id\":\"call_PkwiKeFEuXK3Nw7niuYRchgz\",\"llm.completions.0.tool_calls.0.name\":\"transfer_to_recipe_editor_agent\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641861929,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"de7353505339709d\",\"parent_span_id\":\"f0721dde47d03651\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.vendor\":\"openai_agents\",\"openai.agent.handoff0\":\"{\\\"name\\\":
+        \\\"unknown\\\", \\\"instructions\\\": \\\"No instructions\\\"}\",\"traceloop.span.kind\":\"agent\"},\"duration\":1662,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641861928,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"f0721dde47d03651\",\"parent_span_id\":\"\",\"trace_state\":\"\",\"span_name\":\"Agent
+        Workflow\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.vendor\":\"openai_agents\",\"llm.workflow.name\":\"Agent
+        Workflow\",\"traceloop.span.kind\":\"workflow\"},\"duration\":8219,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641863591,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"15f7239c5f55a608\",\"parent_span_id\":\"de7353505339709d\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent \u2192 unknown.handoff\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.handoff.from_agent\":\"Main Chat Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"handoff\"},\"duration\":0,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641863592,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"36d80bc4be18e4b9\",\"parent_span_id\":\"f0721dde47d03651\",\"trace_state\":\"\",\"span_name\":\"Recipe
+        Editor Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"agent\"},\"duration\":6555,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641863592,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"e052ea4bd13ce381\",\"parent_span_id\":\"36d80bc4be18e4b9\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"18\",\"llm.usage.prompt_tokens\":\"481\",\"llm.usage.total_tokens\":\"499\",\"llm.vendor\":\"openai\"},\"duration\":929,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"What
+        are some vegan recipes for snack?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"query\\\":\\\"vegan
+        snack\\\"}\",\"llm.completions.0.tool_calls.0.id\":\"call_mSMQcJYr1r9foO5xF0cqVdqc\",\"llm.completions.0.tool_calls.0.name\":\"search_recipes\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641864523,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"49ae576e642f15fc\",\"parent_span_id\":\"36d80bc4be18e4b9\",\"trace_state\":\"\",\"span_name\":\"search_recipes.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.tool.name\":\"search_recipes\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":2616,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"search_recipes\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641864536,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"eaba32f0dd7fdf73\",\"parent_span_id\":\"49ae576e642f15fc\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_560af6e559\",\"llm.request.max_tokens\":\"500\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.temperature\":\"0.100000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CNBWLBRJ6LXB14pNqZdtYU9ttuDjV\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"57\",\"llm.usage.prompt_tokens\":\"738\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"795\",\"llm.vendor\":\"openai\"},\"duration\":2602,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are a helpful recipe search assistant that returns only valid JSON.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are a recipe search expert. Given a user's search query and a list of available
+        recipes,\\nidentify which recipes are most relevant to the user's request.\\n\\nUser's
+        search query: \\\"vegan snack\\\"\\n\\nAvailable recipes:\\n[\\n  {\\n    \\\"id\\\":
+        \\\"spaghetti_carbonara\\\",\\n    \\\"name\\\": \\\"Spaghetti Carbonara\\\",\\n
+        \   \\\"ingredients\\\": [\\n      \\\"400g spaghetti\\\",\\n      \\\"200g
+        pancetta or guanciale\\\",\\n      \\\"4 large eggs\\\",\\n      \\\"100g
+        Pecorino Romano cheese, grated\\\",\\n      \\\"2 cloves garlic\\\"\\n    ],\\n
+        \   \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\": \\\"10
+        minutes\\\",\\n    \\\"cook_time\\\": \\\"15 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chicken_tikka_masala\\\",\\n    \\\"name\\\":
+        \\\"Chicken Tikka Masala\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        chicken breast, cubed\\\",\\n      \\\"200ml plain yogurt\\\",\\n      \\\"2
+        tsp garam masala\\\",\\n      \\\"1 tsp turmeric\\\",\\n      \\\"1 onion,
+        diced\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"45 minutes\\\",\\n    \\\"cook_time\\\": \\\"30 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chocolate_chip_cookies\\\",\\n    \\\"name\\\":
+        \\\"Classic Chocolate Chip Cookies\\\",\\n    \\\"ingredients\\\": [\\n      \\\"225g
+        butter, softened\\\",\\n      \\\"200g brown sugar\\\",\\n      \\\"100g white
+        sugar\\\",\\n      \\\"2 large eggs\\\",\\n      \\\"1 tsp vanilla extract\\\"\\n
+        \   ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"10 minutes\\\",\\n    \\\"servings\\\":
+        24\\n  },\\n  {\\n    \\\"id\\\": \\\"beef_stir_fry\\\",\\n    \\\"name\\\":
+        \\\"Vegan Vegetable Stir Fry\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        firm tofu, pressed and cubed\\\",\\n      \\\"2 tbsp vegetable oil\\\",\\n
+        \     \\\"1 bell pepper, sliced\\\",\\n      \\\"1 onion, sliced\\\",\\n      \\\"200g
+        broccoli florets\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"10
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  },\\n  {\\n    \\\"id\\\": \\\"caesar_salad\\\",\\n
+        \   \\\"name\\\": \\\"Classic Caesar Salad\\\",\\n    \\\"ingredients\\\":
+        [\\n      \\\"2 heads romaine lettuce, chopped\\\",\\n      \\\"1/2 cup mayonnaise\\\",\\n
+        \     \\\"2 tbsp lemon juice\\\",\\n      \\\"2 cloves garlic, minced\\\",\\n
+        \     \\\"1 tsp Dijon mustard\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"0
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  }\\n]\\n\\nPlease analyze the query
+        and return a JSON response with the following format:\\n{\\n    \\\"relevant_recipe_ids\\\":
+        [\\\"recipe_id1\\\", \\\"recipe_id2\\\", ...],\\n    \\\"reasoning\\\": \\\"Brief
+        explanation of why these recipes match the query\\\"\\n}\\n\\nConsider:\\n-
+        Ingredient matches (exact or similar)\\n- Cuisine type preferences\\n- Cooking
+        method preferences\\n- Dietary restrictions (vegetarian, vegan, gluten-free,
+        etc.)\\n- Meal type (breakfast, lunch, dinner, dessert)\\n- Difficulty level
+        or time preferences\\n- Flavor profiles (spicy, sweet, savory, etc.)\\n\\nReturn
+        only the JSON response, no additional text.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\n
+        \   \\\"relevant_recipe_ids\\\": [\\\"beef_stir_fry\\\"],\\n    \\\"reasoning\\\":
+        \\\"The Vegan Vegetable Stir Fry is a suitable vegan snack option, as it contains
+        plant-based ingredients and is quick to prepare, aligning with the user's
+        request for a vegan snack.\\\"\\n}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641867140,\"trace_id\":\"94d7bb2b8b2fff15d5654b7868ff8c2a\",\"span_id\":\"0f083ab66b675e75\",\"parent_span_id\":\"36d80bc4be18e4b9\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"304\",\"llm.usage.prompt_tokens\":\"822\",\"llm.usage.total_tokens\":\"1126\",\"llm.vendor\":\"openai\"},\"duration\":3006,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"What
+        are some vegan recipes for snack?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"I
+        found a vegan snack recipe for you: **Vegan Vegetable Stir Fry**. It's quick
+        to prepare and makes for a delicious snack.\\n\\n### Ingredients\\n- 500g
+        firm tofu, pressed and cubed\\n- 2 tbsp vegetable oil\\n- 1 bell pepper, sliced\\n-
+        1 onion, sliced\\n- 200g broccoli florets\\n- 2 carrots, sliced\\n- 3 cloves
+        garlic, minced\\n- 2 tbsp soy sauce (or tamari for gluten-free)\\n- 1 tbsp
+        hoisin sauce\\n- 1 tsp sesame oil\\n- 1 tsp cornstarch\\n- 2 tbsp water\\n-
+        Green onions for garnish\\n\\n### Instructions\\n1. Heat a wok or large pan
+        over high heat.\\n2. Add oil and tofu, stir-fry for 5-7 minutes until golden
+        brown.\\n3. Remove tofu and set aside.\\n4. Add vegetables to the pan, stir-fry
+        for 3-4 minutes.\\n5. Add garlic and cook for 30 seconds.\\n6. Return tofu
+        to the pan.\\n7. Mix soy sauce, hoisin sauce, sesame oil, cornstarch, and
+        water.\\n8. Add sauce to the pan, stir for 1 minute until thickened.\\n9.
+        Garnish with green onions and serve with rice.\\n\\n### Prep Time\\n15 minutes\\n\\n###
+        Cook Time\\n10 minutes\\n\\n### Servings\\n4\\n\\nEnjoy your snack! Let me
+        know if you need any modifications or further assistance.\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641871157,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"011ef8cdb9f0233f\",\"parent_span_id\":\"43a18f1a5a45773f\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.vendor\":\"openai_agents\",\"openai.agent.handoff0\":\"{\\\"name\\\":
+        \\\"unknown\\\", \\\"instructions\\\": \\\"No instructions\\\"}\",\"traceloop.span.kind\":\"agent\"},\"duration\":3576,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641871158,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"22f435d1158609de\",\"parent_span_id\":\"011ef8cdb9f0233f\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Handoff
+        to the Recipe Editor Agent agent to handle the request. \",\"llm.request.functions.0.name\":\"transfer_to_recipe_editor_agent\",\"llm.request.functions.0.parameters\":\"{\\\"additionalProperties\\\":
+        false, \\\"type\\\": \\\"object\\\", \\\"properties\\\": {}, \\\"required\\\":
+        []}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"14\",\"llm.usage.prompt_tokens\":\"226\",\"llm.usage.total_tokens\":\"240\",\"llm.vendor\":\"openai\"},\"duration\":3574,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Can
+        you search for recipes for a spicy dinner?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{}\",\"llm.completions.0.tool_calls.0.id\":\"call_FUsb3sKbzcrGvtRRq4nL0W4g\",\"llm.completions.0.tool_calls.0.name\":\"transfer_to_recipe_editor_agent\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641871157,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"43a18f1a5a45773f\",\"parent_span_id\":\"\",\"trace_state\":\"\",\"span_name\":\"Agent
+        Workflow\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.vendor\":\"openai_agents\",\"llm.workflow.name\":\"Agent
+        Workflow\",\"traceloop.span.kind\":\"workflow\"},\"duration\":18697,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641874736,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"16a7b72021379a9f\",\"parent_span_id\":\"bf9e44287a0d506f\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"18\",\"llm.usage.prompt_tokens\":\"483\",\"llm.usage.total_tokens\":\"501\",\"llm.vendor\":\"openai\"},\"duration\":968,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Can
+        you search for recipes for a spicy dinner?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"query\\\":\\\"spicy
+        dinner\\\"}\",\"llm.completions.0.tool_calls.0.id\":\"call_h9yl2rXNKh6169v4hWDNedJb\",\"llm.completions.0.tool_calls.0.name\":\"search_recipes\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641874735,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"bf9e44287a0d506f\",\"parent_span_id\":\"43a18f1a5a45773f\",\"trace_state\":\"\",\"span_name\":\"Recipe
+        Editor Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"agent\"},\"duration\":15119,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641874734,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"fc4c4dddc061ffb7\",\"parent_span_id\":\"011ef8cdb9f0233f\",\"trace_state\":\"\",\"span_name\":\"Main
+        Chat Agent \u2192 unknown.handoff\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Main
+        Chat Agent\",\"llm.handoff.from_agent\":\"Main Chat Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"handoff\"},\"duration\":0,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641875705,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"98575af300ee7150\",\"parent_span_id\":\"bf9e44287a0d506f\",\"trace_state\":\"\",\"span_name\":\"search_recipes.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.tool.name\":\"search_recipes\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":2669,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"search_recipes\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641875718,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"fdaeaaedddc7bf76\",\"parent_span_id\":\"98575af300ee7150\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_560af6e559\",\"llm.request.max_tokens\":\"500\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.temperature\":\"0.100000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CNBWX3dpvxFF5TtHVitDD2iOiYJ11\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"63\",\"llm.usage.prompt_tokens\":\"738\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"801\",\"llm.vendor\":\"openai\"},\"duration\":2655,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are a helpful recipe search assistant that returns only valid JSON.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are a recipe search expert. Given a user's search query and a list of available
+        recipes,\\nidentify which recipes are most relevant to the user's request.\\n\\nUser's
+        search query: \\\"spicy dinner\\\"\\n\\nAvailable recipes:\\n[\\n  {\\n    \\\"id\\\":
+        \\\"spaghetti_carbonara\\\",\\n    \\\"name\\\": \\\"Spaghetti Carbonara\\\",\\n
+        \   \\\"ingredients\\\": [\\n      \\\"400g spaghetti\\\",\\n      \\\"200g
+        pancetta or guanciale\\\",\\n      \\\"4 large eggs\\\",\\n      \\\"100g
+        Pecorino Romano cheese, grated\\\",\\n      \\\"2 cloves garlic\\\"\\n    ],\\n
+        \   \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\": \\\"10
+        minutes\\\",\\n    \\\"cook_time\\\": \\\"15 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chicken_tikka_masala\\\",\\n    \\\"name\\\":
+        \\\"Chicken Tikka Masala\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        chicken breast, cubed\\\",\\n      \\\"200ml plain yogurt\\\",\\n      \\\"2
+        tsp garam masala\\\",\\n      \\\"1 tsp turmeric\\\",\\n      \\\"1 onion,
+        diced\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"45 minutes\\\",\\n    \\\"cook_time\\\": \\\"30 minutes\\\",\\n    \\\"servings\\\":
+        4\\n  },\\n  {\\n    \\\"id\\\": \\\"chocolate_chip_cookies\\\",\\n    \\\"name\\\":
+        \\\"Classic Chocolate Chip Cookies\\\",\\n    \\\"ingredients\\\": [\\n      \\\"225g
+        butter, softened\\\",\\n      \\\"200g brown sugar\\\",\\n      \\\"100g white
+        sugar\\\",\\n      \\\"2 large eggs\\\",\\n      \\\"1 tsp vanilla extract\\\"\\n
+        \   ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n    \\\"prep_time\\\":
+        \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"10 minutes\\\",\\n    \\\"servings\\\":
+        24\\n  },\\n  {\\n    \\\"id\\\": \\\"beef_stir_fry\\\",\\n    \\\"name\\\":
+        \\\"Vegan Vegetable Stir Fry\\\",\\n    \\\"ingredients\\\": [\\n      \\\"500g
+        firm tofu, pressed and cubed\\\",\\n      \\\"2 tbsp vegetable oil\\\",\\n
+        \     \\\"1 bell pepper, sliced\\\",\\n      \\\"1 onion, sliced\\\",\\n      \\\"200g
+        broccoli florets\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"10
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  },\\n  {\\n    \\\"id\\\": \\\"caesar_salad\\\",\\n
+        \   \\\"name\\\": \\\"Classic Caesar Salad\\\",\\n    \\\"ingredients\\\":
+        [\\n      \\\"2 heads romaine lettuce, chopped\\\",\\n      \\\"1/2 cup mayonnaise\\\",\\n
+        \     \\\"2 tbsp lemon juice\\\",\\n      \\\"2 cloves garlic, minced\\\",\\n
+        \     \\\"1 tsp Dijon mustard\\\"\\n    ],\\n    \\\"cuisine_type\\\": \\\"various\\\",\\n
+        \   \\\"prep_time\\\": \\\"15 minutes\\\",\\n    \\\"cook_time\\\": \\\"0
+        minutes\\\",\\n    \\\"servings\\\": 4\\n  }\\n]\\n\\nPlease analyze the query
+        and return a JSON response with the following format:\\n{\\n    \\\"relevant_recipe_ids\\\":
+        [\\\"recipe_id1\\\", \\\"recipe_id2\\\", ...],\\n    \\\"reasoning\\\": \\\"Brief
+        explanation of why these recipes match the query\\\"\\n}\\n\\nConsider:\\n-
+        Ingredient matches (exact or similar)\\n- Cuisine type preferences\\n- Cooking
+        method preferences\\n- Dietary restrictions (vegetarian, vegan, gluten-free,
+        etc.)\\n- Meal type (breakfast, lunch, dinner, dessert)\\n- Difficulty level
+        or time preferences\\n- Flavor profiles (spicy, sweet, savory, etc.)\\n\\nReturn
+        only the JSON response, no additional text.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\n
+        \   \\\"relevant_recipe_ids\\\": [\\\"chicken_tikka_masala\\\"],\\n    \\\"reasoning\\\":
+        \\\"Chicken Tikka Masala is a spicy dish that fits the user's request for
+        a spicy dinner. It contains spices like garam masala and turmeric, which contribute
+        to its heat and flavor profile.\\\"\\n}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1759641878375,\"trace_id\":\"810beadd9b86f1451416bc6f85890190\",\"span_id\":\"7677c28ec70e7c7f\",\"parent_span_id\":\"bf9e44287a0d506f\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"openai-agents-demo\",\"resource_attributes\":{\"service.name\":\"openai-agents-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Recipe
+        Editor Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        and browse recipes in the database.\",\"llm.request.functions.0.name\":\"search_recipes\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"query\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Search
+        term to filter recipes (optional)\\\", \\\"title\\\": \\\"Query\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"title\\\": \\\"search_recipes_args\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\": [\\\"query\\\"]}\",\"llm.request.functions.1.description\":\"Plan
+        modifications to a recipe based on user request and apply them.\",\"llm.request.functions.1.name\":\"plan_and_apply_recipe_modifications\",\"llm.request.functions.1.parameters\":\"{\\\"$defs\\\":
+        {\\\"Recipe\\\": {\\\"properties\\\": {\\\"id\\\": {\\\"title\\\": \\\"Id\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"name\\\": {\\\"title\\\": \\\"Name\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"ingredients\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Ingredients\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"instructions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        \\\"Instructions\\\", \\\"type\\\": \\\"array\\\"}, \\\"prep_time\\\": {\\\"title\\\":
+        \\\"Prep Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"cook_time\\\": {\\\"title\\\":
+        \\\"Cook Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"servings\\\": {\\\"title\\\":
+        \\\"Servings\\\", \\\"type\\\": \\\"integer\\\"}}, \\\"required\\\": [\\\"id\\\",
+        \\\"name\\\", \\\"ingredients\\\", \\\"instructions\\\", \\\"prep_time\\\",
+        \\\"cook_time\\\", \\\"servings\\\"], \\\"title\\\": \\\"Recipe\\\", \\\"type\\\":
+        \\\"object\\\", \\\"additionalProperties\\\": false}}, \\\"properties\\\":
+        {\\\"recipe\\\": {\\\"$ref\\\": \\\"#/$defs/Recipe\\\"}, \\\"modification_request\\\":
+        {\\\"description\\\": \\\"Description of the desired changes\\\", \\\"title\\\":
+        \\\"Modification Request\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"recipe\\\", \\\"modification_request\\\"], \\\"title\\\": \\\"plan_and_apply_recipe_modifications_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"296\",\"llm.usage.prompt_tokens\":\"804\",\"llm.usage.total_tokens\":\"1100\",\"llm.vendor\":\"openai\"},\"duration\":11477,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Can
+        you search for recipes for a spicy dinner?\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"I
+        found a recipe for a spicy dinner: **Chicken Tikka Masala**. Here's a quick
+        overview:\\n\\n### Ingredients:\\n- 500g chicken breast, cubed\\n- 200ml plain
+        yogurt\\n- 2 tsp garam masala\\n- 1 tsp turmeric\\n- 1 onion, diced\\n- 3
+        cloves garlic, minced\\n- 1 inch ginger, grated\\n- 400ml coconut milk\\n-
+        400g canned tomatoes\\n- 2 tbsp tomato paste\\n- 1 tsp cumin\\n- 1 tsp coriander\\n-
+        Salt and pepper\\n- Fresh cilantro\\n\\n### Instructions:\\n1. Marinate chicken
+        in yogurt, garam masala, and turmeric for 30 minutes.\\n2. Grill or pan-fry
+        chicken pieces until cooked through.\\n3. Saut\xE9 onion until golden, add
+        garlic and ginger.\\n4. Add spices and cook for 1 minute.\\n5. Add tomatoes
+        and tomato paste, simmer for 10 minutes.\\n6. Add coconut milk and cooked
+        chicken.\\n7. Simmer for 15 minutes until thick.\\n8. Garnish with cilantro
+        and serve with rice.\\n\\n### Times:\\n- Prep Time: 45 minutes\\n- Cook Time:
+        30 minutes\\n- Servings: 4\\n\\nThis dish is rich in flavor, with spices like
+        garam masala and turmeric adding a nice heat. Enjoy your spicy dinner! If
+        you need any modifications or have any questions, feel free to ask.\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1760014404763,\"trace_id\":\"86e8b8f4016137ebc0f72d96344daca0\",\"span_id\":\"67f0cc27ba3ce1b2\",\"parent_span_id\":\"7a45af48d5b92bc3\",\"trace_state\":\"\",\"span_name\":\"Travel
+        Planner Agent.agent\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"agent\"},\"duration\":35021,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1760014404767,\"trace_id\":\"86e8b8f4016137ebc0f72d96344daca0\",\"span_id\":\"7233a1f2b7cbaaea\",\"parent_span_id\":\"67f0cc27ba3ce1b2\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.34.1\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.3\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        for travel destinations by region or subregion using REST Countries API.\",\"llm.request.functions.0.name\":\"search_destinations\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"region\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Region
+        to search (e.g., \\\\\\\"Europe\\\\\\\", \\\\\\\"Asia\\\\\\\", \\\\\\\"Americas\\\\\\\")\\\",
+        \\\"title\\\": \\\"Region\\\", \\\"type\\\": \\\"string\\\"}, \\\"subregion\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Subregion to search (e.g.,
+        \\\\\\\"Southern Europe\\\\\\\", \\\\\\\"Southeast Asia\\\\\\\")\\\", \\\"title\\\":
+        \\\"Subregion\\\", \\\"type\\\": \\\"string\\\"}}, \\\"title\\\": \\\"search_destinations_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\":
+        [\\\"region\\\", \\\"subregion\\\"]}\",\"llm.request.functions.1.description\":\"Get
+        current weather and 7-day forecast using Open-Meteo API (no API key required).\",\"llm.request.functions.1.name\":\"get_weather_forecast\",\"llm.request.functions.1.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}, \\\"latitude\\\":
+        {\\\"description\\\": \\\"Latitude coordinate\\\", \\\"title\\\": \\\"Latitude\\\",
+        \\\"type\\\": \\\"number\\\"}, \\\"longitude\\\": {\\\"description\\\": \\\"Longitude
+        coordinate\\\", \\\"title\\\": \\\"Longitude\\\", \\\"type\\\": \\\"number\\\"}},
+        \\\"required\\\": [\\\"location_name\\\", \\\"latitude\\\", \\\"longitude\\\"],
+        \\\"title\\\": \\\"get_weather_forecast_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.functions.2.description\":\"Get
+        coordinates for a location using Nominatim (OpenStreetMap) API.\",\"llm.request.functions.2.name\":\"get_location_coordinates\",\"llm.request.functions.2.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the city or location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"location_name\\\"], \\\"title\\\": \\\"get_location_coordinates_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.3.description\":\"Get
+        information about a destination from Wikipedia API.\",\"llm.request.functions.3.name\":\"get_destination_info\",\"llm.request.functions.3.parameters\":\"{\\\"properties\\\":
+        {\\\"destination_name\\\": {\\\"description\\\": \\\"Name of the destination\\\",
+        \\\"title\\\": \\\"Destination Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"destination_name\\\"], \\\"title\\\": \\\"get_destination_info_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.4.description\":\"Calculate
+        distance and estimated flight time between two locations.\\nUses Haversine
+        formula for distance calculation.\",\"llm.request.functions.4.name\":\"calculate_travel_distance\",\"llm.request.functions.4.parameters\":\"{\\\"properties\\\":
+        {\\\"from_location\\\": {\\\"description\\\": \\\"Starting location name\\\",
+        \\\"title\\\": \\\"From Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"to_location\\\":
+        {\\\"description\\\": \\\"Destination location name\\\", \\\"title\\\": \\\"To
+        Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"from_lat\\\": {\\\"description\\\":
+        \\\"Starting latitude\\\", \\\"title\\\": \\\"From Lat\\\", \\\"type\\\":
+        \\\"number\\\"}, \\\"from_lon\\\": {\\\"description\\\": \\\"Starting longitude\\\",
+        \\\"title\\\": \\\"From Lon\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lat\\\":
+        {\\\"description\\\": \\\"Destination latitude\\\", \\\"title\\\": \\\"To
+        Lat\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lon\\\": {\\\"description\\\":
+        \\\"Destination longitude\\\", \\\"title\\\": \\\"To Lon\\\", \\\"type\\\":
+        \\\"number\\\"}}, \\\"required\\\": [\\\"from_location\\\", \\\"to_location\\\",
+        \\\"from_lat\\\", \\\"from_lon\\\", \\\"to_lat\\\", \\\"to_lon\\\"], \\\"title\\\":
+        \\\"calculate_travel_distance_args\\\", \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\":
+        false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"294\",\"llm.usage.prompt_tokens\":\"0\",\"llm.usage.total_tokens\":\"294\",\"llm.vendor\":\"openai\"},\"duration\":8559,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Looking
+        for a 10-day cultural vacation in Europe with focus on culture\",\"llm.prompts.0.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"That
+        sounds exciting! Here\u2019s how we can plan your cultural vacation in Europe:\\n\\n###
+        Step 1: Identify Potential Destinations\\nFor a cultural vacation in Europe,
+        you might consider cities known for their rich history, architecture, museums,
+        and cultural events. Potential destinations include:\\n\\n- Paris, France\\n-
+        Rome, Italy\\n- Athens, Greece\\n- Vienna, Austria\\n- Prague, Czech Republic\\n\\n###
+        Step 2: Check Weather Conditions\\nIt's important to know what the weather
+        will be like during your visit. I'll check the current weather and forecasts
+        for each destination.\\n\\n### Step 3: Gather Detailed Information\\nWe can
+        dive into what each city has to offer in terms of cultural attractions, museums,
+        and events.\\n\\n### Step 4: Recommendations\\nBased on the information, I\u2019ll
+        provide tailored recommendations for your trip itinerary.\\n\\nLet me get
+        started on checking the weather and gathering information about these destinations.\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.1.finish_reason\":\"tool_calls\",\"llm.completions.1.role\":\"assistant\",\"llm.completions.1.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Paris,
+        France\\\"}\",\"llm.completions.1.tool_calls.0.id\":\"call_ptmmJ3wF2yZNDwPhZ6jIJShe\",\"llm.completions.1.tool_calls.0.name\":\"get_location_coordinates\",\"llm.completions.2.finish_reason\":\"tool_calls\",\"llm.completions.2.role\":\"assistant\",\"llm.completions.2.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Rome,
+        Italy\\\"}\",\"llm.completions.2.tool_calls.0.id\":\"call_Gd2rmUcborRSIps5UScvNldq\",\"llm.completions.2.tool_calls.0.name\":\"get_location_coordinates\",\"llm.completions.3.finish_reason\":\"tool_calls\",\"llm.completions.3.role\":\"assistant\",\"llm.completions.3.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Athens,
+        Greece\\\"}\",\"llm.completions.3.tool_calls.0.id\":\"call_DUBkv7DCuWmvU6SCrm7RGCZ5\",\"llm.completions.3.tool_calls.0.name\":\"get_location_coordinates\",\"llm.completions.4.finish_reason\":\"tool_calls\",\"llm.completions.4.role\":\"assistant\",\"llm.completions.4.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Vienna,
+        Austria\\\"}\",\"llm.completions.4.tool_calls.0.id\":\"call_PBM1TZWYRZHMJfzQIK9qgjeG\",\"llm.completions.4.tool_calls.0.name\":\"get_location_coordinates\",\"llm.completions.5.finish_reason\":\"tool_calls\",\"llm.completions.5.role\":\"assistant\",\"llm.completions.5.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Prague,
+        Czech Republic\\\"}\",\"llm.completions.5.tool_calls.0.id\":\"call_YJXaocXoN1tKgMiIi9WJlRTq\",\"llm.completions.5.tool_calls.0.name\":\"get_location_coordinates\"},\"input\":\"\",\"output\":\"\"}],\"page_size\":50,\"total_results\":71075,\"next_cursor\":\"1760014404767\"}}"
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 16 Nov 2025 11:18:29 GMT
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -116,7 +116,9 @@ class TraceloopBackend(BaseBackend):
             else:
                 # Filter can't be sent to API, apply it client-side
                 client_filters.append(native_filter)
-                logger.debug(f"Filter for field '{native_filter.field}' not supported by API, will apply client-side")
+                logger.debug(
+                    f"Filter for field '{native_filter.field}' not supported by API, will apply client-side"
+                )
 
         if client_filters:
             logger.info(
@@ -206,7 +208,9 @@ class TraceloopBackend(BaseBackend):
             else:
                 # Filter can't be sent to API, apply it client-side
                 client_filters.append(native_filter)
-                logger.debug(f"Filter for field '{native_filter.field}' not supported by API, will apply client-side")
+                logger.debug(
+                    f"Filter for field '{native_filter.field}' not supported by API, will apply client-side"
+                )
 
         if client_filters:
             logger.info(
@@ -278,7 +282,9 @@ class TraceloopBackend(BaseBackend):
                     parent_span_id=span_data.get("parent_span_id"),
                     operation_name=span_data["span_name"],
                     service_name=raw_attrs.get("service.name", ""),
-                    start_time=datetime.fromtimestamp(span_data["timestamp"] / 1000),  # Convert ms to seconds
+                    start_time=datetime.fromtimestamp(
+                        span_data["timestamp"] / 1000
+                    ),  # Convert ms to seconds
                     duration_ms=float(span_data["duration"]),
                     status=self._status_code_to_status(span_data.get("status_code", "UNSET")),
                     attributes=span_attributes,
@@ -422,7 +428,7 @@ class TraceloopBackend(BaseBackend):
         try:
             # Traceloop doesn't have a dedicated health endpoint
             # Use the projects endpoint as a health check
-            endpoint = "/v2/projects"
+            endpoint = "/v2/warehouse/spans"
             response = await self.client.get(endpoint)
             response.raise_for_status()
 
@@ -464,7 +470,9 @@ class TraceloopBackend(BaseBackend):
             else:
                 # General mapping: gen_ai.* -> llm.*
                 field = field.replace("gen_ai.", "llm.", 1)
-            logger.debug(f"Converted filter field to Traceloop format: {filter_obj.field} -> {field}")
+            logger.debug(
+                f"Converted filter field to Traceloop format: {filter_obj.field} -> {field}"
+            )
 
         # Map field names to Traceloop API fields
         if field == "service.name":
@@ -502,7 +510,9 @@ class TraceloopBackend(BaseBackend):
 
         traceloop_operator = operator_map.get(operator)
         if not traceloop_operator:
-            logger.warning(f"Operator {operator} not supported by Traceloop, will filter client-side")
+            logger.warning(
+                f"Operator {operator} not supported by Traceloop, will filter client-side"
+            )
             return None
 
         # Map value_type to Traceloop format
@@ -594,7 +604,9 @@ class TraceloopBackend(BaseBackend):
                 parent_span_id=root_span.get("parent_span_id"),
                 operation_name=root_span["span_name"],
                 service_name=root_span.get("service_name", ""),
-                start_time=datetime.fromtimestamp(root_span["timestamp"] / 1000),  # Convert ms to seconds
+                start_time=datetime.fromtimestamp(
+                    root_span["timestamp"] / 1000
+                ),  # Convert ms to seconds
                 duration_ms=float(root_span["duration"]),
                 status=self._status_code_to_status(root_span.get("status_code", "UNSET")),
                 attributes=span_attributes,
@@ -618,7 +630,9 @@ class TraceloopBackend(BaseBackend):
             logger.error(f"Error converting root span to trace: {e}")
             return None
 
-    def _convert_spans_to_trace(self, trace_id: str, spans_data: list[dict[str, Any]]) -> TraceData | None:
+    def _convert_spans_to_trace(
+        self, trace_id: str, spans_data: list[dict[str, Any]]
+    ) -> TraceData | None:
         """Convert Traceloop spans array to TraceData.
 
         Args:
@@ -655,7 +669,9 @@ class TraceloopBackend(BaseBackend):
                 parent_span_id=span_data.get("parent_span_id"),
                 operation_name=span_data["span_name"],
                 service_name=raw_attrs.get("service.name", ""),
-                start_time=datetime.fromtimestamp(span_data["timestamp"] / 1000),  # Convert ms to seconds
+                start_time=datetime.fromtimestamp(
+                    span_data["timestamp"] / 1000
+                ),  # Convert ms to seconds
                 duration_ms=float(span_data["duration"]),
                 status=self._status_code_to_status(span_data.get("status_code", "UNSET")),
                 attributes=span_attributes,
@@ -673,7 +689,10 @@ class TraceloopBackend(BaseBackend):
             start_times = [s.start_time for s in spans]
             trace_start = min(start_times)
             # Find the maximum end time
-            end_times = [datetime.fromtimestamp(s.start_time.timestamp() + (s.duration_ms / 1000)) for s in spans]
+            end_times = [
+                datetime.fromtimestamp(s.start_time.timestamp() + (s.duration_ms / 1000))
+                for s in spans
+            ]
             trace_end = max(end_times)
             trace_duration_ms = (trace_end - trace_start).total_seconds() * 1000
         else:

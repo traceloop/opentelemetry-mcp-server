@@ -1,0 +1,40 @@
+interactions:
+- request:
+    body: '{"filters":[],"logical_operator":"and","environments":["prd"],"sort_by":"timestamp","sort_order":"DESC","cursor":0,"limit":10}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '188'
+      content-type:
+      - application/json
+      host:
+      - localhost:3001
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: http://localhost:3001/v2/projects/default/traces/root-spans
+  response:
+    body:
+      string: '{"root_spans":{"data":[{"environment":"prd","timestamp":1763273059770,"trace_id":"c4c7e548e1febe34757c208205caa53e","span_id":"6b3a38f23a58e2ec","parent_span_id":"","trace_state":"","span_name":"Agent
+        Workflow","span_kind":"SPAN_KIND_CLIENT","service_name":"travel-agent-demo2","resource_attributes":{"service.name":"travel-agent-demo2","telemetry.sdk.language":"python","telemetry.sdk.name":"opentelemetry","telemetry.sdk.version":"1.38.0"},"scope_name":"opentelemetry.instrumentation.openai_agents","scope_version":"0.47.5","span_attributes":{"llm.vendor":"openai_agents","llm.workflow.name":"Agent
+        Workflow","traceloop.span.kind":"workflow"},"duration":68638,"status_code":"STATUS_CODE_OK","status_message":"","prompts":{},"completions":{},"input":"","output":"","total_tokens":31096,"span_count":16},{"environment":"prd","timestamp":1763272977019,"trace_id":"f53581d7de2b03275fad361fd5a2a9fe","span_id":"51abd109e3f6fc45","parent_span_id":"","trace_state":"","span_name":"Agent
+        Workflow","span_kind":"SPAN_KIND_CLIENT","service_name":"travel-agent-demo2","resource_attributes":{"service.name":"travel-agent-demo2","telemetry.sdk.language":"python","telemetry.sdk.name":"opentelemetry","telemetry.sdk.version":"1.38.0"},"scope_name":"opentelemetry.instrumentation.openai_agents","scope_version":"0.47.5","span_attributes":{"llm.vendor":"openai_agents","llm.workflow.name":"Agent
+        Workflow","traceloop.span.kind":"workflow"},"duration":80747,"status_code":"STATUS_CODE_OK","status_message":"","prompts":{},"completions":{},"input":"","output":"","total_tokens":8650,"span_count":20},{"environment":"prd","timestamp":1763272914648,"trace_id":"83ba2d50d52cac29534deeb6f0197b60","span_id":"2c86398dc9615c3a","parent_span_id":"","trace_state":"","span_name":"Agent
+        Workflow","span_kind":"SPAN_KIND_CLIENT","service_name":"travel-agent-demo2","resource_attributes":{"service.name":"travel-agent-demo2","telemetry.sdk.language":"python","telemetry.sdk.name":"opentelemetry","telemetry.sdk.version":"1.38.0"},"scope_name":"opentelemetry.instrumentation.openai_agents","scope_version":"0.47.5","span_attributes":{"llm.vendor":"openai_agents","llm.workflow.name":"Agent
+        Workflow","traceloop.span.kind":"workflow"},"duration":60364,"status_code":"STATUS_CODE_OK","status_message":"","prompts":{},"completions":{},"input":"","output":"","total_tokens":25326,"span_count":26}],"page_size":3,"total_results":3,"next_cursor":"1763272914648"}}'
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 16 Nov 2025 11:10:19 GMT
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1

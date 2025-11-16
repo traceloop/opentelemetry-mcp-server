@@ -1,0 +1,754 @@
+interactions:
+- request:
+    body: '{"filters":[],"logical_operator":"and","environments":["prd"],"sort_by":"timestamp","sort_order":"DESC","cursor":0,"limit":10}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '188'
+      content-type:
+      - application/json
+      host:
+      - localhost:3001
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: http://localhost:3001/v2/projects/default/spans
+  response:
+    body:
+      string: "{\"spans\":{\"data\":[{\"environment\":\"prd\",\"timestamp\":1763273120050,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"e82e6570ac10b8f6\",\"parent_span_id\":\"0860f990bbf0d202\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        for travel destinations by region or subregion using REST Countries API.\",\"llm.request.functions.0.name\":\"search_destinations\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"region\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Region
+        to search (e.g., \\\\\\\"Europe\\\\\\\", \\\\\\\"Asia\\\\\\\", \\\\\\\"Americas\\\\\\\")\\\",
+        \\\"title\\\": \\\"Region\\\", \\\"type\\\": \\\"string\\\"}, \\\"subregion\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Subregion to search (e.g.,
+        \\\\\\\"Southern Europe\\\\\\\", \\\\\\\"Southeast Asia\\\\\\\")\\\", \\\"title\\\":
+        \\\"Subregion\\\", \\\"type\\\": \\\"string\\\"}}, \\\"title\\\": \\\"search_destinations_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\":
+        [\\\"region\\\", \\\"subregion\\\"]}\",\"llm.request.functions.1.description\":\"Get
+        coordinates for a location using Nominatim (OpenStreetMap) API.\",\"llm.request.functions.1.name\":\"get_location_coordinates\",\"llm.request.functions.1.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the city or location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"location_name\\\"], \\\"title\\\": \\\"get_location_coordinates_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.2.description\":\"Get
+        current weather and 7-day forecast using Open-Meteo API (no API key required).\",\"llm.request.functions.2.name\":\"get_weather_forecast\",\"llm.request.functions.2.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}, \\\"latitude\\\":
+        {\\\"description\\\": \\\"Latitude coordinate\\\", \\\"title\\\": \\\"Latitude\\\",
+        \\\"type\\\": \\\"number\\\"}, \\\"longitude\\\": {\\\"description\\\": \\\"Longitude
+        coordinate\\\", \\\"title\\\": \\\"Longitude\\\", \\\"type\\\": \\\"number\\\"}},
+        \\\"required\\\": [\\\"location_name\\\", \\\"latitude\\\", \\\"longitude\\\"],
+        \\\"title\\\": \\\"get_weather_forecast_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.functions.3.description\":\"Get
+        information about a destination from Wikipedia API.\",\"llm.request.functions.3.name\":\"get_destination_info\",\"llm.request.functions.3.parameters\":\"{\\\"properties\\\":
+        {\\\"destination_name\\\": {\\\"description\\\": \\\"Name of the destination\\\",
+        \\\"title\\\": \\\"Destination Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"destination_name\\\"], \\\"title\\\": \\\"get_destination_info_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.4.description\":\"Calculate
+        distance and estimated flight time between two locations.\\nUses Haversine
+        formula for distance calculation.\",\"llm.request.functions.4.name\":\"calculate_travel_distance\",\"llm.request.functions.4.parameters\":\"{\\\"properties\\\":
+        {\\\"from_location\\\": {\\\"description\\\": \\\"Starting location name\\\",
+        \\\"title\\\": \\\"From Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"to_location\\\":
+        {\\\"description\\\": \\\"Destination location name\\\", \\\"title\\\": \\\"To
+        Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"from_lat\\\": {\\\"description\\\":
+        \\\"Starting latitude\\\", \\\"title\\\": \\\"From Lat\\\", \\\"type\\\":
+        \\\"number\\\"}, \\\"from_lon\\\": {\\\"description\\\": \\\"Starting longitude\\\",
+        \\\"title\\\": \\\"From Lon\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lat\\\":
+        {\\\"description\\\": \\\"Destination latitude\\\", \\\"title\\\": \\\"To
+        Lat\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lon\\\": {\\\"description\\\":
+        \\\"Destination longitude\\\", \\\"title\\\": \\\"To Lon\\\", \\\"type\\\":
+        \\\"number\\\"}}, \\\"required\\\": [\\\"from_location\\\", \\\"to_location\\\",
+        \\\"from_lat\\\", \\\"from_lon\\\", \\\"to_lat\\\", \\\"to_lon\\\"], \\\"title\\\":
+        \\\"calculate_travel_distance_args\\\", \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\":
+        false}\",\"llm.request.functions.5.description\":\"Create a detailed day-by-day
+        travel itinerary using AI.\",\"llm.request.functions.5.name\":\"create_itinerary\",\"llm.request.functions.5.parameters\":\"{\\\"properties\\\":
+        {\\\"destination\\\": {\\\"description\\\": \\\"Main destination for the trip\\\",
+        \\\"title\\\": \\\"Destination\\\", \\\"type\\\": \\\"string\\\"}, \\\"duration_days\\\":
+        {\\\"description\\\": \\\"Number of days for the trip\\\", \\\"title\\\":
+        \\\"Duration Days\\\", \\\"type\\\": \\\"integer\\\"}, \\\"budget\\\": {\\\"description\\\":
+        \\\"Budget level (budget, moderate, luxury)\\\", \\\"title\\\": \\\"Budget\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"interests\\\": {\\\"description\\\": \\\"Traveler
+        interests (e.g., food, history, nature)\\\", \\\"title\\\": \\\"Interests\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"weather_info\\\": {\\\"default\\\": \\\"\\\",
+        \\\"description\\\": \\\"Weather forecast information (optional)\\\", \\\"title\\\":
+        \\\"Weather Info\\\", \\\"type\\\": \\\"string\\\"}, \\\"destination_details\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Additional destination
+        details (optional)\\\", \\\"title\\\": \\\"Destination Details\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"required\\\": [\\\"destination\\\", \\\"duration_days\\\",
+        \\\"budget\\\", \\\"interests\\\", \\\"weather_info\\\", \\\"destination_details\\\"],
+        \\\"title\\\": \\\"create_itinerary_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"395\",\"llm.usage.prompt_tokens\":\"4354\",\"llm.usage.total_tokens\":\"4749\",\"llm.vendor\":\"openai\"},\"duration\":8358,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Help
+        me plan a vacation in Europe for couples. I'm interested in food.\",\"llm.prompts.0.role\":\"user\",\"llm.prompts.1.role\":\"assistant\",\"llm.prompts.1.tool_calls.0.arguments\":\"{\\\"region\\\":\\\"Europe\\\",\\\"subregion\\\":\\\"\\\"}\",\"llm.prompts.1.tool_calls.0.id\":\"fc_002efcb3837ca5ad0069196964b478819693d459e78c68479c\",\"llm.prompts.1.tool_calls.0.name\":\"search_destinations\",\"llm.prompts.10.content\":\"status='success'
+        message='Created 7-day itinerary for Brussels' itinerary=TravelItinerary(trip_title='A
+        Culinary Journey Through Brussels', destination='Brussels', duration_days=7,
+        total_budget_estimate='\u20AC800', daily_plans=[DayPlan(day_number=1, date='2023-10-01',
+        title='Arrival and Exploring the Historic Center', activities=[DayActivity(time='10:00
+        AM', activity='Check into hotel and freshen up.', location=\\\"Hotel Amigo,
+        Rue de l'Amigo 1-3, 1000 Brussels\\\", notes='Moderate hotel located near
+        the city center.'), DayActivity(time='11:30 AM', activity='Visit the Grand
+        Place, UNESCO World Heritage Site.', location='Grand Place, 1000 Brussels',
+        notes=\\\"Don't miss the stunning architecture and the Town Hall.\\\"), DayActivity(time='1:00
+        PM', activity='Lunch at Chez L\xE9on for traditional moules-frites (mussels
+        and fries).', location='Rue des Bouchers 18, 1000 Brussels', notes='A famous
+        spot for seafood lovers.'), DayActivity(time='3:00 PM', activity='Explore
+        the Manneken Pis statue and its surrounding area.', location=\\\"Rue de l'\xC9tuve
+        46, 1000 Brussels\\\", notes='A quirky symbol of Brussels.'), DayActivity(time='5:00
+        PM', activity='Enjoy a chocolate tasting at Chocopolis.', location='Rue de
+        la Presse 8, 1000 Brussels', notes='Sample some of the best Belgian chocolates.')],
+        meals=['Lunch at Chez L\xE9on', 'Dinner at Le Pain Quotidien, organic fare'],
+        accommodation=\\\"Hotel Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"), DayPlan(day_number=2,
+        date='2023-10-02', title='Art \\u0026 Culture Day', activities=[DayActivity(time='9:00
+        AM', activity='Visit the Royal Palace of Brussels.', location='Place des Palais,
+        1000 Brussels', notes='Check the opening hours as they can vary.'), DayActivity(time='11:00
+        AM', activity='Tour the Magritte Museum.', location='Rue de la R\xE9gence
+        3, 1000 Brussels', notes='Features works by surrealist artist Ren\xE9 Magritte.'),
+        DayActivity(time='1:00 PM', activity='Lunch at Caf\xE9 des Halles for local
+        Belgian dishes.', location='Place de la Bourse 2, 1000 Brussels', notes='A
+        lovely caf\xE9 with a cozy atmosphere.'), DayActivity(time='3:00 PM', activity='Stroll
+        through the Parc du Cinquantenaire.', location='Parc du Cinquantenaire, 1000
+        Brussels', notes='Enjoy the beautiful gardens and archway.'), DayActivity(time='5:00
+        PM', activity='Visit the European Parliament.', location='Rue Wiertz 60, 1047
+        Brussels', notes='Free entry, but check for available tours.')], meals=['Lunch
+        at Caf\xE9 des Halles', \\\"Dinner at Restaurant de l'Hotel de Ville, regional
+        specialties\\\"], accommodation=\\\"Hotel Amigo, Rue de l'Amigo 1-3, 1000
+        Brussels\\\"), DayPlan(day_number=3, date='2023-10-03', title='Belgian Beer
+        and Waffles', activities=[DayActivity(time='10:00 AM', activity='Join a beer
+        tasting tour.', location='Brussels Beer Project, Rue Antoine Dansaert 188,
+        1000 Brussels', notes='Sample different Belgian beers.'), DayActivity(time='12:00
+        PM', activity='Lunch at Delirium Caf\xE9 for a vast beer selection.', location='Impasse
+        de la Fid\xE9lit\xE9 4, 1000 Brussels', notes='Try their famous beer menu.'),
+        DayActivity(time='2:00 PM', activity='Visit the Belgian Comic Strip Center.',
+        location='Rue des Sables 20, 1000 Brussels', notes=\\\"A fun take on Belgium's
+        comic strip history.\\\"), DayActivity(time='4:00 PM', activity='Indulge in
+        Belgian waffles at Maison Dandoy.', location='Rue Charles Buls 14, 1000 Brussels',
+        notes='Known for their delicious Li\xE8ge waffles.'), DayActivity(time='6:00
+        PM', activity='Explore the local shops in the Sablon district.', location='Sablon,
+        1000 Brussels', notes='A chic area with antique shops and chocolatiers.')],
+        meals=['Lunch at Delirium Caf\xE9', 'Dinner at Chez L\xE9on (again, for the
+        moules-frites)'], accommodation=\\\"Hotel Amigo, Rue de l'Amigo 1-3, 1000
+        Brussels\\\"), DayPlan(day_number=4, date='2023-10-04', title='Day Trip to
+        Ghent', activities=[DayActivity(time='9:00 AM', activity='Take a train to
+        Ghent.', location='Brussels Central Station', notes='Trains run frequently;
+        buy tickets at the station.'), DayActivity(time='10:00 AM', activity='Visit
+        Gravensteen Castle.', location='Sint-Veerleplein 11, 9000 Ghent', notes='Explore
+        the medieval castle.'), DayActivity(time='12:00 PM', activity='Lunch at De
+        Graslei, riverside dining.', location='Graslei 7, 9000 Ghent', notes='Enjoy
+        local dishes with a view.'), DayActivity(time='2:00 PM', activity=\\\"Stroll
+        through the historic center and visit St. Bavo's Cathedral.\\\", location='Sint-Baafsplein
+        1, 9000 Ghent', notes='Home of the famous Ghent Altarpiece.'), DayActivity(time='4:00
+        PM', activity='Try local beer at a Ghent brewery.', location='Brouwerij Gruut,
+        9000 Ghent', notes='Unique brewery with its own beer style.'), DayActivity(time='6:00
+        PM', activity='Return to Brussels.', location='Brussels Central Station',
+        notes='Trains run until late.')], meals=['Lunch at De Graslei', 'Dinner at
+        Le Pain Quotidien (again for delicious organic options)'], accommodation=\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"), DayPlan(day_number=5, date='2023-10-05',
+        title='Markets and Local Flavors', activities=[DayActivity(time='9:00 AM',
+        activity='Visit the Midi Market (open on Thursdays).', location='Place du
+        Midi, 1060 Brussels', notes='A vibrant market with local produce and street
+        food.'), DayActivity(time='11:00 AM', activity='Try various cheese samples
+        at Fromagerie de la Place.', location='Place du Ch\xE2telain, 1050 Brussels',
+        notes='A delightful cheese shop.'), DayActivity(time='1:00 PM', activity='Lunch
+        at Les Brigittines, local cuisine.', location='Place de la Chapelle 5, 1000
+        Brussels', notes='Known for hearty Belgian dishes.'), DayActivity(time='3:00
+        PM', activity='Explore the Marolles district and its vintage shops.', location='Marolles,
+        1000 Brussels', notes='Great for thrift shopping and unique finds.'), DayActivity(time='5:00
+        PM', activity='Enjoy a beer at a local tavern, Caf\xE9 Belga.', location='Place
+        Eug\xE8ne Flagey, 1050 Brussels', notes='A lively spot to unwind.')], meals=['Lunch
+        at Les Brigittines', 'Dinner at Chez L\xE9on (to try other menu items)'],
+        accommodation=\\\"Hotel Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"), DayPlan(day_number=6,
+        date='2023-10-06', title='Culinary Delights', activities=[DayActivity(time='10:00
+        AM', activity='Take a cooking class to learn Belgian cuisine.', location='Brussels
+        Cooking Classes, Rue des Bouchers 9, 1000 Brussels', notes='Pre-booking is
+        recommended.'), DayActivity(time='1:00 PM', activity=\\\"Enjoy the meal you've
+        prepared during the class.\\\", location='Brussels Cooking Classes', notes='A
+        unique lunch experience.'), DayActivity(time='3:00 PM', activity='Visit the
+        Atomium, an iconic building.', location=\\\"Avenue de l'Atomium, 1020 Brussels\\\",
+        notes='Check out the exhibition inside.'), DayActivity(time='5:00 PM', activity='Explore
+        Mini-Europe, right next to Atomium.', location='Bruparck, 1020 Brussels',
+        notes='A miniature park with famous European landmarks.')], meals=['Lunch
+        at cooking class', \\\"Dinner at La Roue d'Or, known for local favorites\\\"],
+        accommodation=\\\"Hotel Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"), DayPlan(day_number=7,
+        date='2023-10-07', title='Departure Day', activities=[DayActivity(time='9:00
+        AM', activity='Last-minute shopping in the Galeries Royales Saint-Hubert.',
+        location='Galeries Royales Saint-Hubert, 1000 Brussels', notes='Beautiful
+        shopping arcade.'), DayActivity(time='11:00 AM', activity='Visit the Royal
+        Museums of Fine Arts of Belgium.', location='Rue de la R\xE9gence 3, 1000
+        Brussels', notes='Explore the vast collection of art.'), DayActivity(time='1:00
+        PM', activity='Lunch at Le Pain Quotidien, a final taste of organic dishes.',
+        location='Multiple locations', notes='Great ambiance for your last meal.'),
+        DayActivity(time='3:00 PM', activity='Check out from hotel and head to the
+        airport.', location=\\\"Hotel Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\",
+        notes='Plan for travel time to airport.')], meals=['Lunch at Le Pain Quotidien',
+        'Dinner on the flight'], accommodation=\\\"Hotel Amigo, Rue de l'Amigo 1-3,
+        1000 Brussels\\\")], travel_tips=['Purchase a Brussels Card for discounts
+        on entrance fees and public transport.', \\\"Always try to learn a few basic
+        French or Flemish phrases, it's appreciated by locals.\\\", 'Keep an umbrella
+        or raincoat handy due to unpredictable weather.'], packing_suggestions=['Comfortable
+        walking shoes for exploring the city.', 'Layers to adjust to changing temperatures
+        throughout the day.', 'A light waterproof jacket or umbrella for occasional
+        rain.'])\",\"llm.prompts.10.role\":\"tool\",\"llm.prompts.10.tool_call_id\":\"call_eSompCv9cwfQozN9rREMSvt1\",\"llm.prompts.2.content\":\"status='success'
+        message='Found 10 destinations in Europe' countries=[CountryInfo(name='Serbia',
+        capital='Belgrade', region='Europe', subregion='Southeast Europe', population=6567783,
+        currencies=['RSD'], languages=['Serbian'], timezones=['UTC+01:00']), CountryInfo(name='Slovakia',
+        capital='Bratislava', region='Europe', subregion='Central Europe', population=5413813,
+        currencies=['EUR'], languages=['Slovak'], timezones=['UTC+01:00']), CountryInfo(name='Estonia',
+        capital='Tallinn', region='Europe', subregion='Northern Europe', population=1369995,
+        currencies=['EUR'], languages=['Estonian'], timezones=['UTC+02:00']), CountryInfo(name='Gibraltar',
+        capital='Gibraltar', region='Europe', subregion='Southern Europe', population=38000,
+        currencies=['GIP'], languages=['English'], timezones=['UTC+01:00']), CountryInfo(name='Ireland',
+        capital='Dublin', region='Europe', subregion='Northern Europe', population=5458600,
+        currencies=['EUR'], languages=['English', 'Irish'], timezones=['UTC']), CountryInfo(name='Belgium',
+        capital='Brussels', region='Europe', subregion='Western Europe', population=11825551,
+        currencies=['EUR'], languages=['German', 'French', 'Dutch'], timezones=['UTC+01:00']),
+        CountryInfo(name='Kosovo', capital='Pristina', region='Europe', subregion='Southeast
+        Europe', population=1585566, currencies=['EUR'], languages=['Albanian', 'Serbian'],
+        timezones=['UTC+01:00']), CountryInfo(name='Ukraine', capital='Kyiv', region='Europe',
+        subregion='Eastern Europe', population=32862000, currencies=['UAH'], languages=['Ukrainian'],
+        timezones=['UTC+02:00']), CountryInfo(name='Netherlands', capital='Amsterdam',
+        region='Europe', subregion='Western Europe', population=18100436, currencies=['EUR'],
+        languages=['Dutch'], timezones=['UTC+01:00']), CountryInfo(name='Moldova',
+        capital='Chi\u0219in\u0103u', region='Europe', subregion='Eastern Europe',
+        population=2749076, currencies=['MDL'], languages=['Romanian'], timezones=['UTC+02:00'])]
+        count=10\",\"llm.prompts.2.role\":\"tool\",\"llm.prompts.2.tool_call_id\":\"call_x9eEzVdEfljWuZYhyjs2UbYT\",\"llm.prompts.3.role\":\"assistant\",\"llm.prompts.3.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Brussels\\\"}\",\"llm.prompts.3.tool_calls.0.id\":\"fc_002efcb3837ca5ad00691969672f28819697a09a736843dacb\",\"llm.prompts.3.tool_calls.0.name\":\"get_location_coordinates\",\"llm.prompts.4.content\":\"status='success'
+        message='Coordinates found for Brussels' coordinates=LocationCoordinates(location_name='Brussels',
+        latitude=50.8465573, longitude=4.351697, country='Belgi\xEB / Belgique / Belgien',
+        display_name='Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale,
+        R\xE9gion de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, Belgi\xEB
+        / Belgique / Belgien')\",\"llm.prompts.4.role\":\"tool\",\"llm.prompts.4.tool_call_id\":\"call_tYzh1OZDdDLftvCUnNhvaqJP\",\"llm.prompts.5.role\":\"assistant\",\"llm.prompts.5.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Brussels\\\",\\\"latitude\\\":50.8465573,\\\"longitude\\\":4.351697}\",\"llm.prompts.5.tool_calls.0.id\":\"fc_002efcb3837ca5ad006919696c3d4481969155ab11359357d1\",\"llm.prompts.5.tool_calls.0.name\":\"get_weather_forecast\",\"llm.prompts.6.content\":\"status='success'
+        message='Weather forecast retrieved for Brussels' forecast=WeatherForecast(location='Brussels',
+        latitude=50.8465573, longitude=4.351697, current_temperature=10.6, current_conditions='Overcast',
+        forecast_days=[DailyForecast(date='2025-11-16', temp_max=12.8, temp_min=6.5,
+        precipitation=0.1), DailyForecast(date='2025-11-17', temp_max=9.3, temp_min=5.4,
+        precipitation=4.1), DailyForecast(date='2025-11-18', temp_max=6.3, temp_min=3.7,
+        precipitation=0.2), DailyForecast(date='2025-11-19', temp_max=5.6, temp_min=2.4,
+        precipitation=8.7), DailyForecast(date='2025-11-20', temp_max=5.2, temp_min=0.6,
+        precipitation=0.0), DailyForecast(date='2025-11-21', temp_max=6.0, temp_min=0.2,
+        precipitation=0.0), DailyForecast(date='2025-11-22', temp_max=4.1, temp_min=-0.0,
+        precipitation=0.4)])\",\"llm.prompts.6.role\":\"tool\",\"llm.prompts.6.tool_call_id\":\"call_3lqSWvQ36PrWiDz4YFeNWHTq\",\"llm.prompts.7.role\":\"assistant\",\"llm.prompts.7.tool_calls.0.arguments\":\"{\\\"destination_name\\\":\\\"Brussels\\\"}\",\"llm.prompts.7.tool_calls.0.id\":\"fc_002efcb3837ca5ad006919696ed14081968f4ffc1c02b6bb46\",\"llm.prompts.7.tool_calls.0.name\":\"get_destination_info\",\"llm.prompts.8.content\":\"status='success'
+        message='Retrieved information for Brussels' info=DestinationInfo(title='Brussels',
+        summary='Federal region of Belgium including the capital', extract='Brussels,
+        officially the Brussels-Capital Region, is a region of Belgium comprising
+        19 municipalities, including the City of Brussels, which is the capital of
+        Belgium. The Brussels-Capital Region is located in the central portion of
+        the country. It is a part of both the French Community of Belgium and the
+        Flemish Community, and is separate from the Flemish Region (Flanders), within
+        which it forms an enclave, and the Walloon Region (Wallonia), located less
+        than 4 kilometres (2.5\\\\xa0mi) to the south.')\",\"llm.prompts.8.role\":\"tool\",\"llm.prompts.8.tool_call_id\":\"call_RPiJsOQu53UTsFhjQ91Sap6p\",\"llm.prompts.9.role\":\"assistant\",\"llm.prompts.9.tool_calls.0.arguments\":\"{\\\"destination\\\":\\\"Brussels\\\",\\\"duration_days\\\":7,\\\"budget\\\":\\\"moderate\\\",\\\"interests\\\":\\\"food\\\",\\\"weather_info\\\":\\\"Current
+        temperature is 10.6\xB0C with overcast conditions. The forecast for the week
+        includes temperatures ranging from 12.8\xB0C to 4.1\xB0C, with occasional
+        rain.\\\",\\\"destination_details\\\":\\\"Brussels, the capital of Belgium,
+        is a vibrant city known for its eclectic mix of French and Flemish culture.
+        The city is famous for its rich history, stunning architecture, and a gastronomic
+        scene that includes Belgian waffles, chocolates, and a variety of local beers.\\\"}\",\"llm.prompts.9.tool_calls.0.id\":\"fc_002efcb3837ca5ad006919697293788196b01dbbc9dc5fd320\",\"llm.prompts.9.tool_calls.0.name\":\"create_itinerary\"},\"completions\":{\"llm.completions.0.content\":\"I've
+        created a 7-day itinerary for a culinary adventure in Brussels, Belgium, perfect
+        for couples:\\n\\n### Trip Title: A Culinary Journey Through Brussels\\n\\n**Day
+        1: Arrival and Exploring the Historic Center**\\n- **Stay**: Hotel Amigo\\n-
+        **Activities**: \\n  - Visit the Grand Place\\n  - Enjoy lunch at Chez L\xE9on
+        for moules-frites\\n  - Explore the Manneken Pis and Chocopolis for a chocolate
+        tasting\\n- **Weather**: Overcast, 10.6\xB0C\\n\\n**Day 2: Art \\u0026 Culture
+        Day**\\n- **Activities**: \\n  - Royal Palace of Brussels\\n  - Magritte Museum\\n
+        \ - Parc du Cinquantenaire\\n  - European Parliament tour\\n\\n**Day 3: Belgian
+        Beer and Waffles**\\n- **Activities**:\\n  - Beer tasting tour at Brussels
+        Beer Project\\n  - Comic Strip Center\\n  - Belgian waffles at Maison Dandoy\\n
+        \ - Shopping in Sablon district\\n\\n**Day 4: Day Trip to Ghent**\\n- **Activities**:\\n
+        \ - Train to Ghent\\n  - Gravensteen Castle\\n  - St. Bavo's Cathedral\\n
+        \ - Brewery visit\\n\\n**Day 5: Markets and Local Flavors**\\n- **Activities**:\\n
+        \ - Midi Market visit\\n  - Cheese sampling at Fromagerie de la Place\\n  -
+        Explore Marolles district\\n\\n**Day 6: Culinary Delights**\\n- **Activities**:\\n
+        \ - Cooking class\\n  - Visit the Atomium and Mini-Europe\\n\\n**Day 7: Departure
+        Day**\\n- **Activities**:\\n  - Shopping at Galeries Royales Saint-Hubert\\n
+        \ - Royal Museums of Fine Arts\\n\\n**Travel Tips**: \\n- Purchase a Brussels
+        Card for discounts.\\n- Pack layers and a waterproof jacket for the weather.\\n\\n**Budget
+        Estimate**: \u20AC800\\n\\nEnjoy your delicious and romantic European escape
+        in Brussels!\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273077046,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"01e55a77b2a2dce0\",\"parent_span_id\":\"8f466a6f6bb9d33b\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_51db84afab\",\"llm.request.max_tokens\":\"3000\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.structured_output_schema\":\"{\\\"$defs\\\":
+        {\\\"DayActivity\\\": {\\\"properties\\\": {\\\"time\\\": {\\\"title\\\":
+        \\\"Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"activity\\\": {\\\"title\\\":
+        \\\"Activity\\\", \\\"type\\\": \\\"string\\\"}, \\\"location\\\": {\\\"title\\\":
+        \\\"Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"notes\\\": {\\\"title\\\":
+        \\\"Notes\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"time\\\",
+        \\\"activity\\\", \\\"location\\\", \\\"notes\\\"], \\\"title\\\": \\\"DayActivity\\\",
+        \\\"type\\\": \\\"object\\\"}, \\\"DayPlan\\\": {\\\"properties\\\": {\\\"day_number\\\":
+        {\\\"title\\\": \\\"Day Number\\\", \\\"type\\\": \\\"integer\\\"}, \\\"date\\\":
+        {\\\"title\\\": \\\"Date\\\", \\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        {\\\"title\\\": \\\"Title\\\", \\\"type\\\": \\\"string\\\"}, \\\"activities\\\":
+        {\\\"items\\\": {\\\"$ref\\\": \\\"#/$defs/DayActivity\\\"}, \\\"title\\\":
+        \\\"Activities\\\", \\\"type\\\": \\\"array\\\"}, \\\"meals\\\": {\\\"items\\\":
+        {\\\"type\\\": \\\"string\\\"}, \\\"title\\\": \\\"Meals\\\", \\\"type\\\":
+        \\\"array\\\"}, \\\"accommodation\\\": {\\\"title\\\": \\\"Accommodation\\\",
+        \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"day_number\\\", \\\"date\\\",
+        \\\"title\\\", \\\"activities\\\", \\\"meals\\\", \\\"accommodation\\\"],
+        \\\"title\\\": \\\"DayPlan\\\", \\\"type\\\": \\\"object\\\"}}, \\\"properties\\\":
+        {\\\"trip_title\\\": {\\\"title\\\": \\\"Trip Title\\\", \\\"type\\\": \\\"string\\\"},
+        \\\"destination\\\": {\\\"title\\\": \\\"Destination\\\", \\\"type\\\": \\\"string\\\"},
+        \\\"duration_days\\\": {\\\"title\\\": \\\"Duration Days\\\", \\\"type\\\":
+        \\\"integer\\\"}, \\\"total_budget_estimate\\\": {\\\"title\\\": \\\"Total
+        Budget Estimate\\\", \\\"type\\\": \\\"string\\\"}, \\\"daily_plans\\\": {\\\"items\\\":
+        {\\\"$ref\\\": \\\"#/$defs/DayPlan\\\"}, \\\"title\\\": \\\"Daily Plans\\\",
+        \\\"type\\\": \\\"array\\\"}, \\\"travel_tips\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Travel Tips\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"packing_suggestions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"},
+        \\\"title\\\": \\\"Packing Suggestions\\\", \\\"type\\\": \\\"array\\\"}},
+        \\\"required\\\": [\\\"trip_title\\\", \\\"destination\\\", \\\"duration_days\\\",
+        \\\"total_budget_estimate\\\", \\\"daily_plans\\\", \\\"travel_tips\\\", \\\"packing_suggestions\\\"],
+        \\\"title\\\": \\\"TravelItinerary\\\", \\\"type\\\": \\\"object\\\"}\",\"llm.request.temperature\":\"0.700000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CcQAIZ9vs66Ad2yBRePDGlr93GdfC\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"2078\",\"llm.usage.prompt_tokens\":\"579\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"2657\",\"llm.vendor\":\"openai\"},\"duration\":43000,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are an expert travel planner who creates detailed, practical itineraries.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are an expert travel planner. Create a detailed 7-day itinerary for Brussels.\\n\\nTrip
+        Details:\\n- Destination: Brussels\\n- Duration: 7 days\\n- Budget: moderate\\n-
+        Interests: food\\n- Weather: Current temperature is 10.6\xB0C with overcast
+        conditions. The forecast for the week includes temperatures ranging from 12.8\xB0C
+        to 4.1\xB0C, with occasional rain.\\n- Destination Info: Brussels, the capital
+        of Belgium, is a vibrant city known for its eclectic mix of French and Flemish
+        culture. The city is famous for its rich history, stunning architecture, and
+        a gastronomic scene that includes Belgian waffles, chocolates, and a variety
+        of local beers.\\n\\nCreate a comprehensive itinerary that includes:\\n1.
+        A catchy trip title\\n2. Day-by-day plans with specific activities and timings\\n3.
+        Meal recommendations for each day\\n4. Accommodation suggestions\\n5. Travel
+        tips specific to this destination\\n6. Packing suggestions based on the weather
+        and activities\\n\\nMake the itinerary practical, engaging, and tailored to
+        the moderate budget level and food interests.\\nEach day should have 3-5 activities
+        with specific times, locations, and helpful notes.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\\"trip_title\\\":\\\"A
+        Culinary Journey Through Brussels\\\",\\\"destination\\\":\\\"Brussels\\\",\\\"duration_days\\\":7,\\\"total_budget_estimate\\\":\\\"\u20AC800\\\",\\\"daily_plans\\\":[{\\\"day_number\\\":1,\\\"date\\\":\\\"2023-10-01\\\",\\\"title\\\":\\\"Arrival
+        and Exploring the Historic Center\\\",\\\"activities\\\":[{\\\"time\\\":\\\"10:00
+        AM\\\",\\\"activity\\\":\\\"Check into hotel and freshen up.\\\",\\\"location\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\",\\\"notes\\\":\\\"Moderate hotel
+        located near the city center.\\\"},{\\\"time\\\":\\\"11:30 AM\\\",\\\"activity\\\":\\\"Visit
+        the Grand Place, UNESCO World Heritage Site.\\\",\\\"location\\\":\\\"Grand
+        Place, 1000 Brussels\\\",\\\"notes\\\":\\\"Don't miss the stunning architecture
+        and the Town Hall.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at Chez L\xE9on for traditional moules-frites (mussels and fries).\\\",\\\"location\\\":\\\"Rue
+        des Bouchers 18, 1000 Brussels\\\",\\\"notes\\\":\\\"A famous spot for seafood
+        lovers.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Explore the
+        Manneken Pis statue and its surrounding area.\\\",\\\"location\\\":\\\"Rue
+        de l'\xC9tuve 46, 1000 Brussels\\\",\\\"notes\\\":\\\"A quirky symbol of Brussels.\\\"},{\\\"time\\\":\\\"5:00
+        PM\\\",\\\"activity\\\":\\\"Enjoy a chocolate tasting at Chocopolis.\\\",\\\"location\\\":\\\"Rue
+        de la Presse 8, 1000 Brussels\\\",\\\"notes\\\":\\\"Sample some of the best
+        Belgian chocolates.\\\"}],\\\"meals\\\":[\\\"Lunch at Chez L\xE9on\\\",\\\"Dinner
+        at Le Pain Quotidien, organic fare\\\"],\\\"accommodation\\\":\\\"Hotel Amigo,
+        Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":2,\\\"date\\\":\\\"2023-10-02\\\",\\\"title\\\":\\\"Art
+        \\u0026 Culture Day\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Visit
+        the Royal Palace of Brussels.\\\",\\\"location\\\":\\\"Place des Palais, 1000
+        Brussels\\\",\\\"notes\\\":\\\"Check the opening hours as they can vary.\\\"},{\\\"time\\\":\\\"11:00
+        AM\\\",\\\"activity\\\":\\\"Tour the Magritte Museum.\\\",\\\"location\\\":\\\"Rue
+        de la R\xE9gence 3, 1000 Brussels\\\",\\\"notes\\\":\\\"Features works by
+        surrealist artist Ren\xE9 Magritte.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at Caf\xE9 des Halles for local Belgian dishes.\\\",\\\"location\\\":\\\"Place
+        de la Bourse 2, 1000 Brussels\\\",\\\"notes\\\":\\\"A lovely caf\xE9 with
+        a cozy atmosphere.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Stroll
+        through the Parc du Cinquantenaire.\\\",\\\"location\\\":\\\"Parc du Cinquantenaire,
+        1000 Brussels\\\",\\\"notes\\\":\\\"Enjoy the beautiful gardens and archway.\\\"},{\\\"time\\\":\\\"5:00
+        PM\\\",\\\"activity\\\":\\\"Visit the European Parliament.\\\",\\\"location\\\":\\\"Rue
+        Wiertz 60, 1047 Brussels\\\",\\\"notes\\\":\\\"Free entry, but check for available
+        tours.\\\"}],\\\"meals\\\":[\\\"Lunch at Caf\xE9 des Halles\\\",\\\"Dinner
+        at Restaurant de l'Hotel de Ville, regional specialties\\\"],\\\"accommodation\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":3,\\\"date\\\":\\\"2023-10-03\\\",\\\"title\\\":\\\"Belgian
+        Beer and Waffles\\\",\\\"activities\\\":[{\\\"time\\\":\\\"10:00 AM\\\",\\\"activity\\\":\\\"Join
+        a beer tasting tour.\\\",\\\"location\\\":\\\"Brussels Beer Project, Rue Antoine
+        Dansaert 188, 1000 Brussels\\\",\\\"notes\\\":\\\"Sample different Belgian
+        beers.\\\"},{\\\"time\\\":\\\"12:00 PM\\\",\\\"activity\\\":\\\"Lunch at Delirium
+        Caf\xE9 for a vast beer selection.\\\",\\\"location\\\":\\\"Impasse de la
+        Fid\xE9lit\xE9 4, 1000 Brussels\\\",\\\"notes\\\":\\\"Try their famous beer
+        menu.\\\"},{\\\"time\\\":\\\"2:00 PM\\\",\\\"activity\\\":\\\"Visit the Belgian
+        Comic Strip Center.\\\",\\\"location\\\":\\\"Rue des Sables 20, 1000 Brussels\\\",\\\"notes\\\":\\\"A
+        fun take on Belgium's comic strip history.\\\"},{\\\"time\\\":\\\"4:00 PM\\\",\\\"activity\\\":\\\"Indulge
+        in Belgian waffles at Maison Dandoy.\\\",\\\"location\\\":\\\"Rue Charles
+        Buls 14, 1000 Brussels\\\",\\\"notes\\\":\\\"Known for their delicious Li\xE8ge
+        waffles.\\\"},{\\\"time\\\":\\\"6:00 PM\\\",\\\"activity\\\":\\\"Explore the
+        local shops in the Sablon district.\\\",\\\"location\\\":\\\"Sablon, 1000
+        Brussels\\\",\\\"notes\\\":\\\"A chic area with antique shops and chocolatiers.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at Delirium Caf\xE9\\\",\\\"Dinner at Chez L\xE9on (again, for the moules-frites)\\\"],\\\"accommodation\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":4,\\\"date\\\":\\\"2023-10-04\\\",\\\"title\\\":\\\"Day
+        Trip to Ghent\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Take
+        a train to Ghent.\\\",\\\"location\\\":\\\"Brussels Central Station\\\",\\\"notes\\\":\\\"Trains
+        run frequently; buy tickets at the station.\\\"},{\\\"time\\\":\\\"10:00 AM\\\",\\\"activity\\\":\\\"Visit
+        Gravensteen Castle.\\\",\\\"location\\\":\\\"Sint-Veerleplein 11, 9000 Ghent\\\",\\\"notes\\\":\\\"Explore
+        the medieval castle.\\\"},{\\\"time\\\":\\\"12:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at De Graslei, riverside dining.\\\",\\\"location\\\":\\\"Graslei 7, 9000
+        Ghent\\\",\\\"notes\\\":\\\"Enjoy local dishes with a view.\\\"},{\\\"time\\\":\\\"2:00
+        PM\\\",\\\"activity\\\":\\\"Stroll through the historic center and visit St.
+        Bavo's Cathedral.\\\",\\\"location\\\":\\\"Sint-Baafsplein 1, 9000 Ghent\\\",\\\"notes\\\":\\\"Home
+        of the famous Ghent Altarpiece.\\\"},{\\\"time\\\":\\\"4:00 PM\\\",\\\"activity\\\":\\\"Try
+        local beer at a Ghent brewery.\\\",\\\"location\\\":\\\"Brouwerij Gruut, 9000
+        Ghent\\\",\\\"notes\\\":\\\"Unique brewery with its own beer style.\\\"},{\\\"time\\\":\\\"6:00
+        PM\\\",\\\"activity\\\":\\\"Return to Brussels.\\\",\\\"location\\\":\\\"Brussels
+        Central Station\\\",\\\"notes\\\":\\\"Trains run until late.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at De Graslei\\\",\\\"Dinner at Le Pain Quotidien (again for delicious organic
+        options)\\\"],\\\"accommodation\\\":\\\"Hotel Amigo, Rue de l'Amigo 1-3, 1000
+        Brussels\\\"},{\\\"day_number\\\":5,\\\"date\\\":\\\"2023-10-05\\\",\\\"title\\\":\\\"Markets
+        and Local Flavors\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Visit
+        the Midi Market (open on Thursdays).\\\",\\\"location\\\":\\\"Place du Midi,
+        1060 Brussels\\\",\\\"notes\\\":\\\"A vibrant market with local produce and
+        street food.\\\"},{\\\"time\\\":\\\"11:00 AM\\\",\\\"activity\\\":\\\"Try
+        various cheese samples at Fromagerie de la Place.\\\",\\\"location\\\":\\\"Place
+        du Ch\xE2telain, 1050 Brussels\\\",\\\"notes\\\":\\\"A delightful cheese shop.\\\"},{\\\"time\\\":\\\"1:00
+        PM\\\",\\\"activity\\\":\\\"Lunch at Les Brigittines, local cuisine.\\\",\\\"location\\\":\\\"Place
+        de la Chapelle 5, 1000 Brussels\\\",\\\"notes\\\":\\\"Known for hearty Belgian
+        dishes.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Explore the
+        Marolles district and its vintage shops.\\\",\\\"location\\\":\\\"Marolles,
+        1000 Brussels\\\",\\\"notes\\\":\\\"Great for thrift shopping and unique finds.\\\"},{\\\"time\\\":\\\"5:00
+        PM\\\",\\\"activity\\\":\\\"Enjoy a beer at a local tavern, Caf\xE9 Belga.\\\",\\\"location\\\":\\\"Place
+        Eug\xE8ne Flagey, 1050 Brussels\\\",\\\"notes\\\":\\\"A lively spot to unwind.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at Les Brigittines\\\",\\\"Dinner at Chez L\xE9on (to try other menu items)\\\"],\\\"accommodation\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":6,\\\"date\\\":\\\"2023-10-06\\\",\\\"title\\\":\\\"Culinary
+        Delights\\\",\\\"activities\\\":[{\\\"time\\\":\\\"10:00 AM\\\",\\\"activity\\\":\\\"Take
+        a cooking class to learn Belgian cuisine.\\\",\\\"location\\\":\\\"Brussels
+        Cooking Classes, Rue des Bouchers 9, 1000 Brussels\\\",\\\"notes\\\":\\\"Pre-booking
+        is recommended.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Enjoy
+        the meal you've prepared during the class.\\\",\\\"location\\\":\\\"Brussels
+        Cooking Classes\\\",\\\"notes\\\":\\\"A unique lunch experience.\\\"},{\\\"time\\\":\\\"3:00
+        PM\\\",\\\"activity\\\":\\\"Visit the Atomium, an iconic building.\\\",\\\"location\\\":\\\"Avenue
+        de l'Atomium, 1020 Brussels\\\",\\\"notes\\\":\\\"Check out the exhibition
+        inside.\\\"},{\\\"time\\\":\\\"5:00 PM\\\",\\\"activity\\\":\\\"Explore Mini-Europe,
+        right next to Atomium.\\\",\\\"location\\\":\\\"Bruparck, 1020 Brussels\\\",\\\"notes\\\":\\\"A
+        miniature park with famous European landmarks.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at cooking class\\\",\\\"Dinner at La Roue d'Or, known for local favorites\\\"],\\\"accommodation\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":7,\\\"date\\\":\\\"2023-10-07\\\",\\\"title\\\":\\\"Departure
+        Day\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Last-minute
+        shopping in the Galeries Royales Saint-Hubert.\\\",\\\"location\\\":\\\"Galeries
+        Royales Saint-Hubert, 1000 Brussels\\\",\\\"notes\\\":\\\"Beautiful shopping
+        arcade.\\\"},{\\\"time\\\":\\\"11:00 AM\\\",\\\"activity\\\":\\\"Visit the
+        Royal Museums of Fine Arts of Belgium.\\\",\\\"location\\\":\\\"Rue de la
+        R\xE9gence 3, 1000 Brussels\\\",\\\"notes\\\":\\\"Explore the vast collection
+        of art.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch at Le
+        Pain Quotidien, a final taste of organic dishes.\\\",\\\"location\\\":\\\"Multiple
+        locations\\\",\\\"notes\\\":\\\"Great ambiance for your last meal.\\\"},{\\\"time\\\":\\\"3:00
+        PM\\\",\\\"activity\\\":\\\"Check out from hotel and head to the airport.\\\",\\\"location\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\",\\\"notes\\\":\\\"Plan for travel
+        time to airport.\\\"}],\\\"meals\\\":[\\\"Lunch at Le Pain Quotidien\\\",\\\"Dinner
+        on the flight\\\"],\\\"accommodation\\\":\\\"Hotel Amigo, Rue de l'Amigo 1-3,
+        1000 Brussels\\\"}],\\\"travel_tips\\\":[\\\"Purchase a Brussels Card for
+        discounts on entrance fees and public transport.\\\",\\\"Always try to learn
+        a few basic French or Flemish phrases, it's appreciated by locals.\\\",\\\"Keep
+        an umbrella or raincoat handy due to unpredictable weather.\\\"],\\\"packing_suggestions\\\":[\\\"Comfortable
+        walking shoes for exploring the city.\\\",\\\"Layers to adjust to changing
+        temperatures throughout the day.\\\",\\\"A light waterproof jacket or umbrella
+        for occasional rain.\\\"]}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273076537,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"8f466a6f6bb9d33b\",\"parent_span_id\":\"0860f990bbf0d202\",\"trace_state\":\"\",\"span_name\":\"create_itinerary.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.tool.name\":\"create_itinerary\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":43510,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"create_itinerary\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273073000,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"05f6c52415ea7bac\",\"parent_span_id\":\"0860f990bbf0d202\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        for travel destinations by region or subregion using REST Countries API.\",\"llm.request.functions.0.name\":\"search_destinations\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"region\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Region
+        to search (e.g., \\\\\\\"Europe\\\\\\\", \\\\\\\"Asia\\\\\\\", \\\\\\\"Americas\\\\\\\")\\\",
+        \\\"title\\\": \\\"Region\\\", \\\"type\\\": \\\"string\\\"}, \\\"subregion\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Subregion to search (e.g.,
+        \\\\\\\"Southern Europe\\\\\\\", \\\\\\\"Southeast Asia\\\\\\\")\\\", \\\"title\\\":
+        \\\"Subregion\\\", \\\"type\\\": \\\"string\\\"}}, \\\"title\\\": \\\"search_destinations_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\":
+        [\\\"region\\\", \\\"subregion\\\"]}\",\"llm.request.functions.1.description\":\"Get
+        coordinates for a location using Nominatim (OpenStreetMap) API.\",\"llm.request.functions.1.name\":\"get_location_coordinates\",\"llm.request.functions.1.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the city or location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"location_name\\\"], \\\"title\\\": \\\"get_location_coordinates_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.2.description\":\"Get
+        current weather and 7-day forecast using Open-Meteo API (no API key required).\",\"llm.request.functions.2.name\":\"get_weather_forecast\",\"llm.request.functions.2.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}, \\\"latitude\\\":
+        {\\\"description\\\": \\\"Latitude coordinate\\\", \\\"title\\\": \\\"Latitude\\\",
+        \\\"type\\\": \\\"number\\\"}, \\\"longitude\\\": {\\\"description\\\": \\\"Longitude
+        coordinate\\\", \\\"title\\\": \\\"Longitude\\\", \\\"type\\\": \\\"number\\\"}},
+        \\\"required\\\": [\\\"location_name\\\", \\\"latitude\\\", \\\"longitude\\\"],
+        \\\"title\\\": \\\"get_weather_forecast_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.functions.3.description\":\"Get
+        information about a destination from Wikipedia API.\",\"llm.request.functions.3.name\":\"get_destination_info\",\"llm.request.functions.3.parameters\":\"{\\\"properties\\\":
+        {\\\"destination_name\\\": {\\\"description\\\": \\\"Name of the destination\\\",
+        \\\"title\\\": \\\"Destination Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"destination_name\\\"], \\\"title\\\": \\\"get_destination_info_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.4.description\":\"Calculate
+        distance and estimated flight time between two locations.\\nUses Haversine
+        formula for distance calculation.\",\"llm.request.functions.4.name\":\"calculate_travel_distance\",\"llm.request.functions.4.parameters\":\"{\\\"properties\\\":
+        {\\\"from_location\\\": {\\\"description\\\": \\\"Starting location name\\\",
+        \\\"title\\\": \\\"From Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"to_location\\\":
+        {\\\"description\\\": \\\"Destination location name\\\", \\\"title\\\": \\\"To
+        Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"from_lat\\\": {\\\"description\\\":
+        \\\"Starting latitude\\\", \\\"title\\\": \\\"From Lat\\\", \\\"type\\\":
+        \\\"number\\\"}, \\\"from_lon\\\": {\\\"description\\\": \\\"Starting longitude\\\",
+        \\\"title\\\": \\\"From Lon\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lat\\\":
+        {\\\"description\\\": \\\"Destination latitude\\\", \\\"title\\\": \\\"To
+        Lat\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lon\\\": {\\\"description\\\":
+        \\\"Destination longitude\\\", \\\"title\\\": \\\"To Lon\\\", \\\"type\\\":
+        \\\"number\\\"}}, \\\"required\\\": [\\\"from_location\\\", \\\"to_location\\\",
+        \\\"from_lat\\\", \\\"from_lon\\\", \\\"to_lat\\\", \\\"to_lon\\\"], \\\"title\\\":
+        \\\"calculate_travel_distance_args\\\", \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\":
+        false}\",\"llm.request.functions.5.description\":\"Create a detailed day-by-day
+        travel itinerary using AI.\",\"llm.request.functions.5.name\":\"create_itinerary\",\"llm.request.functions.5.parameters\":\"{\\\"properties\\\":
+        {\\\"destination\\\": {\\\"description\\\": \\\"Main destination for the trip\\\",
+        \\\"title\\\": \\\"Destination\\\", \\\"type\\\": \\\"string\\\"}, \\\"duration_days\\\":
+        {\\\"description\\\": \\\"Number of days for the trip\\\", \\\"title\\\":
+        \\\"Duration Days\\\", \\\"type\\\": \\\"integer\\\"}, \\\"budget\\\": {\\\"description\\\":
+        \\\"Budget level (budget, moderate, luxury)\\\", \\\"title\\\": \\\"Budget\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"interests\\\": {\\\"description\\\": \\\"Traveler
+        interests (e.g., food, history, nature)\\\", \\\"title\\\": \\\"Interests\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"weather_info\\\": {\\\"default\\\": \\\"\\\",
+        \\\"description\\\": \\\"Weather forecast information (optional)\\\", \\\"title\\\":
+        \\\"Weather Info\\\", \\\"type\\\": \\\"string\\\"}, \\\"destination_details\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Additional destination
+        details (optional)\\\", \\\"title\\\": \\\"Destination Details\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"required\\\": [\\\"destination\\\", \\\"duration_days\\\",
+        \\\"budget\\\", \\\"interests\\\", \\\"weather_info\\\", \\\"destination_details\\\"],
+        \\\"title\\\": \\\"create_itinerary_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"132\",\"llm.usage.prompt_tokens\":\"2060\",\"llm.usage.total_tokens\":\"2192\",\"llm.vendor\":\"openai\"},\"duration\":3536,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Help
+        me plan a vacation in Europe for couples. I'm interested in food.\",\"llm.prompts.0.role\":\"user\",\"llm.prompts.1.role\":\"assistant\",\"llm.prompts.1.tool_calls.0.arguments\":\"{\\\"region\\\":\\\"Europe\\\",\\\"subregion\\\":\\\"\\\"}\",\"llm.prompts.1.tool_calls.0.id\":\"fc_002efcb3837ca5ad0069196964b478819693d459e78c68479c\",\"llm.prompts.1.tool_calls.0.name\":\"search_destinations\",\"llm.prompts.2.content\":\"status='success'
+        message='Found 10 destinations in Europe' countries=[CountryInfo(name='Serbia',
+        capital='Belgrade', region='Europe', subregion='Southeast Europe', population=6567783,
+        currencies=['RSD'], languages=['Serbian'], timezones=['UTC+01:00']), CountryInfo(name='Slovakia',
+        capital='Bratislava', region='Europe', subregion='Central Europe', population=5413813,
+        currencies=['EUR'], languages=['Slovak'], timezones=['UTC+01:00']), CountryInfo(name='Estonia',
+        capital='Tallinn', region='Europe', subregion='Northern Europe', population=1369995,
+        currencies=['EUR'], languages=['Estonian'], timezones=['UTC+02:00']), CountryInfo(name='Gibraltar',
+        capital='Gibraltar', region='Europe', subregion='Southern Europe', population=38000,
+        currencies=['GIP'], languages=['English'], timezones=['UTC+01:00']), CountryInfo(name='Ireland',
+        capital='Dublin', region='Europe', subregion='Northern Europe', population=5458600,
+        currencies=['EUR'], languages=['English', 'Irish'], timezones=['UTC']), CountryInfo(name='Belgium',
+        capital='Brussels', region='Europe', subregion='Western Europe', population=11825551,
+        currencies=['EUR'], languages=['German', 'French', 'Dutch'], timezones=['UTC+01:00']),
+        CountryInfo(name='Kosovo', capital='Pristina', region='Europe', subregion='Southeast
+        Europe', population=1585566, currencies=['EUR'], languages=['Albanian', 'Serbian'],
+        timezones=['UTC+01:00']), CountryInfo(name='Ukraine', capital='Kyiv', region='Europe',
+        subregion='Eastern Europe', population=32862000, currencies=['UAH'], languages=['Ukrainian'],
+        timezones=['UTC+02:00']), CountryInfo(name='Netherlands', capital='Amsterdam',
+        region='Europe', subregion='Western Europe', population=18100436, currencies=['EUR'],
+        languages=['Dutch'], timezones=['UTC+01:00']), CountryInfo(name='Moldova',
+        capital='Chi\u0219in\u0103u', region='Europe', subregion='Eastern Europe',
+        population=2749076, currencies=['MDL'], languages=['Romanian'], timezones=['UTC+02:00'])]
+        count=10\",\"llm.prompts.2.role\":\"tool\",\"llm.prompts.2.tool_call_id\":\"call_x9eEzVdEfljWuZYhyjs2UbYT\",\"llm.prompts.3.role\":\"assistant\",\"llm.prompts.3.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Brussels\\\"}\",\"llm.prompts.3.tool_calls.0.id\":\"fc_002efcb3837ca5ad00691969672f28819697a09a736843dacb\",\"llm.prompts.3.tool_calls.0.name\":\"get_location_coordinates\",\"llm.prompts.4.content\":\"status='success'
+        message='Coordinates found for Brussels' coordinates=LocationCoordinates(location_name='Brussels',
+        latitude=50.8465573, longitude=4.351697, country='Belgi\xEB / Belgique / Belgien',
+        display_name='Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale,
+        R\xE9gion de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, Belgi\xEB
+        / Belgique / Belgien')\",\"llm.prompts.4.role\":\"tool\",\"llm.prompts.4.tool_call_id\":\"call_tYzh1OZDdDLftvCUnNhvaqJP\",\"llm.prompts.5.role\":\"assistant\",\"llm.prompts.5.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Brussels\\\",\\\"latitude\\\":50.8465573,\\\"longitude\\\":4.351697}\",\"llm.prompts.5.tool_calls.0.id\":\"fc_002efcb3837ca5ad006919696c3d4481969155ab11359357d1\",\"llm.prompts.5.tool_calls.0.name\":\"get_weather_forecast\",\"llm.prompts.6.content\":\"status='success'
+        message='Weather forecast retrieved for Brussels' forecast=WeatherForecast(location='Brussels',
+        latitude=50.8465573, longitude=4.351697, current_temperature=10.6, current_conditions='Overcast',
+        forecast_days=[DailyForecast(date='2025-11-16', temp_max=12.8, temp_min=6.5,
+        precipitation=0.1), DailyForecast(date='2025-11-17', temp_max=9.3, temp_min=5.4,
+        precipitation=4.1), DailyForecast(date='2025-11-18', temp_max=6.3, temp_min=3.7,
+        precipitation=0.2), DailyForecast(date='2025-11-19', temp_max=5.6, temp_min=2.4,
+        precipitation=8.7), DailyForecast(date='2025-11-20', temp_max=5.2, temp_min=0.6,
+        precipitation=0.0), DailyForecast(date='2025-11-21', temp_max=6.0, temp_min=0.2,
+        precipitation=0.0), DailyForecast(date='2025-11-22', temp_max=4.1, temp_min=-0.0,
+        precipitation=0.4)])\",\"llm.prompts.6.role\":\"tool\",\"llm.prompts.6.tool_call_id\":\"call_3lqSWvQ36PrWiDz4YFeNWHTq\",\"llm.prompts.7.role\":\"assistant\",\"llm.prompts.7.tool_calls.0.arguments\":\"{\\\"destination_name\\\":\\\"Brussels\\\"}\",\"llm.prompts.7.tool_calls.0.id\":\"fc_002efcb3837ca5ad006919696ed14081968f4ffc1c02b6bb46\",\"llm.prompts.7.tool_calls.0.name\":\"get_destination_info\",\"llm.prompts.8.content\":\"status='success'
+        message='Retrieved information for Brussels' info=DestinationInfo(title='Brussels',
+        summary='Federal region of Belgium including the capital', extract='Brussels,
+        officially the Brussels-Capital Region, is a region of Belgium comprising
+        19 municipalities, including the City of Brussels, which is the capital of
+        Belgium. The Brussels-Capital Region is located in the central portion of
+        the country. It is a part of both the French Community of Belgium and the
+        Flemish Community, and is separate from the Flemish Region (Flanders), within
+        which it forms an enclave, and the Walloon Region (Wallonia), located less
+        than 4 kilometres (2.5\\\\xa0mi) to the south.')\",\"llm.prompts.8.role\":\"tool\",\"llm.prompts.8.tool_call_id\":\"call_RPiJsOQu53UTsFhjQ91Sap6p\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"destination\\\":\\\"Brussels\\\",\\\"duration_days\\\":7,\\\"budget\\\":\\\"moderate\\\",\\\"interests\\\":\\\"food\\\",\\\"weather_info\\\":\\\"Current
+        temperature is 10.6\xB0C with overcast conditions. The forecast for the week
+        includes temperatures ranging from 12.8\xB0C to 4.1\xB0C, with occasional
+        rain.\\\",\\\"destination_details\\\":\\\"Brussels, the capital of Belgium,
+        is a vibrant city known for its eclectic mix of French and Flemish culture.
+        The city is famous for its rich history, stunning architecture, and a gastronomic
+        scene that includes Belgian waffles, chocolates, and a variety of local beers.\\\"}\",\"llm.completions.0.tool_calls.0.id\":\"call_eSompCv9cwfQozN9rREMSvt1\",\"llm.completions.0.tool_calls.0.name\":\"create_itinerary\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273071226,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"124b20f6c218667c\",\"parent_span_id\":\"a6c189db4bfc7645\",\"trace_state\":\"\",\"span_name\":\"GET\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.requests\",\"scope_version\":\"0.59b0\",\"span_attributes\":{\"http.method\":\"GET\",\"http.status_code\":\"200\",\"http.url\":\"https://en.wikipedia.org/api/rest_v1/page/summary/Brussels\",\"llm.agent.name\":\"Travel
+        Planner Agent\"},\"duration\":1772,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273070720,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"a6c189db4bfc7645\",\"parent_span_id\":\"0860f990bbf0d202\",\"trace_state\":\"\",\"span_name\":\"get_destination_info.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.tool.name\":\"get_destination_info\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":2279,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"get_destination_info\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273069960,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"ef8c2c7c4619c9ed\",\"parent_span_id\":\"0860f990bbf0d202\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        for travel destinations by region or subregion using REST Countries API.\",\"llm.request.functions.0.name\":\"search_destinations\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"region\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Region
+        to search (e.g., \\\\\\\"Europe\\\\\\\", \\\\\\\"Asia\\\\\\\", \\\\\\\"Americas\\\\\\\")\\\",
+        \\\"title\\\": \\\"Region\\\", \\\"type\\\": \\\"string\\\"}, \\\"subregion\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Subregion to search (e.g.,
+        \\\\\\\"Southern Europe\\\\\\\", \\\\\\\"Southeast Asia\\\\\\\")\\\", \\\"title\\\":
+        \\\"Subregion\\\", \\\"type\\\": \\\"string\\\"}}, \\\"title\\\": \\\"search_destinations_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\":
+        [\\\"region\\\", \\\"subregion\\\"]}\",\"llm.request.functions.1.description\":\"Get
+        coordinates for a location using Nominatim (OpenStreetMap) API.\",\"llm.request.functions.1.name\":\"get_location_coordinates\",\"llm.request.functions.1.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the city or location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"location_name\\\"], \\\"title\\\": \\\"get_location_coordinates_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.2.description\":\"Get
+        current weather and 7-day forecast using Open-Meteo API (no API key required).\",\"llm.request.functions.2.name\":\"get_weather_forecast\",\"llm.request.functions.2.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}, \\\"latitude\\\":
+        {\\\"description\\\": \\\"Latitude coordinate\\\", \\\"title\\\": \\\"Latitude\\\",
+        \\\"type\\\": \\\"number\\\"}, \\\"longitude\\\": {\\\"description\\\": \\\"Longitude
+        coordinate\\\", \\\"title\\\": \\\"Longitude\\\", \\\"type\\\": \\\"number\\\"}},
+        \\\"required\\\": [\\\"location_name\\\", \\\"latitude\\\", \\\"longitude\\\"],
+        \\\"title\\\": \\\"get_weather_forecast_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.functions.3.description\":\"Get
+        information about a destination from Wikipedia API.\",\"llm.request.functions.3.name\":\"get_destination_info\",\"llm.request.functions.3.parameters\":\"{\\\"properties\\\":
+        {\\\"destination_name\\\": {\\\"description\\\": \\\"Name of the destination\\\",
+        \\\"title\\\": \\\"Destination Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"destination_name\\\"], \\\"title\\\": \\\"get_destination_info_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.4.description\":\"Calculate
+        distance and estimated flight time between two locations.\\nUses Haversine
+        formula for distance calculation.\",\"llm.request.functions.4.name\":\"calculate_travel_distance\",\"llm.request.functions.4.parameters\":\"{\\\"properties\\\":
+        {\\\"from_location\\\": {\\\"description\\\": \\\"Starting location name\\\",
+        \\\"title\\\": \\\"From Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"to_location\\\":
+        {\\\"description\\\": \\\"Destination location name\\\", \\\"title\\\": \\\"To
+        Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"from_lat\\\": {\\\"description\\\":
+        \\\"Starting latitude\\\", \\\"title\\\": \\\"From Lat\\\", \\\"type\\\":
+        \\\"number\\\"}, \\\"from_lon\\\": {\\\"description\\\": \\\"Starting longitude\\\",
+        \\\"title\\\": \\\"From Lon\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lat\\\":
+        {\\\"description\\\": \\\"Destination latitude\\\", \\\"title\\\": \\\"To
+        Lat\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lon\\\": {\\\"description\\\":
+        \\\"Destination longitude\\\", \\\"title\\\": \\\"To Lon\\\", \\\"type\\\":
+        \\\"number\\\"}}, \\\"required\\\": [\\\"from_location\\\", \\\"to_location\\\",
+        \\\"from_lat\\\", \\\"from_lon\\\", \\\"to_lat\\\", \\\"to_lon\\\"], \\\"title\\\":
+        \\\"calculate_travel_distance_args\\\", \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\":
+        false}\",\"llm.request.functions.5.description\":\"Create a detailed day-by-day
+        travel itinerary using AI.\",\"llm.request.functions.5.name\":\"create_itinerary\",\"llm.request.functions.5.parameters\":\"{\\\"properties\\\":
+        {\\\"destination\\\": {\\\"description\\\": \\\"Main destination for the trip\\\",
+        \\\"title\\\": \\\"Destination\\\", \\\"type\\\": \\\"string\\\"}, \\\"duration_days\\\":
+        {\\\"description\\\": \\\"Number of days for the trip\\\", \\\"title\\\":
+        \\\"Duration Days\\\", \\\"type\\\": \\\"integer\\\"}, \\\"budget\\\": {\\\"description\\\":
+        \\\"Budget level (budget, moderate, luxury)\\\", \\\"title\\\": \\\"Budget\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"interests\\\": {\\\"description\\\": \\\"Traveler
+        interests (e.g., food, history, nature)\\\", \\\"title\\\": \\\"Interests\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"weather_info\\\": {\\\"default\\\": \\\"\\\",
+        \\\"description\\\": \\\"Weather forecast information (optional)\\\", \\\"title\\\":
+        \\\"Weather Info\\\", \\\"type\\\": \\\"string\\\"}, \\\"destination_details\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Additional destination
+        details (optional)\\\", \\\"title\\\": \\\"Destination Details\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"required\\\": [\\\"destination\\\", \\\"duration_days\\\",
+        \\\"budget\\\", \\\"interests\\\", \\\"weather_info\\\", \\\"destination_details\\\"],
+        \\\"title\\\": \\\"create_itinerary_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"18\",\"llm.usage.prompt_tokens\":\"1890\",\"llm.usage.total_tokens\":\"1908\",\"llm.vendor\":\"openai\"},\"duration\":758,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Help
+        me plan a vacation in Europe for couples. I'm interested in food.\",\"llm.prompts.0.role\":\"user\",\"llm.prompts.1.role\":\"assistant\",\"llm.prompts.1.tool_calls.0.arguments\":\"{\\\"region\\\":\\\"Europe\\\",\\\"subregion\\\":\\\"\\\"}\",\"llm.prompts.1.tool_calls.0.id\":\"fc_002efcb3837ca5ad0069196964b478819693d459e78c68479c\",\"llm.prompts.1.tool_calls.0.name\":\"search_destinations\",\"llm.prompts.2.content\":\"status='success'
+        message='Found 10 destinations in Europe' countries=[CountryInfo(name='Serbia',
+        capital='Belgrade', region='Europe', subregion='Southeast Europe', population=6567783,
+        currencies=['RSD'], languages=['Serbian'], timezones=['UTC+01:00']), CountryInfo(name='Slovakia',
+        capital='Bratislava', region='Europe', subregion='Central Europe', population=5413813,
+        currencies=['EUR'], languages=['Slovak'], timezones=['UTC+01:00']), CountryInfo(name='Estonia',
+        capital='Tallinn', region='Europe', subregion='Northern Europe', population=1369995,
+        currencies=['EUR'], languages=['Estonian'], timezones=['UTC+02:00']), CountryInfo(name='Gibraltar',
+        capital='Gibraltar', region='Europe', subregion='Southern Europe', population=38000,
+        currencies=['GIP'], languages=['English'], timezones=['UTC+01:00']), CountryInfo(name='Ireland',
+        capital='Dublin', region='Europe', subregion='Northern Europe', population=5458600,
+        currencies=['EUR'], languages=['English', 'Irish'], timezones=['UTC']), CountryInfo(name='Belgium',
+        capital='Brussels', region='Europe', subregion='Western Europe', population=11825551,
+        currencies=['EUR'], languages=['German', 'French', 'Dutch'], timezones=['UTC+01:00']),
+        CountryInfo(name='Kosovo', capital='Pristina', region='Europe', subregion='Southeast
+        Europe', population=1585566, currencies=['EUR'], languages=['Albanian', 'Serbian'],
+        timezones=['UTC+01:00']), CountryInfo(name='Ukraine', capital='Kyiv', region='Europe',
+        subregion='Eastern Europe', population=32862000, currencies=['UAH'], languages=['Ukrainian'],
+        timezones=['UTC+02:00']), CountryInfo(name='Netherlands', capital='Amsterdam',
+        region='Europe', subregion='Western Europe', population=18100436, currencies=['EUR'],
+        languages=['Dutch'], timezones=['UTC+01:00']), CountryInfo(name='Moldova',
+        capital='Chi\u0219in\u0103u', region='Europe', subregion='Eastern Europe',
+        population=2749076, currencies=['MDL'], languages=['Romanian'], timezones=['UTC+02:00'])]
+        count=10\",\"llm.prompts.2.role\":\"tool\",\"llm.prompts.2.tool_call_id\":\"call_x9eEzVdEfljWuZYhyjs2UbYT\",\"llm.prompts.3.role\":\"assistant\",\"llm.prompts.3.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Brussels\\\"}\",\"llm.prompts.3.tool_calls.0.id\":\"fc_002efcb3837ca5ad00691969672f28819697a09a736843dacb\",\"llm.prompts.3.tool_calls.0.name\":\"get_location_coordinates\",\"llm.prompts.4.content\":\"status='success'
+        message='Coordinates found for Brussels' coordinates=LocationCoordinates(location_name='Brussels',
+        latitude=50.8465573, longitude=4.351697, country='Belgi\xEB / Belgique / Belgien',
+        display_name='Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale,
+        R\xE9gion de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, Belgi\xEB
+        / Belgique / Belgien')\",\"llm.prompts.4.role\":\"tool\",\"llm.prompts.4.tool_call_id\":\"call_tYzh1OZDdDLftvCUnNhvaqJP\",\"llm.prompts.5.role\":\"assistant\",\"llm.prompts.5.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Brussels\\\",\\\"latitude\\\":50.8465573,\\\"longitude\\\":4.351697}\",\"llm.prompts.5.tool_calls.0.id\":\"fc_002efcb3837ca5ad006919696c3d4481969155ab11359357d1\",\"llm.prompts.5.tool_calls.0.name\":\"get_weather_forecast\",\"llm.prompts.6.content\":\"status='success'
+        message='Weather forecast retrieved for Brussels' forecast=WeatherForecast(location='Brussels',
+        latitude=50.8465573, longitude=4.351697, current_temperature=10.6, current_conditions='Overcast',
+        forecast_days=[DailyForecast(date='2025-11-16', temp_max=12.8, temp_min=6.5,
+        precipitation=0.1), DailyForecast(date='2025-11-17', temp_max=9.3, temp_min=5.4,
+        precipitation=4.1), DailyForecast(date='2025-11-18', temp_max=6.3, temp_min=3.7,
+        precipitation=0.2), DailyForecast(date='2025-11-19', temp_max=5.6, temp_min=2.4,
+        precipitation=8.7), DailyForecast(date='2025-11-20', temp_max=5.2, temp_min=0.6,
+        precipitation=0.0), DailyForecast(date='2025-11-21', temp_max=6.0, temp_min=0.2,
+        precipitation=0.0), DailyForecast(date='2025-11-22', temp_max=4.1, temp_min=-0.0,
+        precipitation=0.4)])\",\"llm.prompts.6.role\":\"tool\",\"llm.prompts.6.tool_call_id\":\"call_3lqSWvQ36PrWiDz4YFeNWHTq\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"destination_name\\\":\\\"Brussels\\\"}\",\"llm.completions.0.tool_calls.0.id\":\"call_RPiJsOQu53UTsFhjQ91Sap6p\",\"llm.completions.0.tool_calls.0.name\":\"get_destination_info\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273069020,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"0218eda7b3b9bb1d\",\"parent_span_id\":\"aca85c1c5e5a0b71\",\"trace_state\":\"\",\"span_name\":\"GET\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.requests\",\"scope_version\":\"0.59b0\",\"span_attributes\":{\"http.method\":\"GET\",\"http.status_code\":\"200\",\"http.url\":\"https://api.open-meteo.com/v1/forecast?latitude=50.8465573\\u0026longitude=4.351697\\u0026current=temperature_2m%2Crelative_humidity_2m%2Cwind_speed_10m%2Cweather_code\\u0026daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum\\u0026timezone=auto\\u0026forecast_days=7\",\"llm.agent.name\":\"Travel
+        Planner Agent\"},\"duration\":936,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273068516,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"aca85c1c5e5a0b71\",\"parent_span_id\":\"0860f990bbf0d202\",\"trace_state\":\"\",\"span_name\":\"get_weather_forecast.tool\",\"span_kind\":\"SPAN_KIND_INTERNAL\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.tool.name\":\"get_weather_forecast\",\"llm.vendor\":\"openai_agents\",\"traceloop.span.kind\":\"tool\"},\"duration\":1443,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{},\"completions\":{\"llm.completions.tool.name\":\"get_weather_forecast\",\"llm.completions.tool.strict_json_schema\":\"true\",\"llm.completions.tool.type\":\"FunctionTool\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763273065021,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"7c4695a6beca7e4d\",\"parent_span_id\":\"0860f990bbf0d202\",\"trace_state\":\"\",\"span_name\":\"openai.response\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai_agents\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.operation.name\":\"response\",\"llm.request.functions.0.description\":\"Search
+        for travel destinations by region or subregion using REST Countries API.\",\"llm.request.functions.0.name\":\"search_destinations\",\"llm.request.functions.0.parameters\":\"{\\\"properties\\\":
+        {\\\"region\\\": {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Region
+        to search (e.g., \\\\\\\"Europe\\\\\\\", \\\\\\\"Asia\\\\\\\", \\\\\\\"Americas\\\\\\\")\\\",
+        \\\"title\\\": \\\"Region\\\", \\\"type\\\": \\\"string\\\"}, \\\"subregion\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Subregion to search (e.g.,
+        \\\\\\\"Southern Europe\\\\\\\", \\\\\\\"Southeast Asia\\\\\\\")\\\", \\\"title\\\":
+        \\\"Subregion\\\", \\\"type\\\": \\\"string\\\"}}, \\\"title\\\": \\\"search_destinations_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false, \\\"required\\\":
+        [\\\"region\\\", \\\"subregion\\\"]}\",\"llm.request.functions.1.description\":\"Get
+        coordinates for a location using Nominatim (OpenStreetMap) API.\",\"llm.request.functions.1.name\":\"get_location_coordinates\",\"llm.request.functions.1.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the city or location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"location_name\\\"], \\\"title\\\": \\\"get_location_coordinates_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.2.description\":\"Get
+        current weather and 7-day forecast using Open-Meteo API (no API key required).\",\"llm.request.functions.2.name\":\"get_weather_forecast\",\"llm.request.functions.2.parameters\":\"{\\\"properties\\\":
+        {\\\"location_name\\\": {\\\"description\\\": \\\"Name of the location\\\",
+        \\\"title\\\": \\\"Location Name\\\", \\\"type\\\": \\\"string\\\"}, \\\"latitude\\\":
+        {\\\"description\\\": \\\"Latitude coordinate\\\", \\\"title\\\": \\\"Latitude\\\",
+        \\\"type\\\": \\\"number\\\"}, \\\"longitude\\\": {\\\"description\\\": \\\"Longitude
+        coordinate\\\", \\\"title\\\": \\\"Longitude\\\", \\\"type\\\": \\\"number\\\"}},
+        \\\"required\\\": [\\\"location_name\\\", \\\"latitude\\\", \\\"longitude\\\"],
+        \\\"title\\\": \\\"get_weather_forecast_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.functions.3.description\":\"Get
+        information about a destination from Wikipedia API.\",\"llm.request.functions.3.name\":\"get_destination_info\",\"llm.request.functions.3.parameters\":\"{\\\"properties\\\":
+        {\\\"destination_name\\\": {\\\"description\\\": \\\"Name of the destination\\\",
+        \\\"title\\\": \\\"Destination Name\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\":
+        [\\\"destination_name\\\"], \\\"title\\\": \\\"get_destination_info_args\\\",
+        \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\": false}\",\"llm.request.functions.4.description\":\"Calculate
+        distance and estimated flight time between two locations.\\nUses Haversine
+        formula for distance calculation.\",\"llm.request.functions.4.name\":\"calculate_travel_distance\",\"llm.request.functions.4.parameters\":\"{\\\"properties\\\":
+        {\\\"from_location\\\": {\\\"description\\\": \\\"Starting location name\\\",
+        \\\"title\\\": \\\"From Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"to_location\\\":
+        {\\\"description\\\": \\\"Destination location name\\\", \\\"title\\\": \\\"To
+        Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"from_lat\\\": {\\\"description\\\":
+        \\\"Starting latitude\\\", \\\"title\\\": \\\"From Lat\\\", \\\"type\\\":
+        \\\"number\\\"}, \\\"from_lon\\\": {\\\"description\\\": \\\"Starting longitude\\\",
+        \\\"title\\\": \\\"From Lon\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lat\\\":
+        {\\\"description\\\": \\\"Destination latitude\\\", \\\"title\\\": \\\"To
+        Lat\\\", \\\"type\\\": \\\"number\\\"}, \\\"to_lon\\\": {\\\"description\\\":
+        \\\"Destination longitude\\\", \\\"title\\\": \\\"To Lon\\\", \\\"type\\\":
+        \\\"number\\\"}}, \\\"required\\\": [\\\"from_location\\\", \\\"to_location\\\",
+        \\\"from_lat\\\", \\\"from_lon\\\", \\\"to_lat\\\", \\\"to_lon\\\"], \\\"title\\\":
+        \\\"calculate_travel_distance_args\\\", \\\"type\\\": \\\"object\\\", \\\"additionalProperties\\\":
+        false}\",\"llm.request.functions.5.description\":\"Create a detailed day-by-day
+        travel itinerary using AI.\",\"llm.request.functions.5.name\":\"create_itinerary\",\"llm.request.functions.5.parameters\":\"{\\\"properties\\\":
+        {\\\"destination\\\": {\\\"description\\\": \\\"Main destination for the trip\\\",
+        \\\"title\\\": \\\"Destination\\\", \\\"type\\\": \\\"string\\\"}, \\\"duration_days\\\":
+        {\\\"description\\\": \\\"Number of days for the trip\\\", \\\"title\\\":
+        \\\"Duration Days\\\", \\\"type\\\": \\\"integer\\\"}, \\\"budget\\\": {\\\"description\\\":
+        \\\"Budget level (budget, moderate, luxury)\\\", \\\"title\\\": \\\"Budget\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"interests\\\": {\\\"description\\\": \\\"Traveler
+        interests (e.g., food, history, nature)\\\", \\\"title\\\": \\\"Interests\\\",
+        \\\"type\\\": \\\"string\\\"}, \\\"weather_info\\\": {\\\"default\\\": \\\"\\\",
+        \\\"description\\\": \\\"Weather forecast information (optional)\\\", \\\"title\\\":
+        \\\"Weather Info\\\", \\\"type\\\": \\\"string\\\"}, \\\"destination_details\\\":
+        {\\\"default\\\": \\\"\\\", \\\"description\\\": \\\"Additional destination
+        details (optional)\\\", \\\"title\\\": \\\"Destination Details\\\", \\\"type\\\":
+        \\\"string\\\"}}, \\\"required\\\": [\\\"destination\\\", \\\"duration_days\\\",
+        \\\"budget\\\", \\\"interests\\\", \\\"weather_info\\\", \\\"destination_details\\\"],
+        \\\"title\\\": \\\"create_itinerary_args\\\", \\\"type\\\": \\\"object\\\",
+        \\\"additionalProperties\\\": false}\",\"llm.request.model\":\"gpt-4o-2024-08-06\",\"llm.request.temperature\":\"1.000000\",\"llm.request.top_p\":\"1.000000\",\"llm.request.type\":\"response\",\"llm.usage.completion_tokens\":\"34\",\"llm.usage.prompt_tokens\":\"1577\",\"llm.usage.total_tokens\":\"1611\",\"llm.vendor\":\"openai\"},\"duration\":3494,\"status_code\":\"STATUS_CODE_OK\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"Help
+        me plan a vacation in Europe for couples. I'm interested in food.\",\"llm.prompts.0.role\":\"user\",\"llm.prompts.1.role\":\"assistant\",\"llm.prompts.1.tool_calls.0.arguments\":\"{\\\"region\\\":\\\"Europe\\\",\\\"subregion\\\":\\\"\\\"}\",\"llm.prompts.1.tool_calls.0.id\":\"fc_002efcb3837ca5ad0069196964b478819693d459e78c68479c\",\"llm.prompts.1.tool_calls.0.name\":\"search_destinations\",\"llm.prompts.2.content\":\"status='success'
+        message='Found 10 destinations in Europe' countries=[CountryInfo(name='Serbia',
+        capital='Belgrade', region='Europe', subregion='Southeast Europe', population=6567783,
+        currencies=['RSD'], languages=['Serbian'], timezones=['UTC+01:00']), CountryInfo(name='Slovakia',
+        capital='Bratislava', region='Europe', subregion='Central Europe', population=5413813,
+        currencies=['EUR'], languages=['Slovak'], timezones=['UTC+01:00']), CountryInfo(name='Estonia',
+        capital='Tallinn', region='Europe', subregion='Northern Europe', population=1369995,
+        currencies=['EUR'], languages=['Estonian'], timezones=['UTC+02:00']), CountryInfo(name='Gibraltar',
+        capital='Gibraltar', region='Europe', subregion='Southern Europe', population=38000,
+        currencies=['GIP'], languages=['English'], timezones=['UTC+01:00']), CountryInfo(name='Ireland',
+        capital='Dublin', region='Europe', subregion='Northern Europe', population=5458600,
+        currencies=['EUR'], languages=['English', 'Irish'], timezones=['UTC']), CountryInfo(name='Belgium',
+        capital='Brussels', region='Europe', subregion='Western Europe', population=11825551,
+        currencies=['EUR'], languages=['German', 'French', 'Dutch'], timezones=['UTC+01:00']),
+        CountryInfo(name='Kosovo', capital='Pristina', region='Europe', subregion='Southeast
+        Europe', population=1585566, currencies=['EUR'], languages=['Albanian', 'Serbian'],
+        timezones=['UTC+01:00']), CountryInfo(name='Ukraine', capital='Kyiv', region='Europe',
+        subregion='Eastern Europe', population=32862000, currencies=['UAH'], languages=['Ukrainian'],
+        timezones=['UTC+02:00']), CountryInfo(name='Netherlands', capital='Amsterdam',
+        region='Europe', subregion='Western Europe', population=18100436, currencies=['EUR'],
+        languages=['Dutch'], timezones=['UTC+01:00']), CountryInfo(name='Moldova',
+        capital='Chi\u0219in\u0103u', region='Europe', subregion='Eastern Europe',
+        population=2749076, currencies=['MDL'], languages=['Romanian'], timezones=['UTC+02:00'])]
+        count=10\",\"llm.prompts.2.role\":\"tool\",\"llm.prompts.2.tool_call_id\":\"call_x9eEzVdEfljWuZYhyjs2UbYT\",\"llm.prompts.3.role\":\"assistant\",\"llm.prompts.3.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Brussels\\\"}\",\"llm.prompts.3.tool_calls.0.id\":\"fc_002efcb3837ca5ad00691969672f28819697a09a736843dacb\",\"llm.prompts.3.tool_calls.0.name\":\"get_location_coordinates\",\"llm.prompts.4.content\":\"status='success'
+        message='Coordinates found for Brussels' coordinates=LocationCoordinates(location_name='Brussels',
+        latitude=50.8465573, longitude=4.351697, country='Belgi\xEB / Belgique / Belgien',
+        display_name='Bruxelles - Brussel, Brussel-Hoofdstad - Bruxelles-Capitale,
+        R\xE9gion de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest, Belgi\xEB
+        / Belgique / Belgien')\",\"llm.prompts.4.role\":\"tool\",\"llm.prompts.4.tool_call_id\":\"call_tYzh1OZDdDLftvCUnNhvaqJP\"},\"completions\":{\"llm.completions.0.finish_reason\":\"tool_calls\",\"llm.completions.0.role\":\"assistant\",\"llm.completions.0.tool_calls.0.arguments\":\"{\\\"location_name\\\":\\\"Brussels\\\",\\\"latitude\\\":50.8465573,\\\"longitude\\\":4.351697}\",\"llm.completions.0.tool_calls.0.id\":\"call_3lqSWvQ36PrWiDz4YFeNWHTq\",\"llm.completions.0.tool_calls.0.name\":\"get_weather_forecast\"},\"input\":\"\",\"output\":\"\"}],\"page_size\":10,\"total_results\":54,\"next_cursor\":\"1763273065021\"}}"
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 16 Nov 2025 11:10:22 GMT
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1

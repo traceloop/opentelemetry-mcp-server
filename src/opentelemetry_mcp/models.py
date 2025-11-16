@@ -1,5 +1,6 @@
 """Data models for OpenTelemetry traces and Opentelemetry conventions."""
 
+from collections.abc import Sequence
 from datetime import datetime
 from enum import Enum
 from typing import Literal
@@ -50,7 +51,7 @@ class Filter(BaseModel):
     value: str | int | float | bool | None = Field(
         default=None, description="Single value for most operators"
     )
-    values: list[str | int | float | bool] | None = Field(
+    values: Sequence[str | int | float | bool] | None = Field(
         default=None, description="Multiple values for 'in', 'not_in', 'between' operators"
     )
     value_type: FilterType = Field(..., description="Type of the value(s)")

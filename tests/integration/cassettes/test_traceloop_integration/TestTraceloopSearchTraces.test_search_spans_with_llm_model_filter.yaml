@@ -1,0 +1,394 @@
+interactions:
+- request:
+    body: '{"filters":[{"field":"llm.request.model","operator":"equals","value":"gpt-4o-mini","value_type":"string"}],"logical_operator":"and","environments":["prd"],"sort_by":"timestamp","sort_order":"DESC","cursor":0,"limit":200}'
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-length:
+      - '282'
+      content-type:
+      - application/json
+      host:
+      - localhost:3001
+      user-agent:
+      - python-httpx/0.28.1
+    method: POST
+    uri: http://localhost:3001/v2/projects/default/spans
+  response:
+    body:
+      string: "{\"spans\":{\"data\":[{\"environment\":\"prd\",\"timestamp\":1763273077046,\"trace_id\":\"c4c7e548e1febe34757c208205caa53e\",\"span_id\":\"01e55a77b2a2dce0\",\"parent_span_id\":\"8f466a6f6bb9d33b\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_51db84afab\",\"llm.request.max_tokens\":\"3000\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.structured_output_schema\":\"{\\\"$defs\\\":
+        {\\\"DayActivity\\\": {\\\"properties\\\": {\\\"time\\\": {\\\"title\\\":
+        \\\"Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"activity\\\": {\\\"title\\\":
+        \\\"Activity\\\", \\\"type\\\": \\\"string\\\"}, \\\"location\\\": {\\\"title\\\":
+        \\\"Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"notes\\\": {\\\"title\\\":
+        \\\"Notes\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"time\\\",
+        \\\"activity\\\", \\\"location\\\", \\\"notes\\\"], \\\"title\\\": \\\"DayActivity\\\",
+        \\\"type\\\": \\\"object\\\"}, \\\"DayPlan\\\": {\\\"properties\\\": {\\\"day_number\\\":
+        {\\\"title\\\": \\\"Day Number\\\", \\\"type\\\": \\\"integer\\\"}, \\\"date\\\":
+        {\\\"title\\\": \\\"Date\\\", \\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        {\\\"title\\\": \\\"Title\\\", \\\"type\\\": \\\"string\\\"}, \\\"activities\\\":
+        {\\\"items\\\": {\\\"$ref\\\": \\\"#/$defs/DayActivity\\\"}, \\\"title\\\":
+        \\\"Activities\\\", \\\"type\\\": \\\"array\\\"}, \\\"meals\\\": {\\\"items\\\":
+        {\\\"type\\\": \\\"string\\\"}, \\\"title\\\": \\\"Meals\\\", \\\"type\\\":
+        \\\"array\\\"}, \\\"accommodation\\\": {\\\"title\\\": \\\"Accommodation\\\",
+        \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"day_number\\\", \\\"date\\\",
+        \\\"title\\\", \\\"activities\\\", \\\"meals\\\", \\\"accommodation\\\"],
+        \\\"title\\\": \\\"DayPlan\\\", \\\"type\\\": \\\"object\\\"}}, \\\"properties\\\":
+        {\\\"trip_title\\\": {\\\"title\\\": \\\"Trip Title\\\", \\\"type\\\": \\\"string\\\"},
+        \\\"destination\\\": {\\\"title\\\": \\\"Destination\\\", \\\"type\\\": \\\"string\\\"},
+        \\\"duration_days\\\": {\\\"title\\\": \\\"Duration Days\\\", \\\"type\\\":
+        \\\"integer\\\"}, \\\"total_budget_estimate\\\": {\\\"title\\\": \\\"Total
+        Budget Estimate\\\", \\\"type\\\": \\\"string\\\"}, \\\"daily_plans\\\": {\\\"items\\\":
+        {\\\"$ref\\\": \\\"#/$defs/DayPlan\\\"}, \\\"title\\\": \\\"Daily Plans\\\",
+        \\\"type\\\": \\\"array\\\"}, \\\"travel_tips\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Travel Tips\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"packing_suggestions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"},
+        \\\"title\\\": \\\"Packing Suggestions\\\", \\\"type\\\": \\\"array\\\"}},
+        \\\"required\\\": [\\\"trip_title\\\", \\\"destination\\\", \\\"duration_days\\\",
+        \\\"total_budget_estimate\\\", \\\"daily_plans\\\", \\\"travel_tips\\\", \\\"packing_suggestions\\\"],
+        \\\"title\\\": \\\"TravelItinerary\\\", \\\"type\\\": \\\"object\\\"}\",\"llm.request.temperature\":\"0.700000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CcQAIZ9vs66Ad2yBRePDGlr93GdfC\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"2078\",\"llm.usage.prompt_tokens\":\"579\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"2657\",\"llm.vendor\":\"openai\"},\"duration\":43000,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are an expert travel planner who creates detailed, practical itineraries.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are an expert travel planner. Create a detailed 7-day itinerary for Brussels.\\n\\nTrip
+        Details:\\n- Destination: Brussels\\n- Duration: 7 days\\n- Budget: moderate\\n-
+        Interests: food\\n- Weather: Current temperature is 10.6\xB0C with overcast
+        conditions. The forecast for the week includes temperatures ranging from 12.8\xB0C
+        to 4.1\xB0C, with occasional rain.\\n- Destination Info: Brussels, the capital
+        of Belgium, is a vibrant city known for its eclectic mix of French and Flemish
+        culture. The city is famous for its rich history, stunning architecture, and
+        a gastronomic scene that includes Belgian waffles, chocolates, and a variety
+        of local beers.\\n\\nCreate a comprehensive itinerary that includes:\\n1.
+        A catchy trip title\\n2. Day-by-day plans with specific activities and timings\\n3.
+        Meal recommendations for each day\\n4. Accommodation suggestions\\n5. Travel
+        tips specific to this destination\\n6. Packing suggestions based on the weather
+        and activities\\n\\nMake the itinerary practical, engaging, and tailored to
+        the moderate budget level and food interests.\\nEach day should have 3-5 activities
+        with specific times, locations, and helpful notes.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\\"trip_title\\\":\\\"A
+        Culinary Journey Through Brussels\\\",\\\"destination\\\":\\\"Brussels\\\",\\\"duration_days\\\":7,\\\"total_budget_estimate\\\":\\\"\u20AC800\\\",\\\"daily_plans\\\":[{\\\"day_number\\\":1,\\\"date\\\":\\\"2023-10-01\\\",\\\"title\\\":\\\"Arrival
+        and Exploring the Historic Center\\\",\\\"activities\\\":[{\\\"time\\\":\\\"10:00
+        AM\\\",\\\"activity\\\":\\\"Check into hotel and freshen up.\\\",\\\"location\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\",\\\"notes\\\":\\\"Moderate hotel
+        located near the city center.\\\"},{\\\"time\\\":\\\"11:30 AM\\\",\\\"activity\\\":\\\"Visit
+        the Grand Place, UNESCO World Heritage Site.\\\",\\\"location\\\":\\\"Grand
+        Place, 1000 Brussels\\\",\\\"notes\\\":\\\"Don't miss the stunning architecture
+        and the Town Hall.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at Chez L\xE9on for traditional moules-frites (mussels and fries).\\\",\\\"location\\\":\\\"Rue
+        des Bouchers 18, 1000 Brussels\\\",\\\"notes\\\":\\\"A famous spot for seafood
+        lovers.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Explore the
+        Manneken Pis statue and its surrounding area.\\\",\\\"location\\\":\\\"Rue
+        de l'\xC9tuve 46, 1000 Brussels\\\",\\\"notes\\\":\\\"A quirky symbol of Brussels.\\\"},{\\\"time\\\":\\\"5:00
+        PM\\\",\\\"activity\\\":\\\"Enjoy a chocolate tasting at Chocopolis.\\\",\\\"location\\\":\\\"Rue
+        de la Presse 8, 1000 Brussels\\\",\\\"notes\\\":\\\"Sample some of the best
+        Belgian chocolates.\\\"}],\\\"meals\\\":[\\\"Lunch at Chez L\xE9on\\\",\\\"Dinner
+        at Le Pain Quotidien, organic fare\\\"],\\\"accommodation\\\":\\\"Hotel Amigo,
+        Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":2,\\\"date\\\":\\\"2023-10-02\\\",\\\"title\\\":\\\"Art
+        \\u0026 Culture Day\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Visit
+        the Royal Palace of Brussels.\\\",\\\"location\\\":\\\"Place des Palais, 1000
+        Brussels\\\",\\\"notes\\\":\\\"Check the opening hours as they can vary.\\\"},{\\\"time\\\":\\\"11:00
+        AM\\\",\\\"activity\\\":\\\"Tour the Magritte Museum.\\\",\\\"location\\\":\\\"Rue
+        de la R\xE9gence 3, 1000 Brussels\\\",\\\"notes\\\":\\\"Features works by
+        surrealist artist Ren\xE9 Magritte.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at Caf\xE9 des Halles for local Belgian dishes.\\\",\\\"location\\\":\\\"Place
+        de la Bourse 2, 1000 Brussels\\\",\\\"notes\\\":\\\"A lovely caf\xE9 with
+        a cozy atmosphere.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Stroll
+        through the Parc du Cinquantenaire.\\\",\\\"location\\\":\\\"Parc du Cinquantenaire,
+        1000 Brussels\\\",\\\"notes\\\":\\\"Enjoy the beautiful gardens and archway.\\\"},{\\\"time\\\":\\\"5:00
+        PM\\\",\\\"activity\\\":\\\"Visit the European Parliament.\\\",\\\"location\\\":\\\"Rue
+        Wiertz 60, 1047 Brussels\\\",\\\"notes\\\":\\\"Free entry, but check for available
+        tours.\\\"}],\\\"meals\\\":[\\\"Lunch at Caf\xE9 des Halles\\\",\\\"Dinner
+        at Restaurant de l'Hotel de Ville, regional specialties\\\"],\\\"accommodation\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":3,\\\"date\\\":\\\"2023-10-03\\\",\\\"title\\\":\\\"Belgian
+        Beer and Waffles\\\",\\\"activities\\\":[{\\\"time\\\":\\\"10:00 AM\\\",\\\"activity\\\":\\\"Join
+        a beer tasting tour.\\\",\\\"location\\\":\\\"Brussels Beer Project, Rue Antoine
+        Dansaert 188, 1000 Brussels\\\",\\\"notes\\\":\\\"Sample different Belgian
+        beers.\\\"},{\\\"time\\\":\\\"12:00 PM\\\",\\\"activity\\\":\\\"Lunch at Delirium
+        Caf\xE9 for a vast beer selection.\\\",\\\"location\\\":\\\"Impasse de la
+        Fid\xE9lit\xE9 4, 1000 Brussels\\\",\\\"notes\\\":\\\"Try their famous beer
+        menu.\\\"},{\\\"time\\\":\\\"2:00 PM\\\",\\\"activity\\\":\\\"Visit the Belgian
+        Comic Strip Center.\\\",\\\"location\\\":\\\"Rue des Sables 20, 1000 Brussels\\\",\\\"notes\\\":\\\"A
+        fun take on Belgium's comic strip history.\\\"},{\\\"time\\\":\\\"4:00 PM\\\",\\\"activity\\\":\\\"Indulge
+        in Belgian waffles at Maison Dandoy.\\\",\\\"location\\\":\\\"Rue Charles
+        Buls 14, 1000 Brussels\\\",\\\"notes\\\":\\\"Known for their delicious Li\xE8ge
+        waffles.\\\"},{\\\"time\\\":\\\"6:00 PM\\\",\\\"activity\\\":\\\"Explore the
+        local shops in the Sablon district.\\\",\\\"location\\\":\\\"Sablon, 1000
+        Brussels\\\",\\\"notes\\\":\\\"A chic area with antique shops and chocolatiers.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at Delirium Caf\xE9\\\",\\\"Dinner at Chez L\xE9on (again, for the moules-frites)\\\"],\\\"accommodation\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":4,\\\"date\\\":\\\"2023-10-04\\\",\\\"title\\\":\\\"Day
+        Trip to Ghent\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Take
+        a train to Ghent.\\\",\\\"location\\\":\\\"Brussels Central Station\\\",\\\"notes\\\":\\\"Trains
+        run frequently; buy tickets at the station.\\\"},{\\\"time\\\":\\\"10:00 AM\\\",\\\"activity\\\":\\\"Visit
+        Gravensteen Castle.\\\",\\\"location\\\":\\\"Sint-Veerleplein 11, 9000 Ghent\\\",\\\"notes\\\":\\\"Explore
+        the medieval castle.\\\"},{\\\"time\\\":\\\"12:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at De Graslei, riverside dining.\\\",\\\"location\\\":\\\"Graslei 7, 9000
+        Ghent\\\",\\\"notes\\\":\\\"Enjoy local dishes with a view.\\\"},{\\\"time\\\":\\\"2:00
+        PM\\\",\\\"activity\\\":\\\"Stroll through the historic center and visit St.
+        Bavo's Cathedral.\\\",\\\"location\\\":\\\"Sint-Baafsplein 1, 9000 Ghent\\\",\\\"notes\\\":\\\"Home
+        of the famous Ghent Altarpiece.\\\"},{\\\"time\\\":\\\"4:00 PM\\\",\\\"activity\\\":\\\"Try
+        local beer at a Ghent brewery.\\\",\\\"location\\\":\\\"Brouwerij Gruut, 9000
+        Ghent\\\",\\\"notes\\\":\\\"Unique brewery with its own beer style.\\\"},{\\\"time\\\":\\\"6:00
+        PM\\\",\\\"activity\\\":\\\"Return to Brussels.\\\",\\\"location\\\":\\\"Brussels
+        Central Station\\\",\\\"notes\\\":\\\"Trains run until late.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at De Graslei\\\",\\\"Dinner at Le Pain Quotidien (again for delicious organic
+        options)\\\"],\\\"accommodation\\\":\\\"Hotel Amigo, Rue de l'Amigo 1-3, 1000
+        Brussels\\\"},{\\\"day_number\\\":5,\\\"date\\\":\\\"2023-10-05\\\",\\\"title\\\":\\\"Markets
+        and Local Flavors\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Visit
+        the Midi Market (open on Thursdays).\\\",\\\"location\\\":\\\"Place du Midi,
+        1060 Brussels\\\",\\\"notes\\\":\\\"A vibrant market with local produce and
+        street food.\\\"},{\\\"time\\\":\\\"11:00 AM\\\",\\\"activity\\\":\\\"Try
+        various cheese samples at Fromagerie de la Place.\\\",\\\"location\\\":\\\"Place
+        du Ch\xE2telain, 1050 Brussels\\\",\\\"notes\\\":\\\"A delightful cheese shop.\\\"},{\\\"time\\\":\\\"1:00
+        PM\\\",\\\"activity\\\":\\\"Lunch at Les Brigittines, local cuisine.\\\",\\\"location\\\":\\\"Place
+        de la Chapelle 5, 1000 Brussels\\\",\\\"notes\\\":\\\"Known for hearty Belgian
+        dishes.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Explore the
+        Marolles district and its vintage shops.\\\",\\\"location\\\":\\\"Marolles,
+        1000 Brussels\\\",\\\"notes\\\":\\\"Great for thrift shopping and unique finds.\\\"},{\\\"time\\\":\\\"5:00
+        PM\\\",\\\"activity\\\":\\\"Enjoy a beer at a local tavern, Caf\xE9 Belga.\\\",\\\"location\\\":\\\"Place
+        Eug\xE8ne Flagey, 1050 Brussels\\\",\\\"notes\\\":\\\"A lively spot to unwind.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at Les Brigittines\\\",\\\"Dinner at Chez L\xE9on (to try other menu items)\\\"],\\\"accommodation\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":6,\\\"date\\\":\\\"2023-10-06\\\",\\\"title\\\":\\\"Culinary
+        Delights\\\",\\\"activities\\\":[{\\\"time\\\":\\\"10:00 AM\\\",\\\"activity\\\":\\\"Take
+        a cooking class to learn Belgian cuisine.\\\",\\\"location\\\":\\\"Brussels
+        Cooking Classes, Rue des Bouchers 9, 1000 Brussels\\\",\\\"notes\\\":\\\"Pre-booking
+        is recommended.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Enjoy
+        the meal you've prepared during the class.\\\",\\\"location\\\":\\\"Brussels
+        Cooking Classes\\\",\\\"notes\\\":\\\"A unique lunch experience.\\\"},{\\\"time\\\":\\\"3:00
+        PM\\\",\\\"activity\\\":\\\"Visit the Atomium, an iconic building.\\\",\\\"location\\\":\\\"Avenue
+        de l'Atomium, 1020 Brussels\\\",\\\"notes\\\":\\\"Check out the exhibition
+        inside.\\\"},{\\\"time\\\":\\\"5:00 PM\\\",\\\"activity\\\":\\\"Explore Mini-Europe,
+        right next to Atomium.\\\",\\\"location\\\":\\\"Bruparck, 1020 Brussels\\\",\\\"notes\\\":\\\"A
+        miniature park with famous European landmarks.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at cooking class\\\",\\\"Dinner at La Roue d'Or, known for local favorites\\\"],\\\"accommodation\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\"},{\\\"day_number\\\":7,\\\"date\\\":\\\"2023-10-07\\\",\\\"title\\\":\\\"Departure
+        Day\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Last-minute
+        shopping in the Galeries Royales Saint-Hubert.\\\",\\\"location\\\":\\\"Galeries
+        Royales Saint-Hubert, 1000 Brussels\\\",\\\"notes\\\":\\\"Beautiful shopping
+        arcade.\\\"},{\\\"time\\\":\\\"11:00 AM\\\",\\\"activity\\\":\\\"Visit the
+        Royal Museums of Fine Arts of Belgium.\\\",\\\"location\\\":\\\"Rue de la
+        R\xE9gence 3, 1000 Brussels\\\",\\\"notes\\\":\\\"Explore the vast collection
+        of art.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch at Le
+        Pain Quotidien, a final taste of organic dishes.\\\",\\\"location\\\":\\\"Multiple
+        locations\\\",\\\"notes\\\":\\\"Great ambiance for your last meal.\\\"},{\\\"time\\\":\\\"3:00
+        PM\\\",\\\"activity\\\":\\\"Check out from hotel and head to the airport.\\\",\\\"location\\\":\\\"Hotel
+        Amigo, Rue de l'Amigo 1-3, 1000 Brussels\\\",\\\"notes\\\":\\\"Plan for travel
+        time to airport.\\\"}],\\\"meals\\\":[\\\"Lunch at Le Pain Quotidien\\\",\\\"Dinner
+        on the flight\\\"],\\\"accommodation\\\":\\\"Hotel Amigo, Rue de l'Amigo 1-3,
+        1000 Brussels\\\"}],\\\"travel_tips\\\":[\\\"Purchase a Brussels Card for
+        discounts on entrance fees and public transport.\\\",\\\"Always try to learn
+        a few basic French or Flemish phrases, it's appreciated by locals.\\\",\\\"Keep
+        an umbrella or raincoat handy due to unpredictable weather.\\\"],\\\"packing_suggestions\\\":[\\\"Comfortable
+        walking shoes for exploring the city.\\\",\\\"Layers to adjust to changing
+        temperatures throughout the day.\\\",\\\"A light waterproof jacket or umbrella
+        for occasional rain.\\\"]}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763272985581,\"trace_id\":\"f53581d7de2b03275fad361fd5a2a9fe\",\"span_id\":\"b7bca658fb4eaed9\",\"parent_span_id\":\"bd891d7c9529c5d0\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"error.type\":\"LengthFinishReasonError\",\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.request.max_tokens\":\"3000\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.structured_output_schema\":\"{\\\"$defs\\\":
+        {\\\"DayActivity\\\": {\\\"properties\\\": {\\\"time\\\": {\\\"title\\\":
+        \\\"Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"activity\\\": {\\\"title\\\":
+        \\\"Activity\\\", \\\"type\\\": \\\"string\\\"}, \\\"location\\\": {\\\"title\\\":
+        \\\"Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"notes\\\": {\\\"title\\\":
+        \\\"Notes\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"time\\\",
+        \\\"activity\\\", \\\"location\\\", \\\"notes\\\"], \\\"title\\\": \\\"DayActivity\\\",
+        \\\"type\\\": \\\"object\\\"}, \\\"DayPlan\\\": {\\\"properties\\\": {\\\"day_number\\\":
+        {\\\"title\\\": \\\"Day Number\\\", \\\"type\\\": \\\"integer\\\"}, \\\"date\\\":
+        {\\\"title\\\": \\\"Date\\\", \\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        {\\\"title\\\": \\\"Title\\\", \\\"type\\\": \\\"string\\\"}, \\\"activities\\\":
+        {\\\"items\\\": {\\\"$ref\\\": \\\"#/$defs/DayActivity\\\"}, \\\"title\\\":
+        \\\"Activities\\\", \\\"type\\\": \\\"array\\\"}, \\\"meals\\\": {\\\"items\\\":
+        {\\\"type\\\": \\\"string\\\"}, \\\"title\\\": \\\"Meals\\\", \\\"type\\\":
+        \\\"array\\\"}, \\\"accommodation\\\": {\\\"title\\\": \\\"Accommodation\\\",
+        \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"day_number\\\", \\\"date\\\",
+        \\\"title\\\", \\\"activities\\\", \\\"meals\\\", \\\"accommodation\\\"],
+        \\\"title\\\": \\\"DayPlan\\\", \\\"type\\\": \\\"object\\\"}}, \\\"properties\\\":
+        {\\\"trip_title\\\": {\\\"title\\\": \\\"Trip Title\\\", \\\"type\\\": \\\"string\\\"},
+        \\\"destination\\\": {\\\"title\\\": \\\"Destination\\\", \\\"type\\\": \\\"string\\\"},
+        \\\"duration_days\\\": {\\\"title\\\": \\\"Duration Days\\\", \\\"type\\\":
+        \\\"integer\\\"}, \\\"total_budget_estimate\\\": {\\\"title\\\": \\\"Total
+        Budget Estimate\\\", \\\"type\\\": \\\"string\\\"}, \\\"daily_plans\\\": {\\\"items\\\":
+        {\\\"$ref\\\": \\\"#/$defs/DayPlan\\\"}, \\\"title\\\": \\\"Daily Plans\\\",
+        \\\"type\\\": \\\"array\\\"}, \\\"travel_tips\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Travel Tips\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"packing_suggestions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"},
+        \\\"title\\\": \\\"Packing Suggestions\\\", \\\"type\\\": \\\"array\\\"}},
+        \\\"required\\\": [\\\"trip_title\\\", \\\"destination\\\", \\\"duration_days\\\",
+        \\\"total_budget_estimate\\\", \\\"daily_plans\\\", \\\"travel_tips\\\", \\\"packing_suggestions\\\"],
+        \\\"title\\\": \\\"TravelItinerary\\\", \\\"type\\\": \\\"object\\\"}\",\"llm.request.temperature\":\"0.700000\",\"llm.request.type\":\"chat\",\"llm.vendor\":\"openai\"},\"duration\":64758,\"status_code\":\"STATUS_CODE_ERROR\",\"status_message\":\"Could
+        not parse response content as the length limit was reached - CompletionUsage(completion_tokens=3000,
+        prompt_tokens=579, total_tokens=3579, completion_tokens_details=CompletionTokensDetails(accepted_prediction_tokens=0,
+        audio_tokens=0, reasoning_tokens=0, rejected_prediction_tokens=0), prompt_tokens_details=PromptTokensDetails(audio_tokens=0,
+        cached_tokens=0))\",\"prompts\":{\"llm.prompts.0.content\":\"You are an expert
+        travel planner who creates detailed, practical itineraries.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are an expert travel planner. Create a detailed 14-day itinerary for Istanbul.\\n\\nTrip
+        Details:\\n- Destination: Istanbul\\n- Duration: 14 days\\n- Budget: luxury\\n-
+        Interests: culture\\n- Weather: Current temperature: 12.1\xB0C, Partly cloudy.
+        Upcoming days: Mild temperatures ranging from 16.4\xB0C to 20.2\xB0C, mostly
+        dry.\\n- Destination Info: Istanbul is the largest city in Turkey, a cultural
+        and historical heart, straddling two continents. Known for its rich history,
+        diverse culture, and vibrant economy, Istanbul offers experiences across its
+        European and Asian parts and is famous for its unique position along the Bosphorus
+        strait.\\n\\nCreate a comprehensive itinerary that includes:\\n1. A catchy
+        trip title\\n2. Day-by-day plans with specific activities and timings\\n3.
+        Meal recommendations for each day\\n4. Accommodation suggestions\\n5. Travel
+        tips specific to this destination\\n6. Packing suggestions based on the weather
+        and activities\\n\\nMake the itinerary practical, engaging, and tailored to
+        the luxury budget level and culture interests.\\nEach day should have 3-5
+        activities with specific times, locations, and helpful notes.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{},\"input\":\"\",\"output\":\"\"},{\"environment\":\"prd\",\"timestamp\":1763272934506,\"trace_id\":\"83ba2d50d52cac29534deeb6f0197b60\",\"span_id\":\"7c0721b2051c4bf5\",\"parent_span_id\":\"43ea1c743c0a7ff8\",\"trace_state\":\"\",\"span_name\":\"openai.chat\",\"span_kind\":\"SPAN_KIND_CLIENT\",\"service_name\":\"travel-agent-demo2\",\"resource_attributes\":{\"service.name\":\"travel-agent-demo2\",\"telemetry.sdk.language\":\"python\",\"telemetry.sdk.name\":\"opentelemetry\",\"telemetry.sdk.version\":\"1.38.0\"},\"scope_name\":\"opentelemetry.instrumentation.openai.v1\",\"scope_version\":\"0.47.5\",\"span_attributes\":{\"llm.agent.name\":\"Travel
+        Planner Agent\",\"llm.headers\":\"None\",\"llm.is_streaming\":\"false\",\"llm.openai.api_base\":\"https://api.openai.com/v1/\",\"llm.openai.system_fingerprint\":\"fp_51db84afab\",\"llm.request.max_tokens\":\"3000\",\"llm.request.model\":\"gpt-4o-mini\",\"llm.request.structured_output_schema\":\"{\\\"$defs\\\":
+        {\\\"DayActivity\\\": {\\\"properties\\\": {\\\"time\\\": {\\\"title\\\":
+        \\\"Time\\\", \\\"type\\\": \\\"string\\\"}, \\\"activity\\\": {\\\"title\\\":
+        \\\"Activity\\\", \\\"type\\\": \\\"string\\\"}, \\\"location\\\": {\\\"title\\\":
+        \\\"Location\\\", \\\"type\\\": \\\"string\\\"}, \\\"notes\\\": {\\\"title\\\":
+        \\\"Notes\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"time\\\",
+        \\\"activity\\\", \\\"location\\\", \\\"notes\\\"], \\\"title\\\": \\\"DayActivity\\\",
+        \\\"type\\\": \\\"object\\\"}, \\\"DayPlan\\\": {\\\"properties\\\": {\\\"day_number\\\":
+        {\\\"title\\\": \\\"Day Number\\\", \\\"type\\\": \\\"integer\\\"}, \\\"date\\\":
+        {\\\"title\\\": \\\"Date\\\", \\\"type\\\": \\\"string\\\"}, \\\"title\\\":
+        {\\\"title\\\": \\\"Title\\\", \\\"type\\\": \\\"string\\\"}, \\\"activities\\\":
+        {\\\"items\\\": {\\\"$ref\\\": \\\"#/$defs/DayActivity\\\"}, \\\"title\\\":
+        \\\"Activities\\\", \\\"type\\\": \\\"array\\\"}, \\\"meals\\\": {\\\"items\\\":
+        {\\\"type\\\": \\\"string\\\"}, \\\"title\\\": \\\"Meals\\\", \\\"type\\\":
+        \\\"array\\\"}, \\\"accommodation\\\": {\\\"title\\\": \\\"Accommodation\\\",
+        \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"day_number\\\", \\\"date\\\",
+        \\\"title\\\", \\\"activities\\\", \\\"meals\\\", \\\"accommodation\\\"],
+        \\\"title\\\": \\\"DayPlan\\\", \\\"type\\\": \\\"object\\\"}}, \\\"properties\\\":
+        {\\\"trip_title\\\": {\\\"title\\\": \\\"Trip Title\\\", \\\"type\\\": \\\"string\\\"},
+        \\\"destination\\\": {\\\"title\\\": \\\"Destination\\\", \\\"type\\\": \\\"string\\\"},
+        \\\"duration_days\\\": {\\\"title\\\": \\\"Duration Days\\\", \\\"type\\\":
+        \\\"integer\\\"}, \\\"total_budget_estimate\\\": {\\\"title\\\": \\\"Total
+        Budget Estimate\\\", \\\"type\\\": \\\"string\\\"}, \\\"daily_plans\\\": {\\\"items\\\":
+        {\\\"$ref\\\": \\\"#/$defs/DayPlan\\\"}, \\\"title\\\": \\\"Daily Plans\\\",
+        \\\"type\\\": \\\"array\\\"}, \\\"travel_tips\\\": {\\\"items\\\": {\\\"type\\\":
+        \\\"string\\\"}, \\\"title\\\": \\\"Travel Tips\\\", \\\"type\\\": \\\"array\\\"},
+        \\\"packing_suggestions\\\": {\\\"items\\\": {\\\"type\\\": \\\"string\\\"},
+        \\\"title\\\": \\\"Packing Suggestions\\\", \\\"type\\\": \\\"array\\\"}},
+        \\\"required\\\": [\\\"trip_title\\\", \\\"destination\\\", \\\"duration_days\\\",
+        \\\"total_budget_estimate\\\", \\\"daily_plans\\\", \\\"travel_tips\\\", \\\"packing_suggestions\\\"],
+        \\\"title\\\": \\\"TravelItinerary\\\", \\\"type\\\": \\\"object\\\"}\",\"llm.request.temperature\":\"0.700000\",\"llm.request.type\":\"chat\",\"llm.response.id\":\"chatcmpl-CcQ81k3O0od5vXG0MituaDkAIuIie\",\"llm.response.model\":\"gpt-4o-mini-2024-07-18\",\"llm.usage.cache_read_input_tokens\":\"0\",\"llm.usage.completion_tokens\":\"1604\",\"llm.usage.prompt_tokens\":\"592\",\"llm.usage.reasoning_tokens\":\"0\",\"llm.usage.total_tokens\":\"2196\",\"llm.vendor\":\"openai\"},\"duration\":33431,\"status_code\":\"STATUS_CODE_UNSET\",\"status_message\":\"\",\"prompts\":{\"llm.prompts.0.content\":\"You
+        are an expert travel planner who creates detailed, practical itineraries.\",\"llm.prompts.0.role\":\"system\",\"llm.prompts.1.content\":\"\\nYou
+        are an expert travel planner. Create a detailed 7-day itinerary for New Zealand.\\n\\nTrip
+        Details:\\n- Destination: New Zealand\\n- Duration: 7 days\\n- Budget: moderate\\n-
+        Interests: food\\n- Weather: Current temperature in New Zealand is 12.1\xB0C
+        with mainly clear conditions. The forecast includes temperatures ranging from
+        14.3\xB0C to 22.9\xB0C and some rain over the next week.\\n- Destination Info:
+        New Zealand is an island country in the southwestern Pacific Ocean, known
+        for its stunning landscapes and diverse culture. It's composed of two main
+        islands and over 600 smaller islands. The capital city is Wellington, with
+        Auckland being the most populous city. New Zealand offers a variety of cuisines
+        influenced by its rich cultural heritage.\\n\\nCreate a comprehensive itinerary
+        that includes:\\n1. A catchy trip title\\n2. Day-by-day plans with specific
+        activities and timings\\n3. Meal recommendations for each day\\n4. Accommodation
+        suggestions\\n5. Travel tips specific to this destination\\n6. Packing suggestions
+        based on the weather and activities\\n\\nMake the itinerary practical, engaging,
+        and tailored to the moderate budget level and food interests.\\nEach day should
+        have 3-5 activities with specific times, locations, and helpful notes.\\n\",\"llm.prompts.1.role\":\"user\"},\"completions\":{\"llm.completions.0.content\":\"{\\\"trip_title\\\":\\\"Taste
+        of New Zealand: A Culinary Journey\\\",\\\"destination\\\":\\\"New Zealand\\\",\\\"duration_days\\\":7,\\\"total_budget_estimate\\\":\\\"$1,500\\\",\\\"daily_plans\\\":[{\\\"day_number\\\":1,\\\"date\\\":\\\"2023-10-01\\\",\\\"title\\\":\\\"Arrival
+        in Auckland\\\",\\\"activities\\\":[{\\\"time\\\":\\\"10:00 AM\\\",\\\"activity\\\":\\\"Arrive
+        in Auckland\\\",\\\"location\\\":\\\"Auckland Airport\\\",\\\"notes\\\":\\\"Check
+        in to your accommodation and freshen up.\\\"},{\\\"time\\\":\\\"12:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at the Federal Delicatessen\\\",\\\"location\\\":\\\"Auckland CBD\\\",\\\"notes\\\":\\\"Enjoy
+        a modern take on classic deli food.\\\"},{\\\"time\\\":\\\"2:00 PM\\\",\\\"activity\\\":\\\"Visit
+        Auckland Art Gallery\\\",\\\"location\\\":\\\"Auckland CBD\\\",\\\"notes\\\":\\\"Explore
+        New Zealand's most extensive collection of national and international art.\\\"},{\\\"time\\\":\\\"5:00
+        PM\\\",\\\"activity\\\":\\\"Sky Tower Visit\\\",\\\"location\\\":\\\"Auckland
+        CBD\\\",\\\"notes\\\":\\\"Enjoy panoramic views of the city at sunset.\\\"},{\\\"time\\\":\\\"7:00
+        PM\\\",\\\"activity\\\":\\\"Dinner at The Grove\\\",\\\"location\\\":\\\"Auckland
+        CBD\\\",\\\"notes\\\":\\\"Fine dining experience focusing on New Zealand cuisine.\\\"}],\\\"meals\\\":[\\\"Lunch
+        at Federal Delicatessen\\\",\\\"Dinner at The Grove\\\"],\\\"accommodation\\\":\\\"CityLife
+        Auckland\\\"},{\\\"day_number\\\":2,\\\"date\\\":\\\"2023-10-02\\\",\\\"title\\\":\\\"Exploring
+        Auckland\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Breakfast
+        at Best Ugly Bagels\\\",\\\"location\\\":\\\"Auckland CBD\\\",\\\"notes\\\":\\\"Try
+        their famous bagels.\\\"},{\\\"time\\\":\\\"10:30 AM\\\",\\\"activity\\\":\\\"Ferry
+        to Waiheke Island\\\",\\\"location\\\":\\\"Auckland Ferry Terminal\\\",\\\"notes\\\":\\\"Enjoy
+        the scenic ferry ride (approx. 40 mins).\\\"},{\\\"time\\\":\\\"11:30 AM\\\",\\\"activity\\\":\\\"Wine
+        Tasting at Mudbrick Vineyard\\\",\\\"location\\\":\\\"Waiheke Island\\\",\\\"notes\\\":\\\"Sample
+        local wines with stunning views.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at The Oyster Inn\\\",\\\"location\\\":\\\"Waiheke Island\\\",\\\"notes\\\":\\\"Savor
+        fresh seafood with a view.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Explore
+        Waiheke Island's beaches\\\",\\\"location\\\":\\\"Waiheke Island\\\",\\\"notes\\\":\\\"Relax
+        at Oneroa or Palm Beach.\\\"},{\\\"time\\\":\\\"5:00 PM\\\",\\\"activity\\\":\\\"Return
+        Ferry to Auckland\\\",\\\"location\\\":\\\"Waiheke Island\\\",\\\"notes\\\":\\\"Catch
+        the ferry back.\\\"},{\\\"time\\\":\\\"7:00 PM\\\",\\\"activity\\\":\\\"Dinner
+        at Baduzzi\\\",\\\"location\\\":\\\"Auckland CBD\\\",\\\"notes\\\":\\\"Italian
+        eatery known for its meatballs.\\\"}],\\\"meals\\\":[\\\"Breakfast at Best
+        Ugly Bagels\\\",\\\"Lunch at The Oyster Inn\\\",\\\"Dinner at Baduzzi\\\"],\\\"accommodation\\\":\\\"CityLife
+        Auckland\\\"},{\\\"day_number\\\":3,\\\"date\\\":\\\"2023-10-03\\\",\\\"title\\\":\\\"Travel
+        to Rotorua\\\",\\\"activities\\\":[{\\\"time\\\":\\\"8:00 AM\\\",\\\"activity\\\":\\\"Drive
+        to Rotorua\\\",\\\"location\\\":\\\"Auckland to Rotorua\\\",\\\"notes\\\":\\\"Approx.
+        3-hour drive.\\\"},{\\\"time\\\":\\\"11:00 AM\\\",\\\"activity\\\":\\\"Visit
+        Te Puia\\\",\\\"location\\\":\\\"Rotorua\\\",\\\"notes\\\":\\\"Explore geysers
+        and Maori culture.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at The Pavilion\\\",\\\"location\\\":\\\"Te Puia\\\",\\\"notes\\\":\\\"Caf\xE9
+        with local dishes.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Relax
+        at Polynesian Spa\\\",\\\"location\\\":\\\"Rotorua\\\",\\\"notes\\\":\\\"Enjoy
+        mineral hot pools.\\\"},{\\\"time\\\":\\\"6:00 PM\\\",\\\"activity\\\":\\\"Dinner
+        at Atticus Finch\\\",\\\"location\\\":\\\"Rotorua\\\",\\\"notes\\\":\\\"Contemporary
+        dining with a focus on local ingredients.\\\"}],\\\"meals\\\":[\\\"Lunch at
+        The Pavilion\\\",\\\"Dinner at Atticus Finch\\\"],\\\"accommodation\\\":\\\"Novotel
+        Rotorua Lakeside\\\"},{\\\"day_number\\\":4,\\\"date\\\":\\\"2023-10-04\\\",\\\"title\\\":\\\"Adventure
+        in Rotorua\\\",\\\"activities\\\":[{\\\"time\\\":\\\"8:00 AM\\\",\\\"activity\\\":\\\"Breakfast
+        at your hotel\\\",\\\"location\\\":\\\"Novotel Rotorua Lakeside\\\",\\\"notes\\\":\\\"Fuel
+        up for the day.\\\"},{\\\"time\\\":\\\"9:30 AM\\\",\\\"activity\\\":\\\"Visit
+        Wai-O-Tapu Thermal Wonderland\\\",\\\"location\\\":\\\"Rotorua\\\",\\\"notes\\\":\\\"See
+        colorful geothermal pools.\\\"},{\\\"time\\\":\\\"12:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at Lady Jane's Ice Cream Parlour\\\",\\\"location\\\":\\\"Rotorua\\\",\\\"notes\\\":\\\"A
+        sweet treat and light lunch.\\\"},{\\\"time\\\":\\\"1:30 PM\\\",\\\"activity\\\":\\\"Explore
+        Redwoods Treewalk\\\",\\\"location\\\":\\\"Rotorua\\\",\\\"notes\\\":\\\"Walk
+        among the towering redwoods.\\\"},{\\\"time\\\":\\\"6:00 PM\\\",\\\"activity\\\":\\\"Dinner
+        at the Secret Kitchen\\\",\\\"location\\\":\\\"Rotorua\\\",\\\"notes\\\":\\\"Authentic
+        Asian fusion food.\\\"}],\\\"meals\\\":[\\\"Breakfast at hotel\\\",\\\"Lunch
+        at Lady Jane's\\\",\\\"Dinner at Secret Kitchen\\\"],\\\"accommodation\\\":\\\"Novotel
+        Rotorua Lakeside\\\"},{\\\"day_number\\\":5,\\\"date\\\":\\\"2023-10-05\\\",\\\"title\\\":\\\"Travel
+        to Wellington\\\",\\\"activities\\\":[{\\\"time\\\":\\\"8:00 AM\\\",\\\"activity\\\":\\\"Drive
+        to Wellington\\\",\\\"location\\\":\\\"Rotorua to Wellington\\\",\\\"notes\\\":\\\"Approx.
+        5-hour drive.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at Ortega Fish Shack\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Fresh
+        seafood in a cozy setting.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Visit
+        Te Papa Tongarewa\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Explore
+        New Zealand's national museum.\\\"},{\\\"time\\\":\\\"5:00 PM\\\",\\\"activity\\\":\\\"Explore
+        Cuba Street\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Check
+        out shops and street art.\\\"},{\\\"time\\\":\\\"7:00 PM\\\",\\\"activity\\\":\\\"Dinner
+        at Logan Brown\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Upscale
+        dining with a focus on local produce.\\\"}],\\\"meals\\\":[\\\"Lunch at Ortega
+        Fish Shack\\\",\\\"Dinner at Logan Brown\\\"],\\\"accommodation\\\":\\\"InterContinental
+        Wellington\\\"},{\\\"day_number\\\":6,\\\"date\\\":\\\"2023-10-06\\\",\\\"title\\\":\\\"Wellington
+        Sights\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Breakfast
+        at your hotel\\\",\\\"location\\\":\\\"InterContinental Wellington\\\",\\\"notes\\\":\\\"Enjoy
+        a hearty breakfast.\\\"},{\\\"time\\\":\\\"10:30 AM\\\",\\\"activity\\\":\\\"Visit
+        the Wellington Botanic Garden\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Take
+        the cable car up for great views.\\\"},{\\\"time\\\":\\\"1:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at The Botanist\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Healthy,
+        seasonal dishes.\\\"},{\\\"time\\\":\\\"3:00 PM\\\",\\\"activity\\\":\\\"Visit
+        Zealandia\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Discover
+        New Zealand's unique wildlife.\\\"},{\\\"time\\\":\\\"6:00 PM\\\",\\\"activity\\\":\\\"Dinner
+        at Shepherd\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Farm-to-table
+        dining experience.\\\"}],\\\"meals\\\":[\\\"Breakfast at hotel\\\",\\\"Lunch
+        at The Botanist\\\",\\\"Dinner at Shepherd\\\"],\\\"accommodation\\\":\\\"InterContinental
+        Wellington\\\"},{\\\"day_number\\\":7,\\\"date\\\":\\\"2023-10-07\\\",\\\"title\\\":\\\"Departure
+        from Wellington\\\",\\\"activities\\\":[{\\\"time\\\":\\\"9:00 AM\\\",\\\"activity\\\":\\\"Breakfast
+        at your hotel\\\",\\\"location\\\":\\\"InterContinental Wellington\\\",\\\"notes\\\":\\\"Final
+        breakfast in New Zealand.\\\"},{\\\"time\\\":\\\"10:30 AM\\\",\\\"activity\\\":\\\"Last-minute
+        shopping at Wellington Waterfront\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Pick
+        up souvenirs.\\\"},{\\\"time\\\":\\\"12:00 PM\\\",\\\"activity\\\":\\\"Lunch
+        at Sweet Mother's Kitchen\\\",\\\"location\\\":\\\"Wellington\\\",\\\"notes\\\":\\\"Casual
+        eatery with a vibrant atmosphere.\\\"},{\\\"time\\\":\\\"2:00 PM\\\",\\\"activity\\\":\\\"Check
+        out and head to airport\\\",\\\"location\\\":\\\"Wellington Airport\\\",\\\"notes\\\":\\\"Ensure
+        you arrive 2 hours prior to your flight.\\\"}],\\\"meals\\\":[\\\"Breakfast
+        at hotel\\\",\\\"Lunch at Sweet Mother's Kitchen\\\"],\\\"accommodation\\\":\\\"N/A\\\"}],\\\"travel_tips\\\":[\\\"Book
+        accommodations in advance, especially in popular areas like Auckland and Rotorua.\\\",\\\"Try
+        local delicacies such as lamb, seafood, and pavlova dessert.\\\",\\\"Rent
+        a car for flexibility in exploring the North Island.\\\"],\\\"packing_suggestions\\\":[\\\"Layers
+        of clothing to adapt to changing temperatures (12\xB0C to 22\xB0C).\\\",\\\"Comfortable
+        walking shoes for exploring cities and nature.\\\",\\\"A light rain jacket
+        or umbrella due to the forecasted rain.\\\"]}\",\"llm.completions.0.finish_reason\":\"stop\",\"llm.completions.0.role\":\"assistant\"},\"input\":\"\",\"output\":\"\"}],\"page_size\":3,\"total_results\":3,\"next_cursor\":\"1763272934506\"}}"
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 16 Nov 2025 11:10:20 GMT
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1
