@@ -805,14 +805,14 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 16 Nov 2025 11:10:24 GMT
+      - Sun, 16 Nov 2025 12:22:32 GMT
       Transfer-Encoding:
       - chunked
     status:
       code: 200
       message: OK
 - request:
-    body: '{"filters":[{"field":"service.name","operator":"equals","value":"unknown_service","value_type":"string"},{"field":"duration","operator":"greater_than","value":"5","value_type":"number"}],"logical_operator":"and","environments":["prd"],"sort_by":"timestamp","sort_order":"DESC","cursor":0,"limit":10}'
+    body: '{"filters":[{"field":"service.name","operator":"equals","value":"unknown_service","value_type":"string"},{"field":"duration","operator":"greater_than","value":"50","value_type":"number"}],"logical_operator":"and","environments":["prd"],"sort_by":"timestamp","sort_order":"DESC","cursor":0,"limit":10}'
     headers:
       accept:
       - '*/*'
@@ -821,7 +821,7 @@ interactions:
       connection:
       - keep-alive
       content-length:
-      - '361'
+      - '362'
       content-type:
       - application/json
       host:
@@ -839,7 +839,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 16 Nov 2025 11:10:24 GMT
+      - Sun, 16 Nov 2025 12:22:32 GMT
     status:
       code: 200
       message: OK
