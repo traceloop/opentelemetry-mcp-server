@@ -680,6 +680,11 @@ class TraceloopBackend(BaseBackend):
 
             spans.append(span)
 
+        # Guard against empty spans list
+        if not spans:
+            logger.error(f"Failed to convert any spans for trace {trace_id}")
+            return None
+
         # Find root span
         root_spans = [s for s in spans if not s.parent_span_id]
         root_span = root_spans[0] if root_spans else spans[0]

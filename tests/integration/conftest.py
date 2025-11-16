@@ -71,7 +71,11 @@ def filter_traceloop_timestamps(request: Request) -> Request:
         if "traceloop.com" in request.uri or "localhost:3001" in request.uri:
             # Parse the JSON body
             if request.body:
-                body_str = request.body.decode("utf-8") if isinstance(request.body, bytes) else request.body
+                body_str = (
+                    request.body.decode("utf-8")
+                    if isinstance(request.body, bytes)
+                    else request.body
+                )
                 body = json.loads(body_str)
 
                 # Remove timestamp fields
