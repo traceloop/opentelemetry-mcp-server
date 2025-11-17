@@ -3,7 +3,9 @@ name = "opentelemetry-mcp"
 version = "0.1.0"
 description = "MCP server for querying OpenTelemetry traces from LLM applications with Opentelemetry support"
 authors = [
-    {name = "Doron Kopit", email = "doron@traceloop.com"}
+    {name = "Doron Kopit", email = "doron@traceloop.com"},
+    {name = "Gal Klienman", email = "gal@traceloop.com"},
+    {name = "Nir Gazit", email = "nir@traceloop.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -16,6 +18,8 @@ dependencies = [
     "click~=8.3.0",
     "uvicorn~=0.38.0",
     "starlette~=0.50.0",
+    "opentelemetry-semantic-conventions-ai>=0.4.0",
+    "opentelemetry-semantic-conventions>=0.48b0",
 ]
 
 [project.scripts]

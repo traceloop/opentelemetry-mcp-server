@@ -4,9 +4,11 @@ import json
 from datetime import datetime
 from typing import Any
 
+from opentelemetry.semconv_ai import TraceloopSpanKindValues
 from pydantic import BaseModel
 
 from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.constants import Traceloop
 from opentelemetry_mcp.models import Filter, FilterOperator, FilterType, SpanQuery
 from opentelemetry_mcp.utils import parse_iso_timestamp
 
@@ -57,9 +59,9 @@ async def list_llm_tools(
     # Build filter for traceloop.span.kind == tool
     filters = [
         Filter(
-            field="traceloop.span.kind",
+            field=Traceloop.SPAN_KIND,
             operator=FilterOperator.EQUALS,
-            value="tool",
+            value=TraceloopSpanKindValues.TOOL.value,
             value_type=FilterType.STRING,
         )
     ]

@@ -8,6 +8,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, model_validator
 
 from .attributes import SpanAttributes, SpanEvent
+from .constants import Fields, GenAI, Service
 
 
 class FilterOperator(str, Enum):
@@ -118,7 +119,7 @@ def _convert_legacy_params_to_filters(
     if service_name:
         all_filters.append(
             Filter(
-                field="service.name",
+                field=Service.NAME,
                 operator=FilterOperator.EQUALS,
                 value=service_name,
                 value_type=FilterType.STRING,
@@ -128,7 +129,7 @@ def _convert_legacy_params_to_filters(
     if operation_name:
         all_filters.append(
             Filter(
-                field="name",
+                field=Fields.OPERATION_NAME,
                 operator=FilterOperator.EQUALS,
                 value=operation_name,
                 value_type=FilterType.STRING,
@@ -138,7 +139,7 @@ def _convert_legacy_params_to_filters(
     if min_duration_ms is not None:
         all_filters.append(
             Filter(
-                field="duration",
+                field=Fields.DURATION,
                 operator=FilterOperator.GTE,
                 value=min_duration_ms,
                 value_type=FilterType.NUMBER,
@@ -148,7 +149,7 @@ def _convert_legacy_params_to_filters(
     if max_duration_ms:
         all_filters.append(
             Filter(
-                field="duration",
+                field=Fields.DURATION,
                 operator=FilterOperator.LTE,
                 value=max_duration_ms,
                 value_type=FilterType.NUMBER,
@@ -159,7 +160,7 @@ def _convert_legacy_params_to_filters(
         if has_error:
             all_filters.append(
                 Filter(
-                    field="status",
+                    field=Fields.STATUS,
                     operator=FilterOperator.EQUALS,
                     value="ERROR",
                     value_type=FilterType.STRING,
@@ -168,7 +169,7 @@ def _convert_legacy_params_to_filters(
         else:
             all_filters.append(
                 Filter(
-                    field="status",
+                    field=Fields.STATUS,
                     operator=FilterOperator.NOT_EQUALS,
                     value="ERROR",
                     value_type=FilterType.STRING,
@@ -178,7 +179,7 @@ def _convert_legacy_params_to_filters(
     if gen_ai_system:
         all_filters.append(
             Filter(
-                field="gen_ai.system",
+                field=GenAI.SYSTEM,
                 operator=FilterOperator.EQUALS,
                 value=gen_ai_system,
                 value_type=FilterType.STRING,
@@ -188,7 +189,7 @@ def _convert_legacy_params_to_filters(
     if gen_ai_request_model:
         all_filters.append(
             Filter(
-                field="gen_ai.request.model",
+                field=GenAI.REQUEST_MODEL,
                 operator=FilterOperator.EQUALS,
                 value=gen_ai_request_model,
                 value_type=FilterType.STRING,
@@ -198,7 +199,7 @@ def _convert_legacy_params_to_filters(
     if gen_ai_response_model:
         all_filters.append(
             Filter(
-                field="gen_ai.response.model",
+                field=GenAI.RESPONSE_MODEL,
                 operator=FilterOperator.EQUALS,
                 value=gen_ai_response_model,
                 value_type=FilterType.STRING,
@@ -314,8 +315,9 @@ class LLMSpanAttributes(BaseModel):
             # Search for all gen_ai.usage.* attributes and sum numeric values
             usage_sum = 0
             attrs_dict = attrs.to_dict()
+            usage_prefix = "gen_ai.usage."
             for key, value in attrs_dict.items():
-                if key.startswith("gen_ai.usage.") and isinstance(value, int):
+                if key.startswith(usage_prefix) and isinstance(value, int):
                     usage_sum += value
 
             # If we found usage attributes, use their sum
@@ -329,7 +331,7 @@ class LLMSpanAttributes(BaseModel):
         finish_reasons = attrs.gen_ai_response_finish_reasons or attrs.llm_response_finish_reasons
         if finish_reasons is None:
             # Check if it's stored as a string in extra attributes
-            finish_reasons_raw = attrs.get("gen_ai.response.finish_reasons") or attrs.get(
+            finish_reasons_raw = attrs.get(GenAI.RESPONSE_FINISH_REASONS) or attrs.get(
                 "llm.response.finish_reasons"
             )
             if isinstance(finish_reasons_raw, str):
@@ -342,8 +344,8 @@ class LLMSpanAttributes(BaseModel):
         completion_preview = None
 
         for event in span.events:
-            if event.name == "gen_ai.content.prompt":
-                prompt_content = event.attributes.get("gen_ai.prompt.0.content")
+            if event.name == GenAI.EVENT_CONTENT_PROMPT:
+                prompt_content = event.attributes.get(GenAI.EVENT_PROMPT_CONTENT)
                 if prompt_content and isinstance(prompt_content, str):
                     prompt_preview = (
                         prompt_content[:100] + "..."
@@ -351,8 +353,8 @@ class LLMSpanAttributes(BaseModel):
                         else prompt_content
                     )
 
-            if event.name == "gen_ai.content.completion":
-                completion_content = event.attributes.get("gen_ai.completion.0.content")
+            if event.name == GenAI.EVENT_CONTENT_COMPLETION:
+                completion_content = event.attributes.get(GenAI.EVENT_COMPLETION_CONTENT)
                 if completion_content and isinstance(completion_content, str):
                     completion_preview = (
                         completion_content[:100] + "..."

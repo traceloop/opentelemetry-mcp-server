@@ -7,6 +7,7 @@ from typing import Any, Literal
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.backends.filter_engine import FilterEngine
+from opentelemetry_mcp.constants import Fields, GenAI, LegacyLLM, Service
 from opentelemetry_mcp.models import (
     Filter,
     FilterOperator,
@@ -465,8 +466,8 @@ class TraceloopBackend(BaseBackend):
         # Traceloop uses legacy llm.* naming convention instead of gen_ai.*
         if field.startswith("gen_ai."):
             # Map gen_ai.system -> llm.vendor (special case)
-            if field == "gen_ai.system":
-                field = "llm.vendor"
+            if field == GenAI.SYSTEM:
+                field = LegacyLLM.VENDOR
             else:
                 # General mapping: gen_ai.* -> llm.*
                 field = field.replace("gen_ai.", "llm.", 1)
@@ -475,15 +476,15 @@ class TraceloopBackend(BaseBackend):
             )
 
         # Map field names to Traceloop API fields
-        if field == "service.name":
-            traceloop_field = "service.name"
-        elif field == "name" or field == "operation_name":
+        if field == Service.NAME:
+            traceloop_field = Service.NAME
+        elif field == "name" or field == Fields.OPERATION_NAME:
             traceloop_field = "span_name"
-        elif field == "duration":
-            traceloop_field = "duration"
+        elif field == Fields.DURATION:
+            traceloop_field = Fields.DURATION
         elif field == "duration_ms":
-            traceloop_field = "duration"
-        elif field == "status":
+            traceloop_field = Fields.DURATION
+        elif field == Fields.STATUS:
             # Status filtering is not supported by Traceloop API - filter client-side
             logger.debug("Status filter not supported by Traceloop, will apply client-side")
             return None

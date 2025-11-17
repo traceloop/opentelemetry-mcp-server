@@ -51,7 +51,7 @@ async def search_spans(
     Returns:
         JSON string with span summaries
 
-    Example filter:
+    Example filter to find LLM tool calls:
         {
             "field": "traceloop.span.kind",
             "operator": "equals",

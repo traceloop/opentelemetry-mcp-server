@@ -4,6 +4,10 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+# Note: We import constants for documentation but must use string literals for Pydantic aliases
+# due to mypy strict mode requirements
+from .constants import GenAI, LegacyLLM, Service, Status  # noqa: F401
+
 
 class SpanAttributes(BaseModel):
     """
@@ -144,7 +148,8 @@ class SpanEvent(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     name: str = Field(
-        ..., description="Event name (e.g., 'gen_ai.content.prompt', 'gen_ai.content.completion')"
+        ...,
+        description=f"Event name (e.g., '{GenAI.EVENT_CONTENT_PROMPT}', '{GenAI.EVENT_CONTENT_COMPLETION}')",
     )
     timestamp: int = Field(..., description="Unix timestamp in nanoseconds")
     attributes: dict[str, str | int | float | bool] = Field(
