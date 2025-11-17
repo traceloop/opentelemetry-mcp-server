@@ -99,7 +99,7 @@ class TraceloopBackend(BaseBackend):
         """
         logger.debug(f"Searching traces with query: {query}")
 
-        # Get all filters (legacy + explicit)
+        # Get all filters
         all_filters = query.get_all_filters()
 
         # Separate supported and unsupported filters by operator
@@ -192,7 +192,7 @@ class TraceloopBackend(BaseBackend):
         """
         logger.debug(f"Searching spans with query: {query}")
 
-        # Get all filters (legacy + explicit)
+        # Get all filters
         all_filters = query.get_all_filters()
 
         # Separate supported and unsupported filters by operator

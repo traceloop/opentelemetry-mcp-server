@@ -28,21 +28,21 @@ async def search_traces(
 ) -> str:
     """Search for OpenTelemetry traces with optional filters.
 
-    Supports both legacy simple parameters and the new generic filter system.
+    Supports both simple parameters and the new generic filter system.
 
     Args:
         backend: Backend instance to query
-        service_name: Filter by service name (legacy parameter)
-        operation_name: Filter by operation/span name (legacy parameter)
+        service_name: Filter by service name
+        operation_name: Filter by operation/span name
         start_time: Start time (ISO 8601 format)
         end_time: End time (ISO 8601 format)
-        min_duration_ms: Minimum trace duration in milliseconds (legacy parameter)
-        max_duration_ms: Maximum trace duration in milliseconds (legacy parameter)
-        gen_ai_system: Filter by LLM provider (legacy parameter)
+        min_duration_ms: Minimum trace duration in milliseconds
+        max_duration_ms: Maximum trace duration in milliseconds
+        gen_ai_system: Filter by LLM provider
         gen_ai_request_model: Filter by requested model name
         gen_ai_response_model: Filter by actual model used
-        has_error: Filter traces with errors (legacy parameter)
-        tags: Additional tag filters as key-value pairs (legacy parameter)
+        has_error: Filter traces with errors
+        tags: Additional tag filters as key-value pairs
         filters: Generic filter conditions (list of filter objects)
         limit: Maximum number of traces to return (1-1000)
 

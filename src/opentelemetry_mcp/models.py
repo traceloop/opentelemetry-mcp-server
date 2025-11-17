@@ -82,7 +82,7 @@ class Filter(BaseModel):
         return self
 
 
-def _convert_legacy_params_to_filters(
+def _convert_params_to_filters(
     service_name: str | None = None,
     operation_name: str | None = None,
     min_duration_ms: int | None = None,
@@ -94,7 +94,7 @@ def _convert_legacy_params_to_filters(
     tags: dict[str, str] | None = None,
     explicit_filters: list[Filter] | None = None,
 ) -> list[Filter]:
-    """Convert legacy query parameters to Filter objects and combine with explicit filters.
+    """Convert query parameters to Filter objects and combine with explicit filters.
 
     This helper function is used by both TraceQuery and SpanQuery to avoid code duplication.
 
@@ -111,11 +111,11 @@ def _convert_legacy_params_to_filters(
         explicit_filters: Explicit Filter objects to append
 
     Returns:
-        Combined list of all filters (legacy converted + explicit)
+        Combined list of all filters (converted + explicit)
     """
     all_filters: list[Filter] = []
 
-    # Convert legacy parameters to filters
+    # Convert parameters to filters
     if service_name:
         all_filters.append(
             Filter(
@@ -460,7 +460,7 @@ class TraceData(BaseModel):
 class TraceQuery(BaseModel):
     """Query parameters for searching traces."""
 
-    # Legacy simple parameters (for backward compatibility)
+    # Simple parameters
     service_name: str | None = None
     operation_name: str | None = None
     start_time: datetime | None = None
@@ -471,7 +471,7 @@ class TraceQuery(BaseModel):
     limit: int = Field(default=100, ge=1, le=1000)
     has_error: bool | None = None
 
-    # Opentelemetry-specific filters (legacy)
+    # Opentelemetry-specific filters
     gen_ai_system: str | None = None  # Filter by LLM provider
     gen_ai_request_model: str | None = None  # Filter by requested model
     gen_ai_response_model: str | None = None  # Filter by actual model used
@@ -483,7 +483,7 @@ class TraceQuery(BaseModel):
     )
 
     def has_filters(self) -> bool:
-        """Check if any filters (legacy or new) are specified."""
+        """Check if any filters are specified."""
         return bool(
             self.service_name
             or self.operation_name
@@ -498,12 +498,12 @@ class TraceQuery(BaseModel):
         )
 
     def get_all_filters(self) -> list[Filter]:
-        """Convert legacy parameters to Filter objects and combine with explicit filters.
+        """Convert parameters to Filter objects and combine with explicit filters.
 
         Returns:
-            Combined list of all filters (legacy converted + explicit)
+            Combined list of all filters (converted + explicit)
         """
-        return _convert_legacy_params_to_filters(
+        return _convert_params_to_filters(
             service_name=self.service_name,
             operation_name=self.operation_name,
             min_duration_ms=self.min_duration_ms,
@@ -631,12 +631,12 @@ class SpanQuery(BaseModel):
         )
 
     def get_all_filters(self) -> list[Filter]:
-        """Convert legacy parameters to Filter objects and combine with explicit filters.
+        """Convert parameters to Filter objects and combine with explicit filters.
 
         Returns:
-            Combined list of all filters (legacy converted + explicit)
+            Combined list of all filters (converted + explicit)
         """
-        return _convert_legacy_params_to_filters(
+        return _convert_params_to_filters(
             service_name=self.service_name,
             operation_name=self.operation_name,
             min_duration_ms=self.min_duration_ms,

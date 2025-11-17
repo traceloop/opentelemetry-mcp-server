@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 # Note: We import constants for documentation but must use string literals for Pydantic aliases
 # due to mypy strict mode requirements
-from .constants import GenAI, LegacyLLM, Service, Status  # noqa: F401
+from .constants import GenAI
 
 
 class SpanAttributes(BaseModel):

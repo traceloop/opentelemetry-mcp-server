@@ -59,7 +59,7 @@ class JaegerBackend(BaseBackend):
                 "Use list_services() to see available services, then specify one with service_name parameter."
             )
 
-        # Get all filters (legacy + explicit)
+        # Get all filters (converted + explicit)
         all_filters = query.get_all_filters()
 
         # Jaeger only supports service filtering via API (via query.to_backend_params())
@@ -98,7 +98,7 @@ class JaegerBackend(BaseBackend):
         Returns:
             List of matching traces
         """
-        # Use legacy to_backend_params for now (handles service, operation, duration, time, tags)
+        # Use to_backend_params for now (handles service, operation, duration, time, tags)
         params = query.to_backend_params()
 
         logger.debug(f"Searching traces with params: {params}")
@@ -143,7 +143,7 @@ class JaegerBackend(BaseBackend):
                 "Use list_services() to see available services, then specify one with service_name parameter."
             )
 
-        # Get all filters (legacy + explicit)
+        # Get all filters (converted + explicit)
         all_filters = query.get_all_filters()
 
         # Jaeger only supports service filtering via API

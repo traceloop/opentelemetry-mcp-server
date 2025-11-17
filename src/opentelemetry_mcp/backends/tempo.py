@@ -67,7 +67,7 @@ class TempoBackend(BaseBackend):
         Raises:
             httpx.HTTPError: If API request fails
         """
-        # Get all filters (legacy + explicit)
+        # Get all filters (converted + explicit)
         all_filters = query.get_all_filters()
 
         # Separate supported and unsupported filters
@@ -153,7 +153,7 @@ class TempoBackend(BaseBackend):
         Raises:
             httpx.HTTPError: If API request fails
         """
-        # Get all filters (legacy + explicit)
+        # Get all filters (converted + explicit)
         all_filters = query.get_all_filters()
 
         # For span queries, we need to be careful about which filters to push to TraceQL
@@ -485,7 +485,7 @@ class TempoBackend(BaseBackend):
         return None
 
     def _build_traceql_query(self, query: TraceQuery) -> str:
-        """Build TraceQL query from query parameters (legacy method).
+        """Build TraceQL query from query parameters.
 
         This method is kept for backward compatibility. New code should use
         _build_traceql_from_filters with query.get_all_filters().

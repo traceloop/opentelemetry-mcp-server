@@ -151,20 +151,20 @@ async def search_traces(
 ) -> str:
     """Search for OpenTelemetry traces with filters.
 
-    Supports both simple parameters (legacy) and advanced generic filter system.
+    Supports both simple parameters and advanced generic filter system.
 
     Args:
-        service_name: Filter by service name (legacy - use filters for advanced queries)
-        operation_name: Filter by operation/span name (legacy)
+        service_name: Filter by service name (use filters for advanced queries)
+        operation_name: Filter by operation/span name
         start_time: Start time in ISO 8601 format (e.g., 2024-01-01T00:00:00Z)
         end_time: End time in ISO 8601 format
-        min_duration_ms: Minimum trace duration in milliseconds (legacy)
-        max_duration_ms: Maximum trace duration in milliseconds (legacy)
-        gen_ai_system: Filter by LLM provider (legacy - e.g., openai, anthropic)
+        min_duration_ms: Minimum trace duration in milliseconds
+        max_duration_ms: Maximum trace duration in milliseconds
+        gen_ai_system: Filter by LLM provider (e.g., openai, anthropic)
         gen_ai_request_model: Filter by requested model name (e.g., gpt-4)
         gen_ai_response_model: Filter by actual model used (e.g., gpt-4-0613)
-        has_error: Filter traces with errors (legacy)
-        tags: Additional tag filters as key-value pairs (legacy)
+        has_error: Filter traces with errors
+        tags: Additional tag filters as key-value pairs
         filters: Generic filter conditions (advanced) - list of filter objects with:
             - field: Field name in dotted notation (e.g., "gen_ai.usage.prompt_tokens")
             - operator: Comparison operator (equals, not_equals, gt, lt, gte, lte, contains,
