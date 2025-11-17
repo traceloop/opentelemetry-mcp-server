@@ -34,11 +34,7 @@ class BackendConfig(BaseModel):
     def from_env(cls) -> "BackendConfig":
         """Load configuration from environment variables."""
         backend_type = os.getenv("BACKEND_TYPE", "jaeger")
-        backend_url = os.getenv("BACKEND_URL")
-
-        if not backend_url:
-            raise ValueError("BACKEND_URL environment variable is required")
-
+        backend_url = os.getenv("BACKEND_URL", "http://localhost:16686")
         if backend_type not in ["jaeger", "tempo", "traceloop"]:
             raise ValueError(
                 f"Invalid BACKEND_TYPE: {backend_type}. Must be one of: jaeger, tempo, traceloop"

@@ -687,7 +687,9 @@ def main(
             logger.info(f"Connect clients to: http://{host}:{port}/mcp")
             mcp.run(transport="streamable-http", host=host, port=port)
         else:
-            logger.info("Starting MCP server with stdio transport")
+            logger.info(
+                f"Starting MCP server with stdio transport using Backend: {_config.backend.type} connected to: {_config.backend.url}"
+            )
             mcp.run(transport="stdio")
 
     except KeyboardInterrupt:

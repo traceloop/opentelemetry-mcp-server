@@ -1,88 +1,538 @@
-# OpenTelemetry-MCP-Server
+# OpenTelemetry MCP Server
 
-Unified MCP server for querying OpenTelemetry traces across multiple backends (Jaeger, Tempo, Traceloop, etc.), enabling AI agents to analyze distributed traces for automated debugging and observability.
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![PyPI](https://img.shields.io/pypi/v/opentelemetry-mcp)](https://pypi.org/project/opentelemetry-mcp/)
+[![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 
-An MCP (Model Context Protocol) server for querying OpenTelemetry traces from LLM applications, with specialized support for OpenLLMetry semantic conventions.
+**Query and analyze LLM traces with AI assistance.** Ask Claude to find expensive API calls, debug errors, compare model performance, or track token usage—all from your IDE.
 
+An MCP (Model Context Protocol) server that connects AI assistants to OpenTelemetry trace backends (Jaeger, Tempo, Traceloop), with specialized support for LLM observability through OpenLLMetry semantic conventions.
 
-## Features
+---
 
-- **Multiple Backend Support**: Query traces from Jaeger, Grafana Tempo, or Traceloop
-- **OpenLLMetry Integration**: Automatic parsing of `gen_ai.*` semantic conventions
-- **5 Powerful Tools**:
-  - `search_traces` - Search traces with advanced filters
-  - `get_trace` - Get complete trace details
-  - `get_llm_usage` - Aggregate token usage metrics
-  - `list_services` - List available services
-  - `find_errors` - Find traces with errors
-- **Token Usage Tracking**: Aggregate prompt/completion tokens across models and services
-- **CLI Overrides**: Configure via environment or command-line arguments
-- **Type-Safe**: Built with Pydantic for robust data validation
+## Table of Contents
 
-## Installation
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Features](#features)
+- [Configuration](#configuration)
+- [Tools Reference](#tools-reference)
+- [Example Queries](#example-queries)
+- [Common Workflows](#common-workflows)
+- [Troubleshooting](#troubleshooting)
+- [Development](#development)
+- [Support](#support)
 
-### Prerequisites
-
-- Python 3.11 or higher
-- [UV package manager](https://github.com/astral-sh/uv) (recommended) or pip
-
-### Install with UV
-
-```bash
-# Clone the repository
-cd openllmetry-mcp
-
-# Install dependencies
-uv sync
-
-# Or install in development mode
-uv pip install -e ".[dev]"
-```
-
-### Install with pip
-
-```bash
-pip install -e .
-```
+---
 
 ## Quick Start
 
-The easiest way to run the server locally is using the provided startup script:
+**No installation required!** Configure your client to run the server directly from PyPI:
 
-```bash
-# 1. Configure your backend in start_locally.sh
-# Edit the file and uncomment your preferred backend (Jaeger, Traceloop, or Tempo)
-
-# 2. Run the script
-./start_locally.sh
+```json
+// Add to claude_desktop_config.json:
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "pipx",
+      "args": ["run", "opentelemetry-mcp"],
+      "env": {
+        "BACKEND_TYPE": "jaeger",
+        "BACKEND_URL": "http://localhost:16686"
+      }
+    }
+  }
+}
 ```
 
-The script will:
+Or use `uvx` (alternative):
 
-- Auto-detect the project directory (works from anywhere)
-- Verify `uv` is installed
-- Set up your backend configuration
-- Start the MCP server in stdio mode (ready for Claude Desktop)
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "uvx",
+      "args": ["opentelemetry-mcp"],
+      "env": {
+        "BACKEND_TYPE": "jaeger",
+        "BACKEND_URL": "http://localhost:16686"
+      }
+    }
+  }
+}
+```
 
-**Supported Backends:**
+**That's it!** Ask Claude: _"Show me traces with errors from the last hour"_
 
-- **Jaeger** (local): `http://localhost:16686`
-- **Traceloop** (cloud): `https://api.traceloop.com` (requires API key)
-- **Tempo** (local): `http://localhost:3200`
+---
 
-Edit [start_locally.sh](start_locally.sh) to switch between backends or adjust configuration.
+## Installation
+
+### For End Users (Recommended)
+
+```bash
+# Run without installing (recommended)
+pipx run opentelemetry-mcp --backend jaeger --url http://localhost:16686
+
+# Or with uvx
+uvx opentelemetry-mcp --backend jaeger --url http://localhost:16686
+```
+
+This approach:
+
+- ✅ Always uses the latest version
+- ✅ No global installation needed
+- ✅ Isolated environment automatically
+- ✅ Works on all platforms
+
+### Per Client Integration
+
+<details>
+<summary><b>Claude Desktop</b></summary>
+
+Configure the MCP server in your Claude Desktop config file:
+
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+**Using pipx (recommended):**
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "pipx",
+      "args": ["run", "opentelemetry-mcp"],
+      "env": {
+        "BACKEND_TYPE": "jaeger",
+        "BACKEND_URL": "http://localhost:16686"
+      }
+    }
+  }
+}
+```
+
+**Using uvx (alternative):**
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "uvx",
+      "args": ["opentelemetry-mcp"],
+      "env": {
+        "BACKEND_TYPE": "jaeger",
+        "BACKEND_URL": "http://localhost:16686"
+      }
+    }
+  }
+}
+```
+
+**For Traceloop backend:**
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "pipx",
+      "args": ["run", "opentelemetry-mcp"],
+      "env": {
+        "BACKEND_TYPE": "traceloop",
+        "BACKEND_URL": "https://api.traceloop.com",
+        "BACKEND_API_KEY": "your_traceloop_api_key_here"
+      }
+    }
+  }
+}
+```
+
+<details>
+<summary>Using the repository instead of pipx?</summary>
+
+If you're developing locally with the cloned repository, use one of these configurations:
+
+**Option 1: Wrapper script (easy backend switching)**
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "/absolute/path/to/opentelemetry-mcp-server/start_locally.sh"
+    }
+  }
+}
+```
+
+**Option 2: UV directly (for multiple backends)**
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp-jaeger": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/opentelemetry-mcp-server",
+        "run",
+        "opentelemetry-mcp"
+      ],
+      "env": {
+        "BACKEND_TYPE": "jaeger",
+        "BACKEND_URL": "http://localhost:16686"
+      }
+    }
+  }
+}
+```
+
+</details>
+
+</details>
+
+<details>
+<summary><b>Claude Code</b></summary>
+
+Claude Code works with MCP servers configured in your Claude Desktop config. Once configured above, you can use the server with Claude Code CLI:
+
+```bash
+# Verify the server is available
+claude-code mcp list
+
+# Use Claude Code with access to your OpenTelemetry traces
+claude-code "Show me traces with errors from the last hour"
+```
+
+</details>
+
+<details>
+<summary><b>Codeium (Windsurf)</b></summary>
+
+1. Open Windsurf
+2. Navigate to **Settings → MCP Servers**
+3. Click **Add New MCP Server**
+4. Add this configuration:
+
+**Using pipx (recommended):**
+
+```json
+{
+  "opentelemetry-mcp": {
+    "command": "pipx",
+    "args": ["run", "opentelemetry-mcp"],
+    "env": {
+      "BACKEND_TYPE": "jaeger",
+      "BACKEND_URL": "http://localhost:16686"
+    }
+  }
+}
+```
+
+**Using uvx (alternative):**
+
+```json
+{
+  "opentelemetry-mcp": {
+    "command": "uvx",
+    "args": ["opentelemetry-mcp"],
+    "env": {
+      "BACKEND_TYPE": "jaeger",
+      "BACKEND_URL": "http://localhost:16686"
+    }
+  }
+}
+```
+
+<details>
+<summary>Using the repository instead?</summary>
+
+```json
+{
+  "opentelemetry-mcp": {
+    "command": "uv",
+    "args": [
+      "--directory",
+      "/absolute/path/to/opentelemetry-mcp-server",
+      "run",
+      "opentelemetry-mcp"
+    ],
+    "env": {
+      "BACKEND_TYPE": "jaeger",
+      "BACKEND_URL": "http://localhost:16686"
+    }
+  }
+}
+```
+
+</details>
+
+</details>
+
+<details>
+<summary><b>Cursor</b></summary>
+
+1. Open Cursor
+2. Navigate to **Settings → MCP**
+3. Click **Add new MCP Server**
+4. Add this configuration:
+
+**Using pipx (recommended):**
+
+```json
+{
+  "opentelemetry-mcp": {
+    "command": "pipx",
+    "args": ["run", "opentelemetry-mcp"],
+    "env": {
+      "BACKEND_TYPE": "jaeger",
+      "BACKEND_URL": "http://localhost:16686"
+    }
+  }
+}
+```
+
+**Using uvx (alternative):**
+
+```json
+{
+  "opentelemetry-mcp": {
+    "command": "uvx",
+    "args": ["opentelemetry-mcp"],
+    "env": {
+      "BACKEND_TYPE": "jaeger",
+      "BACKEND_URL": "http://localhost:16686"
+    }
+  }
+}
+```
+
+<details>
+<summary>Using the repository instead of pipx?</summary>
+
+```json
+{
+  "opentelemetry-mcp": {
+    "command": "uv",
+    "args": [
+      "--directory",
+      "/absolute/path/to/opentelemetry-mcp-server",
+      "run",
+      "opentelemetry-mcp"
+    ],
+    "env": {
+      "BACKEND_TYPE": "jaeger",
+      "BACKEND_URL": "http://localhost:16686"
+    }
+  }
+}
+```
+
+</details>
+
+</details>
+
+<details>
+<summary><b>Gemini CLI</b></summary>
+
+Configure the MCP server in your Gemini CLI config file (`~/.gemini/config.json`):
+
+**Using pipx (recommended):**
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "pipx",
+      "args": ["run", "opentelemetry-mcp"],
+      "env": {
+        "BACKEND_TYPE": "jaeger",
+        "BACKEND_URL": "http://localhost:16686"
+      }
+    }
+  }
+}
+```
+
+**Using uvx (alternative):**
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "uvx",
+      "args": ["opentelemetry-mcp"],
+      "env": {
+        "BACKEND_TYPE": "jaeger",
+        "BACKEND_URL": "http://localhost:16686"
+      }
+    }
+  }
+}
+```
+
+Then use Gemini CLI with your traces:
+
+```bash
+gemini "Analyze token usage for gpt-4 requests today"
+```
+
+<details>
+<parameter name="name">Using the repository instead?</summary>
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/opentelemetry-mcp-server",
+        "run",
+        "opentelemetry-mcp"
+      ],
+      "env": {
+        "BACKEND_TYPE": "jaeger",
+        "BACKEND_URL": "http://localhost:16686"
+      }
+    }
+  }
+}
+```
+
+</details>
+
+</details>
+
+**_Prerequisites:_**
+
+- Python 3.11 or higher
+- [pipx](https://pipx.pypa.io/) or [uv](https://github.com/astral-sh/uv) installed
+
+<details>
+<summary><b>Optional: Install globally</b></summary>
+
+If you prefer to install the command globally:
+
+```bash
+# Install with pipx
+pipx install opentelemetry-mcp
+
+# Verify
+opentelemetry-mcp --help
+
+# Upgrade
+pipx upgrade opentelemetry-mcp
+```
+
+Or with pip:
+
+```bash
+pip install opentelemetry-mcp
+```
+
+</details>
+
+## Features
+
+### Core Capabilities
+
+- **🔌 Multiple Backend Support** - Connect to Jaeger, Grafana Tempo, or Traceloop
+- **🤖 LLM-First Design** - Specialized tools for analyzing AI application traces
+- **🔍 Advanced Filtering** - Generic filter system with powerful operators
+- **📊 Token Analytics** - Track and aggregate LLM token usage across models and services
+- **⚡ Fast & Type-Safe** - Built with async Python and Pydantic validation
+
+### Tools
+
+| Tool                       | Description                         | Use Case                           |
+| -------------------------- | ----------------------------------- | ---------------------------------- |
+| `search_traces`            | Search traces with advanced filters | Find specific requests or patterns |
+| `search_spans`             | Search individual spans             | Analyze specific operations        |
+| `get_trace`                | Get complete trace details          | Deep-dive into a single trace      |
+| `get_llm_usage`            | Aggregate token usage metrics       | Track costs and usage trends       |
+| `list_services`            | List available services             | Discover what's instrumented       |
+| `find_errors`              | Find traces with errors             | Debug failures quickly             |
+| `list_llm_models`          | Discover models in use              | Track model adoption               |
+| `get_llm_model_stats`      | Get model performance stats         | Compare model efficiency           |
+| `get_llm_expensive_traces` | Find highest token usage            | Optimize costs                     |
+| `get_llm_slow_traces`      | Find slowest operations             | Improve performance                |
+
+### Backend Support Matrix
+
+| Feature          | Jaeger | Tempo | Traceloop |
+| ---------------- | :----: | :---: | :-------: |
+| Search traces    |   ✓    |   ✓   |     ✓     |
+| Advanced filters |   ✓    |   ✓   |     ✓     |
+| Span search      |  ✓\*   |   ✓   |     ✓     |
+| Token tracking   |   ✓    |   ✓   |     ✓     |
+| Error traces     |   ✓    |   ✓   |     ✓     |
+| LLM tools        |   ✓    |   ✓   |     ✓     |
+
+<sub>\* Jaeger requires `service_name` parameter for span search</sub>
+
+### For Developers
+
+If you're contributing to the project or want to make local modifications:
+
+```bash
+# Clone the repository
+git clone https://github.com/traceloop/opentelemetry-mcp-server.git
+cd opentelemetry-mcp-server
+
+# Install dependencies with UV
+uv sync
+
+# Or install in development mode with editable install
+uv pip install -e ".[dev]"
+```
+
+---
 
 ## Configuration
 
-### Environment Variables
+### Supported Backends
 
-Create a `.env` file (see `.env.example`):
+| Backend       | Type        | URL Example                 | Notes                      |
+| ------------- | ----------- | --------------------------- | -------------------------- |
+| **Jaeger**    | Local       | `http://localhost:16686`    | Popular open-source option |
+| **Tempo**     | Local/Cloud | `http://localhost:3200`     | Grafana's trace backend    |
+| **Traceloop** | Cloud       | `https://api.traceloop.com` | Requires API key           |
+
+### Quick Configuration
+
+**Option 1: Environment Variables** (Create `.env` file - see [.env.example](.env.example))
 
 ```bash
-# Backend type: jaeger, tempo, or traceloop
 BACKEND_TYPE=jaeger
+BACKEND_URL=http://localhost:16686
+```
 
-# Backend URL
+**Option 2: CLI Arguments** (Override environment)
+
+```bash
+opentelemetry-mcp --backend jaeger --url http://localhost:16686
+opentelemetry-mcp --backend traceloop --url https://api.traceloop.com --api-key YOUR_KEY
+```
+
+> **Configuration Precedence:** CLI arguments > Environment variables > Defaults
+
+<details>
+<summary><b>All Configuration Options</b></summary>
+
+| Variable               | Type    | Default  | Description                                        |
+| ---------------------- | ------- | -------- | -------------------------------------------------- |
+| `BACKEND_TYPE`         | string  | `jaeger` | Backend type: `jaeger`, `tempo`, or `traceloop`    |
+| `BACKEND_URL`          | URL     | -        | Backend API endpoint (required)                    |
+| `BACKEND_API_KEY`      | string  | -        | API key (required for Traceloop)                   |
+| `BACKEND_TIMEOUT`      | integer | `30`     | Request timeout in seconds                         |
+| `LOG_LEVEL`            | string  | `INFO`   | Logging level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
+| `MAX_TRACES_PER_QUERY` | integer | `100`    | Maximum traces to return per query (1-1000)        |
+
+**Complete `.env` example:**
+
+```bash
+# Backend configuration
+BACKEND_TYPE=jaeger
 BACKEND_URL=http://localhost:16686
 
 # Optional: API key (mainly for Traceloop)
@@ -98,23 +548,26 @@ LOG_LEVEL=INFO
 MAX_TRACES_PER_QUERY=100
 ```
 
-### Backend-Specific Configuration
+</details>
 
-#### Jaeger
+<details>
+<summary><b>Backend-Specific Setup</b></summary>
+
+### Jaeger
 
 ```bash
 BACKEND_TYPE=jaeger
 BACKEND_URL=http://localhost:16686
 ```
 
-#### Grafana Tempo
+### Grafana Tempo
 
 ```bash
 BACKEND_TYPE=tempo
 BACKEND_URL=http://localhost:3200
 ```
 
-#### Traceloop
+### Traceloop
 
 ```bash
 BACKEND_TYPE=traceloop
@@ -122,16 +575,11 @@ BACKEND_URL=https://api.traceloop.com/v2
 BACKEND_API_KEY=your_api_key_here
 ```
 
-**Note**: The API key contains the project information. The backend uses a hardcoded project slug of `"default"` and Traceloop resolves the actual project and environment from the API key.
+> **Note:** The API key contains project information. The backend uses a project slug of `"default"` and Traceloop resolves the actual project/environment from the API key.
 
-### CLI Overrides
+</details>
 
-You can override environment variables with CLI arguments:
-
-```bash
-openllmetry-mcp --backend jaeger --url http://localhost:16686
-openllmetry-mcp --backend traceloop --url https://api.traceloop.com --api-key YOUR_KEY
-```
+---
 
 ## Usage
 
@@ -154,12 +602,17 @@ For advanced use cases or custom configurations, you can run the server manually
 Start the MCP server with stdio transport for local/Claude Desktop integration:
 
 ```bash
-openllmetry-mcp
-# or with UV
-uv run openllmetry-mcp
+# If installed with pipx/pip
+opentelemetry-mcp
 
-# With backend override
-uv run openllmetry-mcp --backend jaeger --url http://localhost:16686
+# If running from cloned repository with UV
+uv run opentelemetry-mcp
+
+# With backend override (pipx/pip)
+opentelemetry-mcp --backend jaeger --url http://localhost:16686
+
+# With backend override (UV)
+uv run opentelemetry-mcp --backend jaeger --url http://localhost:16686
 ```
 
 #### HTTP Transport (for Network Access)
@@ -167,14 +620,17 @@ uv run openllmetry-mcp --backend jaeger --url http://localhost:16686
 Start the MCP server with HTTP/SSE transport for remote access:
 
 ```bash
-# Start HTTP server on default port 8000
-openllmetry-mcp --transport http
+# If installed with pipx/pip
+opentelemetry-mcp --transport http
 
-# Or with UV
-uv run openllmetry-mcp --transport http
+# If running from cloned repository with UV
+uv run opentelemetry-mcp --transport http
 
-# Specify custom host and port
-uv run openllmetry-mcp --transport http --host 127.0.0.1 --port 9000
+# Specify custom host and port (pipx/pip)
+opentelemetry-mcp --transport http --host 127.0.0.1 --port 9000
+
+# With UV
+uv run opentelemetry-mcp --transport http --host 127.0.0.1 --port 9000
 ```
 
 The HTTP server will be accessible at `http://localhost:8000/sse` by default.
@@ -183,160 +639,6 @@ The HTTP server will be accessible at `http://localhost:8000/sse` by default.
 
 - **stdio transport**: Local use, Claude Desktop integration, single process
 - **HTTP transport**: Remote access, multiple clients, network deployment, sample applications
-
-### Integrating with Claude Desktop
-
-Configure the MCP server in your Claude Desktop config file:
-
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-#### Why Two Configuration Approaches?
-
-This server supports **3 different backends** (Jaeger, Tempo, Traceloop). We provide two integration methods to suit different use cases:
-
-- **Wrapper Script** (`start_locally.sh`) → Easy backend switching for development/testing
-- **Direct Configuration** → Standard MCP pattern, better for production or single-backend setups
-
-Choose the approach that fits your workflow. See [Best Practices](#best-practices-choosing-an-approach) below for guidance.
-
-#### Option 1: Using start_locally.sh (Recommended for Development)
-
-**Best for:** Frequent backend switching, local development, testing multiple backends
-
-```json
-{
-  "mcpServers": {
-    "opentelemetry-mcp": {
-      "command": "/absolute/path/to/opentelemetry-mcp-server/start_locally.sh"
-    }
-  }
-}
-```
-
-**Pros:**
-
-- Switch backends by editing one file (`start_locally.sh`)
-- Centralized configuration
-- Includes validation (checks if `uv` is installed)
-
-**Cons:**
-
-- Requires absolute path
-- macOS/Linux only (no Windows support yet)
-
-**To switch backends:** Edit `start_locally.sh` and uncomment your preferred backend section.
-
-#### Option 2: Direct Configuration (Standard MCP Pattern)
-
-**Best for:** Production, single backend, Windows users, following MCP ecosystem conventions
-
-##### Jaeger Backend (Local)
-
-```json
-{
-  "mcpServers": {
-    "opentelemetry-mcp-jaeger": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/absolute/path/to/opentelemetry-mcp-server",
-        "run",
-        "opentelemetry-mcp"
-      ],
-      "env": {
-        "BACKEND_TYPE": "jaeger",
-        "BACKEND_URL": "http://localhost:16686"
-      }
-    }
-  }
-}
-```
-
-##### Tempo Backend (Local)
-
-```json
-{
-  "mcpServers": {
-    "opentelemetry-mcp-tempo": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/absolute/path/to/opentelemetry-mcp-server",
-        "run",
-        "opentelemetry-mcp"
-      ],
-      "env": {
-        "BACKEND_TYPE": "tempo",
-        "BACKEND_URL": "http://localhost:3200"
-      }
-    }
-  }
-}
-```
-
-##### Traceloop Backend (Cloud)
-
-```json
-{
-  "mcpServers": {
-    "opentelemetry-mcp-traceloop": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/absolute/path/to/opentelemetry-mcp-server",
-        "run",
-        "opentelemetry-mcp"
-      ],
-      "env": {
-        "BACKEND_TYPE": "traceloop",
-        "BACKEND_URL": "https://api.traceloop.com",
-        "BACKEND_API_KEY": "your_traceloop_api_key_here"
-      }
-    }
-  }
-}
-```
-
-**Pros:**
-
-- Standard MCP ecosystem pattern
-- Works on all platforms (Windows/macOS/Linux)
-- Can configure multiple backends simultaneously (use different server names)
-- No wrapper script dependency
-
-**Cons:**
-
-- Must edit JSON config to switch backends
-- Backend configuration split between script and config file
-
-**Tip:** You can configure multiple backends at once (e.g., `opentelemetry-mcp-jaeger` and `opentelemetry-mcp-tempo`) and Claude will show both as available MCP servers.
-
-### Best Practices: Choosing an Approach
-
-| Scenario                             | Recommended Approach                | Why                                          |
-| ------------------------------------ | ----------------------------------- | -------------------------------------------- |
-| **Development & Testing**            | Wrapper Script (`start_locally.sh`) | Easy to switch backends, centralized config  |
-| **Testing multiple backends**        | Wrapper Script                      | Edit one file to switch, no JSON editing     |
-| **Production deployment**            | Direct Configuration                | Standard MCP pattern, explicit configuration |
-| **Single backend only**              | Direct Configuration                | Simpler, no wrapper needed                   |
-| **Windows users**                    | Direct Configuration                | Wrapper script not yet supported on Windows  |
-| **macOS/Linux users**                | Either approach                     | Choose based on your workflow                |
-| **Multiple backends simultaneously** | Direct Configuration                | Configure all backends with different names  |
-| **Shared team configuration**        | Direct Configuration                | More portable, follows MCP conventions       |
-
-**General Guidelines:**
-
-- **Start with the wrapper script** if you're testing different backends or doing local development
-- **Switch to direct configuration** once you've settled on a backend for production use
-- **On Windows**, use direct configuration (wrapper script support coming soon)
-- **For CI/CD**, use direct configuration with environment variables
-- **For shared teams**, document the direct configuration approach for consistency
-
-**Platform Support:**
-
-- **macOS/Linux**: Both approaches fully supported
-- **Windows**: Direct configuration only (PRs welcome for `.bat`/`.ps1` wrapper scripts!)
 
 ## Tools Reference
 
@@ -440,56 +742,214 @@ Find traces with errors:
 
 ## Example Queries
 
-### Find expensive LLM operations
+### Find Expensive OpenAI Operations
 
-```
-Use search_traces to find traces from the last hour where:
-- gen_ai_system is "openai"
-- min_duration_ms is 5000
-```
+**Natural Language:** _"Show me OpenAI traces from the last hour that took longer than 5 seconds"_
 
-### Analyze token usage by model
+**Tool Call:** `search_traces`
 
-```
-Use get_llm_usage for the last 24 hours to see token usage breakdown by model
-```
-
-### Debug recent errors
-
-```
-Use find_errors to show all error traces from the last hour
+```json
+{
+  "service_name": "my-app",
+  "gen_ai_system": "openai",
+  "min_duration_ms": 5000,
+  "start_time": "2024-01-15T10:00:00Z",
+  "limit": 20
+}
 ```
 
-### Investigate a specific trace
+**Response:**
 
+```json
+{
+  "traces": [
+    {
+      "trace_id": "abc123...",
+      "service_name": "my-app",
+      "duration_ms": 8250,
+      "total_tokens": 4523,
+      "gen_ai_system": "openai",
+      "gen_ai_model": "gpt-4"
+    }
+  ],
+  "count": 1
+}
 ```
-Use get_trace with trace_id "abc123" to see all spans and LLM attributes
+
+---
+
+### Analyze Token Usage by Model
+
+**Natural Language:** _"How many tokens did we use for each model today?"_
+
+**Tool Call:** `get_llm_usage`
+
+```json
+{
+  "start_time": "2024-01-15T00:00:00Z",
+  "end_time": "2024-01-15T23:59:59Z",
+  "service_name": "my-app"
+}
 ```
 
-## OpenLLMetry Semantic Conventions
+**Response:**
 
-This server automatically parses OpenLLMetry semantic conventions:
+```json
+{
+  "summary": {
+    "total_tokens": 125430,
+    "prompt_tokens": 82140,
+    "completion_tokens": 43290,
+    "request_count": 487
+  },
+  "by_model": {
+    "gpt-4": {
+      "total_tokens": 85200,
+      "request_count": 156
+    },
+    "gpt-3.5-turbo": {
+      "total_tokens": 40230,
+      "request_count": 331
+    }
+  }
+}
+```
 
-### Supported Attributes
+---
 
-- `gen_ai.system` - Provider (openai, anthropic, cohere, etc.)
-- `gen_ai.request.model` - Requested model
-- `gen_ai.response.model` - Actual model used
-- `gen_ai.operation.name` - Operation type (chat, completion, embedding)
-- `gen_ai.request.temperature` - Temperature parameter
-- `gen_ai.request.top_p` - Top-p parameter
-- `gen_ai.request.max_tokens` - Max tokens
-- `gen_ai.usage.prompt_tokens` - Input tokens (also supports `input_tokens` for Anthropic)
-- `gen_ai.usage.completion_tokens` - Output tokens (also supports `output_tokens` for Anthropic)
-- `gen_ai.usage.total_tokens` - Total tokens
+### Find Traces with Errors
 
-### Provider Compatibility
+**Natural Language:** _"Show me all errors from the last hour"_
 
-The server handles different token naming conventions:
+**Tool Call:** `find_errors`
 
-- **OpenAI**: `prompt_tokens`, `completion_tokens`
-- **Anthropic**: `input_tokens`, `output_tokens`
-- **Others**: Falls back to standard OpenLLMetry names
+```json
+{
+  "start_time": "2024-01-15T14:00:00Z",
+  "service_name": "my-app",
+  "limit": 10
+}
+```
+
+**Response:**
+
+```json
+{
+  "errors": [
+    {
+      "trace_id": "def456...",
+      "service_name": "my-app",
+      "error_message": "RateLimitError: Too many requests",
+      "error_type": "openai.error.RateLimitError",
+      "timestamp": "2024-01-15T14:23:15Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+---
+
+### Compare Model Performance
+
+**Natural Language:** _"What's the performance difference between GPT-4 and Claude?"_
+
+**Tool Call 1:** `get_llm_model_stats` for gpt-4
+
+```json
+{
+  "model_name": "gpt-4",
+  "start_time": "2024-01-15T00:00:00Z"
+}
+```
+
+**Tool Call 2:** `get_llm_model_stats` for claude-3-opus
+
+```json
+{
+  "model_name": "claude-3-opus-20240229",
+  "start_time": "2024-01-15T00:00:00Z"
+}
+```
+
+---
+
+### Investigate High Token Usage
+
+**Natural Language:** _"Which requests used the most tokens today?"_
+
+**Tool Call:** `get_llm_expensive_traces`
+
+```json
+{
+  "limit": 10,
+  "start_time": "2024-01-15T00:00:00Z",
+  "min_tokens": 5000
+}
+```
+
+---
+
+## Common Workflows
+
+### Cost Optimization
+
+1. **Identify expensive operations:**
+
+   ```
+   Use get_llm_expensive_traces to find high-token requests
+   ```
+
+2. **Analyze by model:**
+
+   ```
+   Use get_llm_usage to see which models are costing the most
+   ```
+
+3. **Investigate specific traces:**
+   ```
+   Use get_trace with the trace_id to see exact prompts/responses
+   ```
+
+### Performance Debugging
+
+1. **Find slow operations:**
+
+   ```
+   Use get_llm_slow_traces to identify latency issues
+   ```
+
+2. **Check for errors:**
+
+   ```
+   Use find_errors to see failure patterns
+   ```
+
+3. **Analyze finish reasons:**
+   ```
+   Use get_llm_model_stats to see if responses are being truncated
+   ```
+
+### Model Adoption Tracking
+
+1. **Discover models in use:**
+
+   ```
+   Use list_llm_models to see all models being called
+   ```
+
+2. **Compare model statistics:**
+
+   ```
+   Use get_llm_model_stats for each model to compare performance
+   ```
+
+3. **Identify shadow AI:**
+   ```
+   Look for unexpected models or services in list_llm_models results
+   ```
+
+---
 
 ## Development
 
@@ -536,7 +996,7 @@ Make sure your API key is set correctly:
 ```bash
 export BACKEND_API_KEY=your_key_here
 # Or use --api-key CLI flag
-openllmetry-mcp --api-key your_key_here
+opentelemetry-mcp --api-key your_key_here
 ```
 
 ### No Traces Found
@@ -584,5 +1044,6 @@ Apache 2.0 License - see LICENSE file for details
 
 For issues and questions:
 
-- GitHub Issues: https://github.com/yourusername/openllmetry-mcp/issues
+- GitHub Issues: https://github.com/traceloop/opentelemetry-mcp-server/issues
+- PyPI Package: https://pypi.org/project/opentelemetry-mcp/
 - Traceloop Community: https://traceloop.com/slack
