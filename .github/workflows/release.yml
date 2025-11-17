@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  workflow_dispatch:  # Manual trigger via GitHub Actions UI
+
+permissions:
+  contents: write      # Required for pushing commits, tags, and creating releases
+  id-token: write      # Required for PyPI OIDC (Trusted Publishing)
+
+jobs:
+  bump-version:
+    name: Bump Version & Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.cz.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history required for Commitizen
+          token: ${{ secrets.GH_ACCESS_TOKEN }}  # Use PAT for pushing
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Commitizen
+        run: pip install commitizen
+
+      - name: Bump version
+        id: cz
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          changelog_increment_filename: body.md
+
+      - name: Print version info
+        run: |
+          echo "New version: ${{ steps.cz.outputs.version }}"
+          echo "Version bump: ${{ steps.cz.outputs.version }}"
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
+        run: |
+          gh release create "${{ steps.cz.outputs.version }}" \
+            --title "Release ${{ steps.cz.outputs.version }}" \
+            --notes-file "body.md"
+
+  build-and-publish:
+    name: Build and Publish to PyPI
+    needs: bump-version
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for PyPI OIDC
+    steps:
+      - name: Checkout code (with new version)
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Get the version-bumped code
+
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build package
+        run: |
+          uv build --wheel --sdist
+          ls -lh dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # No credentials needed - uses OIDC/Trusted Publishing!
+
+  test-installation:
+    name: Test PyPI Installation
+    needs: [bump-version, build-and-publish]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Wait for package availability
+        run: sleep 60  # Wait for PyPI to index the package
+
+      - name: Test installation from PyPI
+        run: |
+          pip install opentelemetry-mcp==${{ needs.bump-version.outputs.new_version }}
+          python -c "import opentelemetry_mcp; print(f'Installed version: {opentelemetry_mcp.__version__}')"
+          opentelemetry-mcp --help
+
+      - name: Installation successful
+        run: echo "✅ Package successfully published and verified on PyPI!"

@@ -8,7 +8,33 @@ authors = [
     {name = "Nir Gazit", email = "nir@traceloop.com"}
 ]
 readme = "README.md"
+license = {text = ""Apache-2.0"}
 requires-python = ">=3.11"
+keywords = [
+    "mcp",
+    "opentelemetry",
+    "observability",
+    "tracing",
+    "llm",
+    "model-context-protocol",
+    "debugging",
+    "telemetry",
+    "jaeger",
+    "tempo",
+    "traceloop"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: System :: Monitoring",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: "Apache-2.0 License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Framework :: FastAPI",
+]
 dependencies = [
     "mcp~=1.20.0",
     "fastmcp~=2.13.0",
@@ -21,6 +47,13 @@ dependencies = [
     "opentelemetry-semantic-conventions-ai>=0.4.0",
     "opentelemetry-semantic-conventions>=0.48b0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/traceloop/opentelemetry-mcp-server"
+Documentation = "https://github.com/traceloop/opentelemetry-mcp-server#readme"
+Repository = "https://github.com/traceloop/opentelemetry-mcp-server"
+Issues = "https://github.com/traceloop/opentelemetry-mcp-server/issues"
+Changelog = "https://github.com/traceloop/opentelemetry-mcp-server/blob/main/CHANGELOG.md"
 
 [project.scripts]
 opentelemetry-mcp = "opentelemetry_mcp.server:main"

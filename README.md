@@ -1,4 +1,5 @@
 # OpenTelemetry-MCP-Server
+
 Unified MCP server for querying OpenTelemetry traces across multiple backends (Jaeger, Tempo, Traceloop, etc.), enabling AI agents to analyze distributed traces for automated debugging and observability.
 
 An MCP (Model Context Protocol) server for querying OpenTelemetry traces from LLM applications, with specialized support for OpenLLMetry semantic conventions.
@@ -56,12 +57,14 @@ The easiest way to run the server locally is using the provided startup script:
 ```
 
 The script will:
+
 - Auto-detect the project directory (works from anywhere)
 - Verify `uv` is installed
 - Set up your backend configuration
 - Start the MCP server in stdio mode (ready for Claude Desktop)
 
 **Supported Backends:**
+
 - **Jaeger** (local): `http://localhost:16686`
 - **Traceloop** (cloud): `https://api.traceloop.com` (requires API key)
 - **Tempo** (local): `http://localhost:3200`
@@ -176,12 +179,14 @@ uv run openllmetry-mcp --transport http --host 127.0.0.1 --port 9000
 The HTTP server will be accessible at `http://localhost:8000/sse` by default.
 
 **Transport Use Cases:**
+
 - **stdio transport**: Local use, Claude Desktop integration, single process
 - **HTTP transport**: Remote access, multiple clients, network deployment, sample applications
 
 ### Integrating with Claude Desktop
 
 Configure the MCP server in your Claude Desktop config file:
+
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
@@ -209,11 +214,13 @@ Choose the approach that fits your workflow. See [Best Practices](#best-practice
 ```
 
 **Pros:**
+
 - Switch backends by editing one file (`start_locally.sh`)
 - Centralized configuration
 - Includes validation (checks if `uv` is installed)
 
 **Cons:**
+
 - Requires absolute path
 - macOS/Linux only (no Windows support yet)
 
@@ -291,12 +298,14 @@ Choose the approach that fits your workflow. See [Best Practices](#best-practice
 ```
 
 **Pros:**
+
 - Standard MCP ecosystem pattern
 - Works on all platforms (Windows/macOS/Linux)
 - Can configure multiple backends simultaneously (use different server names)
 - No wrapper script dependency
 
 **Cons:**
+
 - Must edit JSON config to switch backends
 - Backend configuration split between script and config file
 
@@ -304,16 +313,16 @@ Choose the approach that fits your workflow. See [Best Practices](#best-practice
 
 ### Best Practices: Choosing an Approach
 
-| Scenario | Recommended Approach | Why |
-|----------|---------------------|-----|
-| **Development & Testing** | Wrapper Script (`start_locally.sh`) | Easy to switch backends, centralized config |
-| **Testing multiple backends** | Wrapper Script | Edit one file to switch, no JSON editing |
-| **Production deployment** | Direct Configuration | Standard MCP pattern, explicit configuration |
-| **Single backend only** | Direct Configuration | Simpler, no wrapper needed |
-| **Windows users** | Direct Configuration | Wrapper script not yet supported on Windows |
-| **macOS/Linux users** | Either approach | Choose based on your workflow |
-| **Multiple backends simultaneously** | Direct Configuration | Configure all backends with different names |
-| **Shared team configuration** | Direct Configuration | More portable, follows MCP conventions |
+| Scenario                             | Recommended Approach                | Why                                          |
+| ------------------------------------ | ----------------------------------- | -------------------------------------------- |
+| **Development & Testing**            | Wrapper Script (`start_locally.sh`) | Easy to switch backends, centralized config  |
+| **Testing multiple backends**        | Wrapper Script                      | Edit one file to switch, no JSON editing     |
+| **Production deployment**            | Direct Configuration                | Standard MCP pattern, explicit configuration |
+| **Single backend only**              | Direct Configuration                | Simpler, no wrapper needed                   |
+| **Windows users**                    | Direct Configuration                | Wrapper script not yet supported on Windows  |
+| **macOS/Linux users**                | Either approach                     | Choose based on your workflow                |
+| **Multiple backends simultaneously** | Direct Configuration                | Configure all backends with different names  |
+| **Shared team configuration**        | Direct Configuration                | More portable, follows MCP conventions       |
 
 **General Guidelines:**
 
@@ -348,6 +357,7 @@ Search for traces with flexible filtering:
 ```
 
 **Parameters:**
+
 - `service_name` - Filter by service
 - `operation_name` - Filter by operation
 - `start_time` / `end_time` - ISO 8601 timestamps
@@ -371,6 +381,7 @@ Get complete trace details including all spans and OpenLLMetry attributes:
 ```
 
 **Returns:** Full trace tree with:
+
 - All spans with attributes
 - Parsed OpenLLMetry data for LLM spans
 - Token usage per span
@@ -391,6 +402,7 @@ Get aggregated token usage metrics:
 ```
 
 **Returns:** Aggregated metrics with:
+
 - Total prompt/completion/total tokens
 - Breakdown by model
 - Breakdown by service
@@ -419,6 +431,7 @@ Find traces with errors:
 ```
 
 **Returns:** Error traces with:
+
 - Error messages and types
 - Stack traces (truncated)
 - LLM-specific error info
@@ -584,7 +597,7 @@ Contributions are welcome! Please ensure:
 
 ## License
 
-MIT License - see LICENSE file for details
+Apache 2.0 License - see LICENSE file for details
 
 ## Related Projects
 
@@ -595,5 +608,6 @@ MIT License - see LICENSE file for details
 ## Support
 
 For issues and questions:
+
 - GitHub Issues: https://github.com/yourusername/openllmetry-mcp/issues
 - Traceloop Community: https://traceloop.com/slack

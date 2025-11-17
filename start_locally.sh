@@ -24,10 +24,13 @@ fi
 # Uncomment and configure ONE of the backends below:
 
 ## Jaeger (local)
-export BACKEND_TYPE="jaeger"
-export BACKEND_URL="http://localhost:16686"
+# export BACKEND_TYPE="jaeger"
+# export BACKEND_URL="http://localhost:16686"
 
 ## Traceloop (cloud)
+export BACKEND_TYPE="traceloop"
+export BACKEND_URL="https://api-staging.traceloop.com"
+export BACKEND_API_KEY="tl_9981e7218948437584e08e7b724304d8"  # Set your API key here or via environment
 # export BACKEND_TYPE="traceloop"
 # export BACKEND_URL="https://api.traceloop.com"
 # export BACKEND_API_KEY="your-api-key-here"  # Set your API key here or via environment

@@ -1,0 +1,18 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "v$version"
+update_changelog_on_bump = true
+major_version_zero = true
+version_scheme = "pep440"
+
+# Files where Commitizen will update the version
+version_files = [
+    "pyproject.toml:version",
+    "src/opentelemetry_mcp/__init__.py:__version__"
+]
+
+# Changelog configuration
+[tool.commitizen.changelog]
+# Categorize commits by type
+file = "CHANGELOG.md"
