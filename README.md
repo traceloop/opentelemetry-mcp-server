@@ -571,7 +571,7 @@ BACKEND_URL=http://localhost:3200
 
 ```bash
 BACKEND_TYPE=traceloop
-BACKEND_URL=https://api.traceloop.com/v2
+BACKEND_URL=https://api.traceloop.com
 BACKEND_API_KEY=your_api_key_here
 ```
 
