@@ -4,6 +4,7 @@ Unified MCP server for querying OpenTelemetry traces across multiple backends (J
 
 An MCP (Model Context Protocol) server for querying OpenTelemetry traces from LLM applications, with specialized support for OpenLLMetry semantic conventions.
 
+
 ## Features
 
 - **Multiple Backend Support**: Query traces from Jaeger, Grafana Tempo, or Traceloop
@@ -516,32 +517,6 @@ uv run ruff check .
 
 # Type checking
 uv run mypy src/
-```
-
-### Project Structure
-
-```
-openllmetry-mcp/
-   src/openllmetry_mcp/
-      __init__.py
-      server.py          # Main MCP server
-      config.py          # Configuration models
-      models.py          # Data models
-      backends/          # Backend implementations
-         base.py        # Abstract interface
-         jaeger.py      # Jaeger backend
-         tempo.py       # Tempo backend
-         traceloop.py   # Traceloop backend
-      tools/             # MCP tools
-          search.py
-          trace.py
-          usage.py
-          services.py
-          errors.py
-   tests/                 # Test suite
-   pyproject.toml         # Project configuration
-   .env.example           # Example environment config
-   README.md
 ```
 
 ## Troubleshooting
