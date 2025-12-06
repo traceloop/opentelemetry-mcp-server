@@ -484,9 +484,6 @@ class DynatraceBackend(BaseBackend):
                      )
             else:
                 start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=timezone.utc)
-                     
-                    
-
             duration_ms = span_data.get("duration", span_data.get("duration_ms", 0))
             if isinstance(duration_ms, str):
                 duration_ms = float(duration_ms)
@@ -555,7 +552,7 @@ class DynatraceBackend(BaseBackend):
                     event_attrs.update(event_data["attributes"])
                 elif "fields" in event_data:
                     # Handle Jaeger-style fields
-                     for field in event_data["fields"] or []:
+                    for field in event_data["fields"] or []:
                          if isinstance(field, dict):
                              key = field.get("key")
                              value = field.get("value")
@@ -574,10 +571,10 @@ class DynatraceBackend(BaseBackend):
                             dt = dt.astimezone(timezone.utc)
                         event_timestamp = int(dt.timestamp() * 1_000_000_000)
                     except Exception:
-                      event_timestamp = 0
+                        event_timestamp = 0
                 elif isinstance(raw_ts, (int, float)):
                     # Dynatrace timestamps are typically in milliseconds; convert to nanoseconds
-                     event_timestamp = int(raw_ts * 1_000_000)
+                    event_timestamp = int(raw_ts * 1_000_000)
                 else:
                     event_timestamp = 0
                 events.append(
