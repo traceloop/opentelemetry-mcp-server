@@ -1,7 +1,7 @@
 """Dynatrace backend implementation for querying OpenTelemetry traces."""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
@@ -91,7 +91,9 @@ class DynatraceBackend(BaseBackend):
 
         # Add time range (Dynatrace uses milliseconds since epoch)
         if query.start_time:
-            params["from"] = int(query.start_time.timestamp() * 1000)
+            params["from"] = int(
+                (datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000
+            )
         else:
             # Default to last 24 hours if not specified
             params["from"] = int((datetime.now() - timedelta(days=1)).timestamp() * 1000)
@@ -99,7 +101,7 @@ class DynatraceBackend(BaseBackend):
         if query.end_time:
             params["to"] = int(query.end_time.timestamp() * 1000)
         else:
-            params["to"] = int(datetime.now().timestamp() * 1000)
+            params["to"] = int(datetime.now(timezone.utc).timestamp() * 1000)
 
         # Add service filter if available
         if query.service_name:
@@ -290,8 +292,10 @@ class DynatraceBackend(BaseBackend):
         # Search for traces in the last 24 hours to discover services
 
         params = {
-            "from": int((datetime.now() - timedelta(days=1)).timestamp() * 1000),
-            "to": int(datetime.now().timestamp() * 1000),
+            "from": int(
+                (datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000
+        ),
+            "to": int(datetime.now(timezone.utc).timestamp() * 1000),
             "limit": 1000,
         }
 
@@ -329,8 +333,10 @@ class DynatraceBackend(BaseBackend):
 
         params = {
             "service": service_name,
-            "from": int((datetime.now() - timedelta(days=1)).timestamp() * 1000),
-            "to": int(datetime.now().timestamp() * 1000),
+            "from": int(
+                (datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000
+            ),
+            "to": int(datetime.now().timestamp(timezone.utc) * 1000),
             "limit": 1000,
         }
 
@@ -417,12 +423,7 @@ class DynatraceBackend(BaseBackend):
 
             # Calculate trace duration
             start_times = [s.start_time for s in spans]
-            end_times = [
-                datetime.fromtimestamp(
-                    s.start_time.timestamp() + (s.duration_ms / 1000), tz=s.start_time.tzinfo
-                )
-                for s in spans
-            ]
+            end_times = [s.start_time + timedelta(milliseconds=s.duration_ms) for s in spans]
             trace_start = min(start_times)
             trace_end = max(end_times)
             trace_duration_ms = (trace_end - trace_start).total_seconds() * 1000
