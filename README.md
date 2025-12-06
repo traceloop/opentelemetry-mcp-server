@@ -440,7 +440,7 @@ pip install opentelemetry-mcp
 
 ### Core Capabilities
 
-- **🔌 Multiple Backend Support** - Connect to Jaeger, Grafana Tempo, or Traceloop
+- **🔌 Multiple Backend Support** - Connect to Jaeger, Grafana Tempo, Traceloop, or Dynatrace
 - **🤖 LLM-First Design** - Specialized tools for analyzing AI application traces
 - **🔍 Advanced Filtering** - Generic filter system with powerful operators
 - **📊 Token Analytics** - Track and aggregate LLM token usage across models and services
@@ -463,14 +463,14 @@ pip install opentelemetry-mcp
 
 ### Backend Support Matrix
 
-| Feature          | Jaeger | Tempo | Traceloop |
-| ---------------- | :----: | :---: | :-------: |
-| Search traces    |   ✓    |   ✓   |     ✓     |
-| Advanced filters |   ✓    |   ✓   |     ✓     |
-| Span search      |  ✓\*   |   ✓   |     ✓     |
-| Token tracking   |   ✓    |   ✓   |     ✓     |
-| Error traces     |   ✓    |   ✓   |     ✓     |
-| LLM tools        |   ✓    |   ✓   |     ✓     |
+| Feature          | Jaeger | Tempo | Traceloop | Dynatrace |
+| ---------------- | :----: | :---: | :-------: | :-------: |
+| Search traces    |   ✓    |   ✓   |     ✓     |     ✓     |
+| Advanced filters |   ✓    |   ✓   |     ✓     |     ✓     |
+| Span search      |  ✓\*   |   ✓   |     ✓     |     ✓     |
+| Token tracking   |   ✓    |   ✓   |     ✓     |     ✓     |
+| Error traces     |   ✓    |   ✓   |     ✓     |     ✓     |
+| LLM tools        |   ✓    |   ✓   |     ✓     |     ✓     |
 
 <sub>\* Jaeger requires `service_name` parameter for span search</sub>
 
@@ -496,11 +496,12 @@ uv pip install -e ".[dev]"
 
 ### Supported Backends
 
-| Backend       | Type        | URL Example                 | Notes                      |
-| ------------- | ----------- | --------------------------- | -------------------------- |
-| **Jaeger**    | Local       | `http://localhost:16686`    | Popular open-source option |
-| **Tempo**     | Local/Cloud | `http://localhost:3200`     | Grafana's trace backend    |
-| **Traceloop** | Cloud       | `https://api.traceloop.com` | Requires API key           |
+| Backend       | Type        | URL Example                              | Notes                      |
+| ------------- | ----------- | ---------------------------------------- | -------------------------- |
+| **Jaeger**    | Local       | `http://localhost:16686`                 | Popular open-source option |
+| **Tempo**     | Local/Cloud | `http://localhost:3200`                 | Grafana's trace backend    |
+| **Traceloop** | Cloud       | `https://api.traceloop.com`              | Requires API key           |
+| **Dynatrace** | Cloud       | `https://{env-id}.live.dynatrace.com`    | Requires API token         |
 
 ### Quick Configuration
 
@@ -525,7 +526,7 @@ opentelemetry-mcp --backend traceloop --url https://api.traceloop.com --api-key 
 
 | Variable               | Type    | Default  | Description                                        |
 | ---------------------- | ------- | -------- | -------------------------------------------------- |
-| `BACKEND_TYPE`         | string  | `jaeger` | Backend type: `jaeger`, `tempo`, or `traceloop`    |
+| `BACKEND_TYPE`         | string  | `jaeger` | Backend type: `jaeger`, `tempo`, `traceloop`, or `dynatrace` |
 | `BACKEND_URL`          | URL     | -        | Backend API endpoint (required)                    |
 | `BACKEND_API_KEY`      | string  | -        | API key (required for Traceloop)                   |
 | `BACKEND_TIMEOUT`      | integer | `30`     | Request timeout in seconds                         |
@@ -580,6 +581,50 @@ BACKEND_API_KEY=your_api_key_here
 ```
 
 > **Note:** The API key contains project information. The backend uses a project slug of `"default"` and Traceloop resolves the actual project/environment from the API key.
+
+### Dynatrace
+
+```bash
+BACKEND_TYPE=dynatrace
+BACKEND_URL=https://abc12345.live.dynatrace.com
+BACKEND_API_KEY=dt0c01.ABC123...
+```
+
+**Configuration Details:**
+- **BACKEND_URL**: Your Dynatrace environment URL (format: `https://{your-environment-id}.live.dynatrace.com`)
+- **BACKEND_API_KEY**: Dynatrace API token with trace read permissions
+
+**Creating a Dynatrace API Token:**
+1. Log in to your Dynatrace environment
+2. Go to **Settings** → **Integration** → **Dynatrace API**
+3. Click **Generate new token**
+4. Select scopes: **Read traces** (and optionally **Read entities** for service discovery)
+5. Copy the token and use it as `BACKEND_API_KEY`
+
+**Claude Desktop Integration Example:**
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry-mcp": {
+      "command": "pipx",
+      "args": ["run", "opentelemetry-mcp"],
+      "env": {
+        "BACKEND_TYPE": "dynatrace",
+        "BACKEND_URL": "https://abc12345.live.dynatrace.com",
+        "BACKEND_API_KEY": "dt0c01.ABC123..."
+      }
+    }
+  }
+}
+```
+
+**Troubleshooting Dynatrace Connection:**
+
+- **401 Unauthorized**: Verify your API token has the correct permissions (Read traces scope)
+- **404 Not Found**: Check that your BACKEND_URL is correct (should include environment ID)
+- **Connection Timeout**: Ensure your network can reach the Dynatrace environment
+- **No Traces Found**: Verify that OpenTelemetry traces are being sent to Dynatrace and check the time range of your queries
 
 </details>
 

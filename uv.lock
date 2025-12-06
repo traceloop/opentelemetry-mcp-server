@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "platform_python_implementation != 'PyPy'",
@@ -931,7 +931,7 @@ wheels = [
 
 [[package]]
 name = "opentelemetry-mcp"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
