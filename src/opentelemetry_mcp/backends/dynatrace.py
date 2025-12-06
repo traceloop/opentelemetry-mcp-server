@@ -195,9 +195,9 @@ class DynatraceBackend(BaseBackend):
                 f"{[(f.field, f.operator.value) for f in client_filters]}"
             )
 
-         # Convert SpanQuery to a minimal TraceQuery for Dynatrace API:
-         # use it only to bound the search window and basic scoping
-         # and rely on client-side filtering for span-level predicates.
+        # Convert SpanQuery to a minimal TraceQuery for Dynatrace API:
+        # use it only to bound the search window and basic scoping
+        # and rely on client-side filtering for span-level predicates.
         trace_query = TraceQuery(
             service_name=query.service_name,
             operation_name=query.operation_name,
