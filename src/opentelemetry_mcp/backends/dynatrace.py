@@ -91,9 +91,7 @@ class DynatraceBackend(BaseBackend):
 
         # Add time range (Dynatrace uses milliseconds since epoch)
         if query.start_time:
-            params["from"] = int(
-                (datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000
-            )
+             params["from"] = int(query.start_time.timestamp() * 1000)
         else:
             # Default to last 24 hours if not specified
             params["from"] = int((datetime.now() - timedelta(days=1)).timestamp() * 1000)
@@ -336,7 +334,7 @@ class DynatraceBackend(BaseBackend):
             "from": int(
                 (datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000
             ),
-            "to": int(datetime.now().timestamp(timezone.utc) * 1000),
+             "to": int(datetime.now(timezone.utc).timestamp() * 1000),
             "limit": 1000,
         }
 
@@ -423,7 +421,12 @@ class DynatraceBackend(BaseBackend):
 
             # Calculate trace duration
             start_times = [s.start_time for s in spans]
-            end_times = [s.start_time + timedelta(milliseconds=s.duration_ms) for s in spans]
+            end_times = [
+                datetime.fromtimestamp(
+                    s.start_time.timestamp() + (s.duration_ms / 1000), tz=s.start_time.tzinfo
+                )
+                for s in spans
+            ]
             trace_start = min(start_times)
             trace_end = max(end_times)
             trace_duration_ms = (trace_end - trace_start).total_seconds() * 1000
@@ -479,7 +482,7 @@ class DynatraceBackend(BaseBackend):
                 except Exception:
                     start_time = datetime.fromtimestamp(int(start_time_ms) / 1000)
             else:
-                start_time = datetime.fromtimestamp(start_time_ms / 1000)
+                start_time = datetime.fromtimestamp(start_time_ms / 1000, tz=timezone.utc)
 
             duration_ms = span_data.get("duration", span_data.get("duration_ms", 0))
             if isinstance(duration_ms, str):
