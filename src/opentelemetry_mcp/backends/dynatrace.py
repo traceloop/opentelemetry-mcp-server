@@ -288,7 +288,6 @@ class DynatraceBackend(BaseBackend):
 
         # Fallback: Extract services from trace search
         # Search for traces in the last 24 hours to discover services
-        from datetime import timedelta
 
         params = {
             "from": int((datetime.now() - timedelta(days=1)).timestamp() * 1000),
