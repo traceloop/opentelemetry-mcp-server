@@ -8,9 +8,7 @@ from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, Sp
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.backends.filter_engine import FilterEngine
 from opentelemetry_mcp.models import (
-    Filter,
     FilterOperator,
-    FilterType,
     SpanData,
     SpanQuery,
     TraceData,

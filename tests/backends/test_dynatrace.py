@@ -1,11 +1,12 @@
 """Unit tests for Dynatrace backend implementation."""
 
-import pytest
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from opentelemetry_mcp.backends.dynatrace import DynatraceBackend
-from opentelemetry_mcp.models import Filter, FilterOperator, FilterType, SpanQuery, TraceQuery
+from opentelemetry_mcp.models import FilterOperator, SpanQuery, TraceQuery
 
 
 class TestDynatraceBackend:
