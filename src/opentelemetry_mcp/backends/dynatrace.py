@@ -423,7 +423,7 @@ class DynatraceBackend(BaseBackend):
             start_times = [s.start_time for s in spans]
             end_times = [
                 datetime.fromtimestamp(
-                    s.start_time.timestamp() + (s.duration_ms / 1000), tz=s.start_time.tzinfo
+                    s.start_time.timestamp() + (s.duration_ms / 1000), tz=timezone.utc
                 )
                 for s in spans
             ]
