@@ -195,21 +195,15 @@ class DynatraceBackend(BaseBackend):
                 f"{[(f.field, f.operator.value) for f in client_filters]}"
             )
 
-        # Convert SpanQuery to TraceQuery for Dynatrace API
+         # Convert SpanQuery to a minimal TraceQuery for Dynatrace API:
+         # use it only to bound the search window and basic scoping
+         # and rely on client-side filtering for span-level predicates.
         trace_query = TraceQuery(
             service_name=query.service_name,
             operation_name=query.operation_name,
             start_time=query.start_time,
             end_time=query.end_time,
-            min_duration_ms=query.min_duration_ms,
-            max_duration_ms=query.max_duration_ms,
-            tags=query.tags,
             limit=query.limit * 2,  # Fetch more traces to ensure we get enough spans
-            has_error=query.has_error,
-            gen_ai_system=query.gen_ai_system,
-            gen_ai_request_model=query.gen_ai_request_model,
-            gen_ai_response_model=query.gen_ai_response_model,
-            filters=query.filters,
         )
 
         # Search traces
@@ -473,16 +467,25 @@ class DynatraceBackend(BaseBackend):
             span_id = str(span_id_raw)
             operation_name = str(operation_name_raw)
 
-            # Parse timestamps (Dynatrace uses milliseconds since epoch)
+            # Parse timestamps (Dynatrace uses milliseconds since epoch) and normalize to UTC
             start_time_ms = span_data.get("startTime", span_data.get("start_time", 0))
             if isinstance(start_time_ms, str):
-                # Try to parse ISO format
+                # Try to parse ISO format first
                 try:
                     start_time = datetime.fromisoformat(start_time_ms.replace("Z", "+00:00"))
+                    if start_time.tzinfo is None:
+                        start_time = start_time.replace(tzinfo=timezone.utc)
+                    else:
+                        start_time = start_time.astimezone(timezone.utc)
                 except Exception:
-                    start_time = datetime.fromtimestamp(int(start_time_ms) / 1000)
+                     # Fallback: treat as milliseconds since epoch
+                     start_time = datetime.fromtimestamp(
+                         int(start_time_ms) / 1000, tz=timezone.utc
+                     )
             else:
-                start_time = datetime.fromtimestamp(start_time_ms / 1000, tz=timezone.utc)
+                start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=timezone.utc)
+                     
+                    
 
             duration_ms = span_data.get("duration", span_data.get("duration_ms", 0))
             if isinstance(duration_ms, str):
@@ -539,28 +542,47 @@ class DynatraceBackend(BaseBackend):
 
             # Parse events/logs
             events: list[SpanEvent] = []
-            for event_data in span_data.get("events", span_data.get("logs", [])):
+            events_source = span_data.get("events")
+            if events_source is None:
+                events_source = span_data.get("logs", [])
+            
+            for event_data in events_source:
+                if not isinstance(event_data, dict):
+                    continue
+
                 event_attrs: dict[str, str | int | float | bool] = {}
-                if isinstance(event_data, dict):
-                    if "attributes" in event_data:
-                        event_attrs.update(event_data["attributes"])
-                    elif "fields" in event_data:
-                        # Handle Jaeger-style fields
-                        for field in event_data["fields"]:
-                            if isinstance(field, dict):
-                                key = field.get("key")
-                                value = field.get("value")
-                                if key:
-                                    event_attrs[key] = value
+                if "attributes" in event_data and isinstance(event_data["attributes"], dict):
+                    event_attrs.update(event_data["attributes"])
+                elif "fields" in event_data:
+                    # Handle Jaeger-style fields
+                     for field in event_data["fields"] or []:
+                         if isinstance(field, dict):
+                             key = field.get("key")
+                             value = field.get("value")
+                             if key:
+                                 event_attrs[key] = value
 
-                event_name = event_data.get("name", "event") if isinstance(event_data, dict) else "event"
-                event_timestamp = (
-                    event_data.get("timestamp", 0) if isinstance(event_data, dict) else 0
-                )
+                event_name = event_data.get("name", "event")
 
+                raw_ts = event_data.get("timestamp", 0)
+                if isinstance(raw_ts, str):
+                    try:
+                        dt = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
+                        if dt.tzinfo is None:
+                            dt = dt.replace(tzinfo=timezone.utc)
+                        else:
+                            dt = dt.astimezone(timezone.utc)
+                        event_timestamp = int(dt.timestamp() * 1_000_000_000)
+                    except Exception:
+                      event_timestamp = 0
+                elif isinstance(raw_ts, (int, float)):
+                    # Dynatrace timestamps are typically in milliseconds; convert to nanoseconds
+                     event_timestamp = int(raw_ts * 1_000_000)
+                else:
+                    event_timestamp = 0
                 events.append(
                     SpanEvent(
-                        name=event_name,
+                        name=str(event_name),
                         timestamp=event_timestamp,
                         attributes=event_attrs,
                     )
