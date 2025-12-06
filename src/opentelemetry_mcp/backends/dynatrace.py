@@ -94,7 +94,7 @@ class DynatraceBackend(BaseBackend):
              params["from"] = int(query.start_time.timestamp() * 1000)
         else:
             # Default to last 24 hours if not specified
-            params["from"] = int((datetime.now() - timedelta(days=1)).timestamp() * 1000)
+            params["from"] = int((datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000)
 
         if query.end_time:
             params["to"] = int(query.end_time.timestamp() * 1000)
