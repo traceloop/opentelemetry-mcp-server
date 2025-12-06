@@ -327,7 +327,6 @@ class DynatraceBackend(BaseBackend):
         logger.debug(f"Getting operations for service: {service_name}")
 
         # Search for traces from this service to discover operations
-        from datetime import timedelta
 
         params = {
             "service": service_name,
