@@ -141,16 +141,23 @@ class DynatraceBackend(BaseBackend):
                 f"results to avoid excessive API calls"
             )
 
-        for trace_result in trace_results[:max_traces_to_fetch]:
+        import asyncio
+
+        async def fetch_trace(trace_result):
             trace_id = trace_result.get("traceId") or trace_result.get("trace_id")
-            if trace_id:
-                try:
-                    # Fetch full trace details
-                    trace = await self.get_trace(str(trace_id))
-                    if trace:
-                        traces.append(trace)
-                except Exception as e:
-                    logger.warning(f"Failed to fetch trace {trace_id}: {e}")
+            if not trace_id:
+                return None
+            try:
+                return await self.get_trace(str(trace_id))
+            except Exception as e:
+                logger.warning(f"Failed to fetch trace {trace_id}: {e}")
+                return None
+        
+        trace_results_to_fetch = trace_results[:max_traces_to_fetch]
+        fetch_tasks = [fetch_trace(tr) for tr in trace_results_to_fetch]
+        fetched_traces = await asyncio.gather(*fetch_tasks)
+        traces = [t for t in fetched_traces if t is not None]
+    
 
         # Apply client-side filters
         if client_filters:
@@ -417,7 +424,9 @@ class DynatraceBackend(BaseBackend):
             start_times = [s.start_time for s in spans]
             end_times = [
                 datetime.fromtimestamp(
-                    s.start_time.timestamp() + (s.duration_ms / 1000), tz=timezone.utc
+                    (s.start_time.replace(tzinfo=timezone.utc) if s.start_time.tzinfo is None
+                     else s.start_time.astimezone(timezone.utc)).timestamp() + (s.duration_ms / 1000),
+                    tz=timezone.utc,
                 )
                 for s in spans
             ]
