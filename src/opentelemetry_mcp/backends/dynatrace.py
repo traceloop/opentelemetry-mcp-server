@@ -1,7 +1,7 @@
 """Dynatrace backend implementation for querying OpenTelemetry traces."""
 
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, UTC
 from typing import Any, Literal
 
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
@@ -94,12 +94,12 @@ class DynatraceBackend(BaseBackend):
              params["from"] = int(query.start_time.timestamp() * 1000)
         else:
             # Default to last 24 hours if not specified
-            params["from"] = int((datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000)
+            params["from"] = int((datetime.now(timezone.UTC) - timedelta(days=1)).timestamp() * 1000)
 
         if query.end_time:
             params["to"] = int(query.end_time.timestamp() * 1000)
         else:
-            params["to"] = int(datetime.now(timezone.utc).timestamp() * 1000)
+            params["to"] = int(datetime.now(timezone.UTC).timestamp() * 1000)
 
         # Add service filter if available
         if query.service_name:
@@ -292,9 +292,9 @@ class DynatraceBackend(BaseBackend):
 
         params = {
             "from": int(
-                (datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000
+                (datetime.now(timezone.UTC) - timedelta(days=1)).timestamp() * 1000
         ),
-            "to": int(datetime.now(timezone.utc).timestamp() * 1000),
+            "to": int(datetime.now(timezone.UTC).timestamp() * 1000),
             "limit": 1000,
         }
 
@@ -333,9 +333,9 @@ class DynatraceBackend(BaseBackend):
         params = {
             "service": service_name,
             "from": int(
-                (datetime.now(timezone.utc) - timedelta(days=1)).timestamp() * 1000
+                (datetime.now(timezone.UTC) - timedelta(days=1)).timestamp() * 1000
             ),
-             "to": int(datetime.now(timezone.utc).timestamp() * 1000),
+             "to": int(datetime.now(timezone.UTC).timestamp() * 1000),
             "limit": 1000,
         }
 
@@ -424,9 +424,9 @@ class DynatraceBackend(BaseBackend):
             start_times = [s.start_time for s in spans]
             end_times = [
                 datetime.fromtimestamp(
-                    (s.start_time.replace(tzinfo=timezone.utc) if s.start_time.tzinfo is None
-                     else s.start_time.astimezone(timezone.utc)).timestamp() + (s.duration_ms / 1000),
-                    tz=timezone.utc,
+                    (s.start_time.replace(tzinfo=timezone.UTC) if s.start_time.tzinfo is None
+                     else s.start_time.astimezone(timezone.UTC)).timestamp() + (s.duration_ms / 1000),
+                    tz=timezone.UTC,
                 )
                 for s in spans
             ]
@@ -483,16 +483,16 @@ class DynatraceBackend(BaseBackend):
                 try:
                     start_time = datetime.fromisoformat(start_time_ms.replace("Z", "+00:00"))
                     if start_time.tzinfo is None:
-                        start_time = start_time.replace(tzinfo=timezone.utc)
+                        start_time = start_time.replace(tzinfo=timezone.UTC)
                     else:
-                        start_time = start_time.astimezone(timezone.utc)
+                        start_time = start_time.astimezone(timezone.UTC)
                 except Exception:
                      # Fallback: treat as milliseconds since epoch
                      start_time = datetime.fromtimestamp(
-                         int(start_time_ms) / 1000, tz=timezone.utc
+                         int(start_time_ms) / 1000, tz=timezone.UTC
                      )
             else:
-                start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=timezone.utc)
+                start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=timezone.UTC)
             duration_ms = span_data.get("duration", span_data.get("duration_ms", 0))
             if isinstance(duration_ms, str):
                 duration_ms = float(duration_ms)
@@ -575,7 +575,7 @@ class DynatraceBackend(BaseBackend):
                     try:
                         dt = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
                         if dt.tzinfo is None:
-                            dt = dt.replace(tzinfo=timezone.utc)
+                            dt = dt.replace(tzinfo=timezone.UTC)
                         else:
                             dt = dt.astimezone(timezone.utc)
                         event_timestamp = int(dt.timestamp() * 1_000_000_000)
