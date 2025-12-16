@@ -493,7 +493,7 @@ class DynatraceBackend(BaseBackend):
                     else:
                         start_time = start_time.astimezone(timezone.UTC)
                 except Exception:
-                     # Fallback: treat as milliseconds since epoch
+                    # Fallback: treat as milliseconds since epoch
                      start_time = datetime.fromtimestamp(
                          int(start_time_ms) / 1000, tz=timezone.UTC
                      )
