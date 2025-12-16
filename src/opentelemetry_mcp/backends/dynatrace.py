@@ -1,7 +1,7 @@
 """Dynatrace backend implementation for querying OpenTelemetry traces."""
 
 import logging
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from typing import Any, Literal
 
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
@@ -122,8 +122,14 @@ class DynatraceBackend(BaseBackend):
         logger.debug(f"Querying Dynatrace API with params: {params}")
 
         # Query Dynatrace Trace API v2
-        # Endpoint: /api/v2/traces
-        response = await self.client.get("/api/v2/traces", params=params)
+        # Endpoint
+        response = await self.client.post(
+            "/api/v2/ql/query:execute",
+            json={
+                "query": "FETCH spans | LIMIT 50"
+            },
+        )
+
         response.raise_for_status()
 
         data = response.json()
@@ -152,12 +158,12 @@ class DynatraceBackend(BaseBackend):
             except Exception as e:
                 logger.warning(f"Failed to fetch trace {trace_id}: {e}")
                 return None
-        
+
         trace_results_to_fetch = trace_results[:max_traces_to_fetch]
         fetch_tasks = [fetch_trace(tr) for tr in trace_results_to_fetch]
         fetched_traces = await asyncio.gather(*fetch_tasks)
         traces = [t for t in fetched_traces if t is not None]
-    
+
 
         # Apply client-side filters
         if client_filters:
@@ -551,7 +557,7 @@ class DynatraceBackend(BaseBackend):
             events_source = span_data.get("events")
             if events_source is None:
                 events_source = span_data.get("logs", [])
-            
+
             for event_data in events_source:
                 if not isinstance(event_data, dict):
                     continue
@@ -577,7 +583,7 @@ class DynatraceBackend(BaseBackend):
                         if dt.tzinfo is None:
                             dt = dt.replace(tzinfo=timezone.UTC)
                         else:
-                            dt = dt.astimezone(timezone.utc)
+                            dt = dt.astimezone(UTC)
                         event_timestamp = int(dt.timestamp() * 1_000_000_000)
                     except Exception:
                         event_timestamp = 0
