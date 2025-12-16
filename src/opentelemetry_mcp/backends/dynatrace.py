@@ -49,6 +49,69 @@ class DynatraceBackend(BaseBackend):
             FilterOperator.EQUALS,  # Via query parameters
         }
 
+    def _build_dql_query(self, query: TraceQuery) -> str:
+        """Build a DQL query string from TraceQuery parameters.
+
+        Args:
+            query: Trace query parameters
+
+        Returns:
+            Complete DQL query string with all filters applied
+        """
+        dql_parts = []
+
+        # Build time range for FETCH command
+        if query.start_time:
+            from_time = query.start_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        else:
+            from_time = (datetime.now(timezone.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+        if query.end_time:
+            to_time = query.end_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        else:
+            to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+        # Start with FETCH spans and time range
+        dql_parts.append(f'FETCH spans FROM "{from_time}" TO "{to_time}"')
+
+        # Build FILTER clauses
+        filter_clauses = []
+
+        # Add service filter
+        if query.service_name:
+            escaped_service = query.service_name.replace('"', '\\"')
+            filter_clauses.append(f'service.name == "{escaped_service}"')
+
+        # Add operation filter
+        if query.operation_name:
+            escaped_operation = query.operation_name.replace('"', '\\"')
+            filter_clauses.append(f'span.name == "{escaped_operation}"')
+
+        # Add duration filters (Dynatrace DQL uses nanoseconds or duration literals)
+        if query.min_duration_ms:
+            filter_clauses.append(f"duration >= {query.min_duration_ms}ms")
+        if query.max_duration_ms:
+            filter_clauses.append(f"duration <= {query.max_duration_ms}ms")
+
+        # Add error filter
+        if query.has_error is not None:
+            if query.has_error:
+                filter_clauses.append('otel.status_code == "ERROR"')
+            else:
+                filter_clauses.append('otel.status_code != "ERROR"')
+
+        # Combine all filter clauses with AND
+        if filter_clauses:
+            combined_filters = " AND ".join(filter_clauses)
+            dql_parts.append(f"| FILTER {combined_filters}")
+
+        # Add limit
+        limit = query.limit if query.limit else 50
+        dql_parts.append(f"| LIMIT {limit}")
+
+        dql_query = " ".join(dql_parts)
+        return dql_query
+
     async def search_traces(self, query: TraceQuery) -> list[TraceData]:
         """Search for traces using Dynatrace Trace API v2.
 
@@ -84,49 +147,16 @@ class DynatraceBackend(BaseBackend):
                 f"{[(f.field, f.operator.value) for f in client_filters]}"
             )
 
-        # Build query parameters
-        params: dict[str, Any] = {
-            "limit": query.limit,
-        }
+        # Build the DQL query with all parameters incorporated
+        dql_query = self._build_dql_query(query)
 
-        # Add time range (Dynatrace uses milliseconds since epoch)
-        if query.start_time:
-             params["from"] = int(query.start_time.timestamp() * 1000)
-        else:
-            # Default to last 24 hours if not specified
-            params["from"] = int((datetime.now(timezone.UTC) - timedelta(days=1)).timestamp() * 1000)
+        logger.debug(f"Querying Dynatrace API with DQL: {dql_query}")
 
-        if query.end_time:
-            params["to"] = int(query.end_time.timestamp() * 1000)
-        else:
-            params["to"] = int(datetime.now(timezone.UTC).timestamp() * 1000)
-
-        # Add service filter if available
-        if query.service_name:
-            params["service"] = query.service_name
-
-        # Add operation filter if available
-        if query.operation_name:
-            params["operation"] = query.operation_name
-
-        # Add duration filters
-        if query.min_duration_ms:
-            params["minDuration"] = query.min_duration_ms
-        if query.max_duration_ms:
-            params["maxDuration"] = query.max_duration_ms
-
-        # Add error filter
-        if query.has_error is not None:
-            params["error"] = query.has_error
-
-        logger.debug(f"Querying Dynatrace API with params: {params}")
-
-        # Query Dynatrace Trace API v2
-        # Endpoint
+        # Query Dynatrace DQL API
         response = await self.client.post(
             "/api/v2/ql/query:execute",
             json={
-                "query": "FETCH spans | LIMIT 50"
+                "query": dql_query
             },
         )
 
@@ -139,7 +169,7 @@ class DynatraceBackend(BaseBackend):
         trace_results = data.get("traces", []) if isinstance(data, dict) else data
 
         # Limit the number of traces to fetch details for
-        max_traces_to_fetch = min(len(trace_results), 50)
+        max_traces_to_fetch = min(len(trace_results), query.limit if query.limit else 50)
 
         if len(trace_results) > max_traces_to_fetch:
             logger.warning(
@@ -295,24 +325,23 @@ class DynatraceBackend(BaseBackend):
 
         # Fallback: Extract services from trace search
         # Search for traces in the last 24 hours to discover services
+        from_time = (datetime.now(timezone.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
-        params = {
-            "from": int(
-                (datetime.now(timezone.UTC) - timedelta(days=1)).timestamp() * 1000
-        ),
-            "to": int(datetime.now(timezone.UTC).timestamp() * 1000),
-            "limit": 1000,
-        }
+        dql_query = f'FETCH spans FROM "{from_time}" TO "{to_time}" | FIELDS service.name | LIMIT 1000'
 
-        response = await self.client.get("/api/v2/traces", params=params)
+        response = await self.client.post(
+            "/api/v2/ql/query:execute",
+            json={"query": dql_query},
+        )
         response.raise_for_status()
 
         data = response.json()
-        trace_results = data.get("traces", []) if isinstance(data, dict) else data
+        trace_results = data.get("records", []) if isinstance(data, dict) else data
 
         services_set = set()
         for trace_result in trace_results:
-            service_name = trace_result.get("serviceName") or trace_result.get("service")
+            service_name = trace_result.get("service.name") or trace_result.get("serviceName") or trace_result.get("service")
             if service_name:
                 services_set.add(str(service_name))
 
@@ -334,26 +363,25 @@ class DynatraceBackend(BaseBackend):
         """
         logger.debug(f"Getting operations for service: {service_name}")
 
-        # Search for traces from this service to discover operations
+        # Build DQL query to get operations for a specific service
+        from_time = (datetime.now(timezone.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        escaped_service = service_name.replace('"', '\\"')
 
-        params = {
-            "service": service_name,
-            "from": int(
-                (datetime.now(timezone.UTC) - timedelta(days=1)).timestamp() * 1000
-            ),
-             "to": int(datetime.now(timezone.UTC).timestamp() * 1000),
-            "limit": 1000,
-        }
+        dql_query = f'FETCH spans FROM "{from_time}" TO "{to_time}" | FILTER service.name == "{escaped_service}" | FIELDS span.name | LIMIT 1000'
 
-        response = await self.client.get("/api/v2/traces", params=params)
+        response = await self.client.post(
+            "/api/v2/ql/query:execute",
+            json={"query": dql_query},
+        )
         response.raise_for_status()
 
         data = response.json()
-        trace_results = data.get("traces", []) if isinstance(data, dict) else data
+        trace_results = data.get("records", []) if isinstance(data, dict) else data
 
         operations = set()
         for trace_result in trace_results:
-            operation_name = trace_result.get("operationName") or trace_result.get("operation")
+            operation_name = trace_result.get("span.name") or trace_result.get("operationName") or trace_result.get("operation")
             if operation_name:
                 operations.add(str(operation_name))
 
@@ -616,4 +644,3 @@ class DynatraceBackend(BaseBackend):
         except Exception as e:
             logger.error(f"Error parsing span: {e}")
             return None
-
