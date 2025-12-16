@@ -71,8 +71,9 @@ class DynatraceBackend(BaseBackend):
         else:
             to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
-        # Start with FETCH spans and time range
-        dql_parts.append(f'FETCH spans FROM "{from_time}" TO "{to_time}"')
+        # Start with FETCH spans and time range using correct DQL syntax
+        # Fixed: Use 'from:' and 'to:' parameters instead of FROM/TO keywords
+        dql_parts.append(f'fetch spans, from: "{from_time}", to: "{to_time}"')
 
         # Build FILTER clauses
         filter_clauses = []
@@ -94,20 +95,21 @@ class DynatraceBackend(BaseBackend):
             filter_clauses.append(f"duration <= {query.max_duration_ms}ms")
 
         # Add error filter
+        # Fixed: Use 'request.is_failed' instead of non-existent 'otel.status_code'
         if query.has_error is not None:
             if query.has_error:
-                filter_clauses.append('otel.status_code == "ERROR"')
+                filter_clauses.append('request.is_failed == true')
             else:
-                filter_clauses.append('otel.status_code != "ERROR"')
+                filter_clauses.append('request.is_failed == false')
 
         # Combine all filter clauses with AND
         if filter_clauses:
             combined_filters = " AND ".join(filter_clauses)
-            dql_parts.append(f"| FILTER {combined_filters}")
+            dql_parts.append(f"| filter {combined_filters}")
 
         # Add limit
         limit = query.limit if query.limit else 50
-        dql_parts.append(f"| LIMIT {limit}")
+        dql_parts.append(f"| limit {limit}")
 
         dql_query = " ".join(dql_parts)
         return dql_query
@@ -328,7 +330,8 @@ class DynatraceBackend(BaseBackend):
         from_time = (datetime.now(timezone.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
-        dql_query = f'FETCH spans FROM "{from_time}" TO "{to_time}" | FIELDS service.name | LIMIT 1000'
+        # Fixed: Use correct DQL syntax with 'from:' and 'to:' parameters
+        dql_query = f'fetch spans, from: "{from_time}", to: "{to_time}" | fields service.name | limit 1000'
 
         response = await self.client.post(
             "/api/v2/ql/query:execute",
@@ -368,7 +371,8 @@ class DynatraceBackend(BaseBackend):
         to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         escaped_service = service_name.replace('"', '\\"')
 
-        dql_query = f'FETCH spans FROM "{from_time}" TO "{to_time}" | FILTER service.name == "{escaped_service}" | FIELDS span.name | LIMIT 1000'
+        # Fixed: Use correct DQL syntax with 'from:' and 'to:' parameters
+        dql_query = f'fetch spans, from: "{from_time}", to: "{to_time}" | filter service.name == "{escaped_service}" | fields span.name | limit 1000'
 
         response = await self.client.post(
             "/api/v2/ql/query:execute",
@@ -609,20 +613,17 @@ class DynatraceBackend(BaseBackend):
                     try:
                         dt = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
                         if dt.tzinfo is None:
-                            dt = dt.replace(tzinfo=timezone.UTC)
+                            event_timestamp = dt.replace(tzinfo=timezone.UTC)
                         else:
-                            dt = dt.astimezone(UTC)
-                        event_timestamp = int(dt.timestamp() * 1_000_000_000)
+                            event_timestamp = dt.astimezone(timezone.UTC)
                     except Exception:
-                        event_timestamp = 0
-                elif isinstance(raw_ts, (int, float)):
-                    # Dynatrace timestamps are typically in milliseconds; convert to nanoseconds
-                    event_timestamp = int(raw_ts * 1_000_000)
+                        event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=timezone.UTC)
                 else:
-                    event_timestamp = 0
+                    event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=timezone.UTC)
+
                 events.append(
                     SpanEvent(
-                        name=str(event_name),
+                        name=event_name,
                         timestamp=event_timestamp,
                         attributes=event_attrs,
                     )
@@ -631,14 +632,15 @@ class DynatraceBackend(BaseBackend):
             return SpanData(
                 trace_id=trace_id,
                 span_id=span_id,
-                parent_span_id=parent_span_id,
                 operation_name=operation_name,
-                service_name=str(service_name),
+                service_name=service_name,
                 start_time=start_time,
                 duration_ms=duration_ms,
                 status=status,
+                parent_span_id=parent_span_id,
                 attributes=span_attributes,
                 events=events,
+                has_error=(status == "ERROR"),
             )
 
         except Exception as e:
