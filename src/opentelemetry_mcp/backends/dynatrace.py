@@ -341,7 +341,7 @@ class DynatraceBackend(BaseBackend):
             "from": int(
                 (datetime.now(timezone.UTC) - timedelta(days=1)).timestamp() * 1000
             ),
-             "to": int(datetime.now(timezone.UTC).timestamp() * 1000),
+            "to": int(datetime.now(timezone.UTC).timestamp() * 1000),
             "limit": 1000,
         }
 
