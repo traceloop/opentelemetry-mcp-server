@@ -91,7 +91,7 @@ class DynatraceBackend(BaseBackend):
 
         # Add time range (Dynatrace uses milliseconds since epoch)
         if query.start_time:
-             params["from"] = int(query.start_time.timestamp() * 1000)
+            params["from"] = int(query.start_time.timestamp() * 1000)
         else:
             # Default to last 24 hours if not specified
             params["from"] = int((datetime.now(timezone.UTC) - timedelta(days=1)).timestamp() * 1000)
