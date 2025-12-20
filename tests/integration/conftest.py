@@ -281,3 +281,43 @@ async def traceloop_backend(
     )
     async with backend:
         yield backend
+
+
+# Dynatrace Backend Fixtures
+
+
+@pytest.fixture
+def dynatrace_url() -> str:
+    """Dynatrace backend URL - can be overridden via environment variable."""
+    return os.getenv("DYNATRACE_URL", "https://abc12345.live.dynatrace.com")
+
+
+@pytest.fixture
+def dynatrace_api_key() -> str:
+    """
+    Dynatrace API key - can be set via environment variable.
+
+    For recording new cassettes, set DYNATRACE_API_KEY env var.
+    For replaying cassettes, the key is not needed (filtered from cassettes).
+    """
+    return os.getenv("DYNATRACE_API_KEY", "test_api_key_for_replay")
+
+
+@pytest.fixture
+def dynatrace_config(dynatrace_url: str, dynatrace_api_key: str) -> BackendConfig:
+    """Dynatrace backend configuration."""
+    return BackendConfig(type="dynatrace", url=TypeAdapter(HttpUrl).validate_python(dynatrace_url), api_key=dynatrace_api_key)
+
+
+@pytest.fixture
+async def dynatrace_backend(dynatrace_config: BackendConfig) -> AsyncGenerator:
+    """
+    Dynatrace backend instance for integration testing.
+
+    Uses async context manager to properly initialize and cleanup the backend.
+    """
+    from opentelemetry_mcp.backends.dynatrace import DynatraceBackend
+
+    backend = DynatraceBackend(url=str(dynatrace_config.url), api_key=dynatrace_config.api_key, timeout=dynatrace_config.timeout)
+    async with backend:
+        yield backend

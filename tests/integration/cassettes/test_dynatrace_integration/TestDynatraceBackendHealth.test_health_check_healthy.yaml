@@ -1,0 +1,86 @@
+interactions:
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - abc12345.live.dynatrace.com
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://abc12345.live.dynatrace.com/api/v2/services
+  response:
+    body:
+      string: '{"message":"Not Found"}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 20 Dec 2025 08:32:49 GMT
+      Via:
+      - 1.1 4067594c0a7ce97995ae63e2acbcd00c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - YceIBot0wPJwaMF5E19qmTZvnINLl0oWKDK5qviWXw41oEob3dfiGA==
+      X-Amz-Cf-Pop:
+      - HYD57-P4
+      X-Cache:
+      - Error from cloudfront
+      apigw-requestid:
+      - V4PPyjidoAMEbeg=
+    status:
+      code: 404
+      message: Not Found
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      content-type:
+      - application/json
+      host:
+      - abc12345.live.dynatrace.com
+      user-agent:
+      - python-httpx/0.28.1
+    method: GET
+    uri: https://abc12345.live.dynatrace.com/api/v2/ql/query:execute?query=fetch+spans%2C+from%3A+%222025-12-19T08%3A32%3A49.000Z%22%2C+to%3A+%222025-12-20T08%3A32%3A49.000Z%22+%7C+fields+service.name+%7C+limit+1000
+  response:
+    body:
+      string: '{"message":"Not Found"}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 20 Dec 2025 08:32:50 GMT
+      Via:
+      - 1.1 4067594c0a7ce97995ae63e2acbcd00c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - wCxQNlEKSsS1_2rxhyBpKIxW9E41yTR_YDO5-fCr50199Sao2Ksk3Q==
+      X-Amz-Cf-Pop:
+      - HYD57-P4
+      X-Cache:
+      - Error from cloudfront
+      apigw-requestid:
+      - V4PP4jqOoAMEJoQ=
+    status:
+      code: 404
+      message: Not Found
+version: 1

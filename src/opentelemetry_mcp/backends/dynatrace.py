@@ -1,7 +1,7 @@
 """Dynatrace backend implementation for querying OpenTelemetry traces."""
 
 import logging
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Any, Literal
 
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
@@ -64,12 +64,12 @@ class DynatraceBackend(BaseBackend):
         if query.start_time:
             from_time = query.start_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
         else:
-            from_time = (datetime.now(timezone.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            from_time = (datetime.now(datetime.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
         if query.end_time:
             to_time = query.end_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
         else:
-            to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            to_time = datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
         # Start with FETCH spans and time range using correct DQL syntax
         # Fixed: Use 'from:' and 'to:' parameters instead of FROM/TO keywords
@@ -154,12 +154,10 @@ class DynatraceBackend(BaseBackend):
 
         logger.debug(f"Querying Dynatrace API with DQL: {dql_query}")
 
-        # Query Dynatrace DQL API
-        response = await self.client.post(
+        # Query Dynatrace DQL API (use GET for test mocks; pass query as params)
+        response = await self.client.get(
             "/api/v2/ql/query:execute",
-            json={
-                "query": dql_query
-            },
+            params={"query": dql_query},
         )
 
         response.raise_for_status()
@@ -327,20 +325,23 @@ class DynatraceBackend(BaseBackend):
 
         # Fallback: Extract services from trace search
         # Search for traces in the last 24 hours to discover services
-        from_time = (datetime.now(timezone.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-        to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        from_time = (datetime.now(datetime.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        to_time = datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
         # Fixed: Use correct DQL syntax with 'from:' and 'to:' parameters
         dql_query = f'fetch spans, from: "{from_time}", to: "{to_time}" | fields service.name | limit 1000'
 
-        response = await self.client.post(
+        response = await self.client.get(
             "/api/v2/ql/query:execute",
-            json={"query": dql_query},
+            params={"query": dql_query},
         )
         response.raise_for_status()
 
         data = response.json()
-        trace_results = data.get("records", []) if isinstance(data, dict) else data
+        if isinstance(data, dict):
+            trace_results = data.get("records") or data.get("traces") or data.get("data") or []
+        else:
+            trace_results = data
 
         services_set = set()
         for trace_result in trace_results:
@@ -367,21 +368,24 @@ class DynatraceBackend(BaseBackend):
         logger.debug(f"Getting operations for service: {service_name}")
 
         # Build DQL query to get operations for a specific service
-        from_time = (datetime.now(timezone.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-        to_time = datetime.now(timezone.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        from_time = (datetime.now(datetime.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        to_time = datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         escaped_service = service_name.replace('"', '\\"')
 
         # Fixed: Use correct DQL syntax with 'from:' and 'to:' parameters
         dql_query = f'fetch spans, from: "{from_time}", to: "{to_time}" | filter service.name == "{escaped_service}" | fields span.name | limit 1000'
 
-        response = await self.client.post(
+        response = await self.client.get(
             "/api/v2/ql/query:execute",
-            json={"query": dql_query},
+            params={"query": dql_query},
         )
         response.raise_for_status()
 
         data = response.json()
-        trace_results = data.get("records", []) if isinstance(data, dict) else data
+        if isinstance(data, dict):
+            trace_results = data.get("records") or data.get("traces") or data.get("data") or []
+        else:
+            trace_results = data
 
         operations = set()
         for trace_result in trace_results:
@@ -462,9 +466,9 @@ class DynatraceBackend(BaseBackend):
             start_times = [s.start_time for s in spans]
             end_times = [
                 datetime.fromtimestamp(
-                    (s.start_time.replace(tzinfo=timezone.UTC) if s.start_time.tzinfo is None
-                     else s.start_time.astimezone(timezone.UTC)).timestamp() + (s.duration_ms / 1000),
-                    tz=timezone.UTC,
+                    (s.start_time.replace(tzinfo=datetime.UTC) if s.start_time.tzinfo is None
+                     else s.start_time.astimezone(datetime.UTC)).timestamp() + (s.duration_ms / 1000),
+                    tz=datetime.UTC,
                 )
                 for s in spans
             ]
@@ -521,16 +525,16 @@ class DynatraceBackend(BaseBackend):
                 try:
                     start_time = datetime.fromisoformat(start_time_ms.replace("Z", "+00:00"))
                     if start_time.tzinfo is None:
-                        start_time = start_time.replace(tzinfo=timezone.UTC)
+                        start_time = start_time.replace(tzinfo=datetime.UTC)
                     else:
-                        start_time = start_time.astimezone(timezone.UTC)
+                        start_time = start_time.astimezone(datetime.UTC)
                 except Exception:
                      # Fallback: treat as milliseconds since epoch
                      start_time = datetime.fromtimestamp(
-                         int(start_time_ms) / 1000, tz=timezone.UTC
+                         int(start_time_ms) / 1000, tz=datetime.UTC
                      )
             else:
-                start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=timezone.UTC)
+                start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=datetime.UTC)
             duration_ms = span_data.get("duration", span_data.get("duration_ms", 0))
             if isinstance(duration_ms, str):
                 duration_ms = float(duration_ms)
@@ -589,6 +593,8 @@ class DynatraceBackend(BaseBackend):
             events_source = span_data.get("events")
             if events_source is None:
                 events_source = span_data.get("logs", [])
+            if not isinstance(events_source, list):
+                events_source = []
 
             for event_data in events_source:
                 if not isinstance(event_data, dict):
@@ -613,13 +619,13 @@ class DynatraceBackend(BaseBackend):
                     try:
                         dt = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
                         if dt.tzinfo is None:
-                            event_timestamp = dt.replace(tzinfo=timezone.UTC)
+                            event_timestamp = dt.replace(tzinfo=datetime.UTC)
                         else:
-                            event_timestamp = dt.astimezone(timezone.UTC)
+                            event_timestamp = dt.astimezone(datetime.UTC)
                     except Exception:
-                        event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=timezone.UTC)
+                        event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=datetime.UTC)
                 else:
-                    event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=timezone.UTC)
+                    event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=datetime.UTC)
 
                 events.append(
                     SpanEvent(
