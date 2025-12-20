@@ -1,13 +1,14 @@
 """Dynatrace backend implementation for querying OpenTelemetry traces."""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
 from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.backends.filter_engine import FilterEngine
 from opentelemetry_mcp.models import (
+    Filter,
     FilterOperator,
     SpanData,
     SpanQuery,
@@ -16,6 +17,13 @@ from opentelemetry_mcp.models import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Use datetime.UTC alias when available (preferred by ruff UP017).
+# Some Python runtimes may not expose datetime.UTC, so fall back to timezone.utc.
+try:
+    _UTC = datetime.UTC  # type: ignore[attr-defined]
+except Exception:
+    _UTC = timezone.utc  # noqa: UP017
 
 
 class DynatraceBackend(BaseBackend):
@@ -49,11 +57,13 @@ class DynatraceBackend(BaseBackend):
             FilterOperator.EQUALS,  # Via query parameters
         }
 
-    def _build_dql_query(self, query: TraceQuery) -> str:
+    def _build_dql_query(self, query: TraceQuery, native_filters: list[Filter] | None = None) -> str:
         """Build a DQL query string from TraceQuery parameters.
 
         Args:
             query: Trace query parameters
+            native_filters: Optional list of native filters that should be applied
+                directly in the DQL query (e.g. service.name equals).
 
         Returns:
             Complete DQL query string with all filters applied
@@ -64,12 +74,12 @@ class DynatraceBackend(BaseBackend):
         if query.start_time:
             from_time = query.start_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
         else:
-            from_time = (datetime.now(datetime.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            from_time = (datetime.now(_UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
         if query.end_time:
             to_time = query.end_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
         else:
-            to_time = datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            to_time = datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
         # Start with FETCH spans and time range using correct DQL syntax
         # Fixed: Use 'from:' and 'to:' parameters instead of FROM/TO keywords
@@ -102,6 +112,41 @@ class DynatraceBackend(BaseBackend):
             else:
                 filter_clauses.append('request.is_failed == false')
 
+        # Apply any native filters provided (explicit Filter objects targeting native fields)
+        if native_filters:
+            for f in native_filters:
+                try:
+                    # Service name equals
+                    if f.field in ("service.name",) and f.operator == FilterOperator.EQUALS and f.value is not None:
+                        escaped = str(f.value).replace('"', '\\"')
+                        clause = f'service.name == "{escaped}"'
+                        if clause not in filter_clauses:
+                            filter_clauses.append(clause)
+
+                    # Operation name equals
+                    elif f.field in ("operation_name", "operationName") and f.operator == FilterOperator.EQUALS and f.value is not None:
+                        escaped = str(f.value).replace('"', '\\"')
+                        clause = f'span.name == "{escaped}"'
+                        if clause not in filter_clauses:
+                            filter_clauses.append(clause)
+
+                    # Duration comparisons
+                    elif f.field == "duration":
+                        if f.operator == FilterOperator.GTE and f.value is not None:
+                            filter_clauses.append(f"duration >= {int(f.value)}ms")
+                        elif f.operator == FilterOperator.LTE and f.value is not None:
+                            filter_clauses.append(f"duration <= {int(f.value)}ms")
+
+                    # Status -> map ERROR to request.is_failed
+                    elif f.field == "status":
+                        if f.operator == FilterOperator.EQUALS and str(f.value) == "ERROR":
+                            filter_clauses.append('request.is_failed == true')
+                        elif f.operator == FilterOperator.NOT_EQUALS and str(f.value) == "ERROR":
+                            filter_clauses.append('request.is_failed == false')
+                except Exception:
+                    # Ignore malformed filters
+                    continue
+
         # Combine all filter clauses with AND
         if filter_clauses:
             combined_filters = " AND ".join(filter_clauses)
@@ -114,11 +159,12 @@ class DynatraceBackend(BaseBackend):
         dql_query = " ".join(dql_parts)
         return dql_query
 
-    async def search_traces(self, query: TraceQuery) -> list[TraceData]:
+    async def search_traces(self, query: TraceQuery, native_filters: list[Filter] | None = None) -> list[TraceData]:
         """Search for traces using Dynatrace Trace API v2.
 
         Args:
             query: Trace query parameters
+            native_filters: Optional list of native Filter objects to apply directly in the DQL query
 
         Returns:
             List of matching traces
@@ -136,11 +182,23 @@ class DynatraceBackend(BaseBackend):
         supported_fields = {"service.name"}  # Service filtering via API
         supported_operators = self.get_supported_operators()
 
-        native_filters = [
+        # Compute native-capable filters from the query
+        computed_native = [
             f
             for f in all_filters
             if f.field in supported_fields and f.operator in supported_operators
         ]
+
+        # If caller provided native filters explicitly, merge them (avoid duplicates)
+        if native_filters:
+            merged = list(native_filters)
+            for f in computed_native:
+                if f not in merged:
+                    merged.append(f)
+            native_filters = merged
+        else:
+            native_filters = computed_native
+
         client_filters = [f for f in all_filters if f not in native_filters]
 
         if client_filters:
@@ -150,7 +208,8 @@ class DynatraceBackend(BaseBackend):
             )
 
         # Build the DQL query with all parameters incorporated
-        dql_query = self._build_dql_query(query)
+        # Include native_filters so explicitly provided native Filter objects are applied to DQL
+        dql_query = self._build_dql_query(query, native_filters=native_filters)
 
         logger.debug(f"Querying Dynatrace API with DQL: {dql_query}")
 
@@ -238,6 +297,11 @@ class DynatraceBackend(BaseBackend):
                 f"{[(f.field, f.operator.value) for f in client_filters]}"
             )
 
+        # When converting SpanQuery->TraceQuery above we only used simple fields for scoping.
+        # If the caller provided span-level native filters, ensure they are passed to trace search
+        # so we can leverage Dynatrace native filtering where supported.
+        # (This is handled in search_traces when native_filters are provided.)
+
         # Convert SpanQuery to a minimal TraceQuery for Dynatrace API:
         # use it only to bound the search window and basic scoping
         # and rely on client-side filtering for span-level predicates.
@@ -247,10 +311,11 @@ class DynatraceBackend(BaseBackend):
             start_time=query.start_time,
             end_time=query.end_time,
             limit=query.limit * 2,  # Fetch more traces to ensure we get enough spans
+            filters=[f for f in query.get_all_filters() if f.field in ("service.name",)],
         )
 
-        # Search traces
-        traces = await self.search_traces(trace_query)
+        # Search traces and pass any native filters discovered for span-level queries
+        traces = await self.search_traces(trace_query, native_filters=[f for f in query.get_all_filters() if f.field in ("service.name",)])
 
         # Flatten spans from all traces
         all_spans: list[SpanData] = []
@@ -325,8 +390,8 @@ class DynatraceBackend(BaseBackend):
 
         # Fallback: Extract services from trace search
         # Search for traces in the last 24 hours to discover services
-        from_time = (datetime.now(datetime.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-        to_time = datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        from_time = (datetime.now(_UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        to_time = datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
         # Fixed: Use correct DQL syntax with 'from:' and 'to:' parameters
         dql_query = f'fetch spans, from: "{from_time}", to: "{to_time}" | fields service.name | limit 1000'
@@ -368,8 +433,8 @@ class DynatraceBackend(BaseBackend):
         logger.debug(f"Getting operations for service: {service_name}")
 
         # Build DQL query to get operations for a specific service
-        from_time = (datetime.now(datetime.UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-        to_time = datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        from_time = (datetime.now(_UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        to_time = datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
         escaped_service = service_name.replace('"', '\\"')
 
         # Fixed: Use correct DQL syntax with 'from:' and 'to:' parameters
@@ -466,9 +531,9 @@ class DynatraceBackend(BaseBackend):
             start_times = [s.start_time for s in spans]
             end_times = [
                 datetime.fromtimestamp(
-                    (s.start_time.replace(tzinfo=datetime.UTC) if s.start_time.tzinfo is None
-                     else s.start_time.astimezone(datetime.UTC)).timestamp() + (s.duration_ms / 1000),
-                    tz=datetime.UTC,
+                    (s.start_time.replace(tzinfo=_UTC) if s.start_time.tzinfo is None
+                     else s.start_time.astimezone(_UTC)).timestamp() + (s.duration_ms / 1000),
+                    tz=_UTC,
                 )
                 for s in spans
             ]
@@ -525,16 +590,16 @@ class DynatraceBackend(BaseBackend):
                 try:
                     start_time = datetime.fromisoformat(start_time_ms.replace("Z", "+00:00"))
                     if start_time.tzinfo is None:
-                        start_time = start_time.replace(tzinfo=datetime.UTC)
+                        start_time = start_time.replace(tzinfo=_UTC)
                     else:
-                        start_time = start_time.astimezone(datetime.UTC)
+                        start_time = start_time.astimezone(_UTC)
                 except Exception:
                      # Fallback: treat as milliseconds since epoch
                      start_time = datetime.fromtimestamp(
-                         int(start_time_ms) / 1000, tz=datetime.UTC
+                         int(start_time_ms) / 1000, tz=_UTC
                      )
             else:
-                start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=datetime.UTC)
+                start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=_UTC)
             duration_ms = span_data.get("duration", span_data.get("duration_ms", 0))
             if isinstance(duration_ms, str):
                 duration_ms = float(duration_ms)
@@ -619,13 +684,13 @@ class DynatraceBackend(BaseBackend):
                     try:
                         dt = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
                         if dt.tzinfo is None:
-                            event_timestamp = dt.replace(tzinfo=datetime.UTC)
+                            event_timestamp = dt.replace(tzinfo=_UTC)
                         else:
-                            event_timestamp = dt.astimezone(datetime.UTC)
+                            event_timestamp = dt.astimezone(_UTC)
                     except Exception:
-                        event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=datetime.UTC)
+                        event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=_UTC)
                 else:
-                    event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=datetime.UTC)
+                    event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=_UTC)
 
                 events.append(
                     SpanEvent(

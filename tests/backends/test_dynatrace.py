@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from opentelemetry_mcp.backends.dynatrace import DynatraceBackend
-from opentelemetry_mcp.models import FilterOperator, SpanQuery, TraceQuery
+from opentelemetry_mcp.models import Filter, FilterOperator, FilterType, SpanQuery, TraceQuery
 
 
 class TestDynatraceBackend:
@@ -83,6 +83,29 @@ class TestDynatraceBackend:
 
             assert len(traces) > 0
             assert all(trace.service_name == "test-service" for trace in traces)
+
+    @pytest.mark.asyncio
+    async def test_search_traces_with_native_filter(self, backend: DynatraceBackend) -> None:
+        """Test that an explicit native filter is included in the DQL query."""
+        mock_traces_response = {"traces": []}
+
+        with patch.object(backend.client, "get") as mock_get:
+            mock_response = MagicMock()
+            mock_response.json.return_value = mock_traces_response
+            mock_response.raise_for_status = MagicMock()
+            mock_get.return_value = mock_response
+
+            # Explicit native filter that should be applied to the DQL query
+            q = TraceQuery(filters=[Filter(field="service.name", operator=FilterOperator.EQUALS, value="svc", value_type=FilterType.STRING)], limit=5)
+
+            await backend.search_traces(q)
+
+            # Inspect the first call to client.get and ensure the query param contains service filter
+            assert mock_get.call_count >= 1
+            called_args, called_kwargs = mock_get.call_args
+            params = called_kwargs.get("params") or {}
+            dql = params.get("query", "")
+            assert 'service.name == "svc"' in dql
 
     @pytest.mark.asyncio
     async def test_get_trace(self, backend: DynatraceBackend) -> None:
