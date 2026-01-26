@@ -35,7 +35,7 @@ classifiers = [
     "Framework :: FastAPI",
 ]
 dependencies = [
-    "mcp~=1.25.0",
+    "mcp>=1.25,<1.27",
     "fastmcp~=2.14.0",
     "pydantic~=2.12.0",
     "httpx~=0.28.0",
