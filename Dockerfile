@@ -28,6 +28,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Stage 2: Runtime - Minimal production image
 FROM python:3.13-slim-trixie AS runtime
 
+# Upgrade packages to get latest security patches
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copy the entire app with virtual environment from builder
 COPY --from=builder /app /app
 
