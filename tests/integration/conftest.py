@@ -198,7 +198,7 @@ def jaeger_config(jaeger_url: str) -> BackendConfig:
 
 
 @pytest.fixture
-async def jaeger_backend(jaeger_config: BackendConfig) -> AsyncGenerator[JaegerBackend, None]:
+async def jaeger_backend(jaeger_config: BackendConfig) -> AsyncGenerator[JaegerBackend]:
     """
     Jaeger backend instance for integration testing.
 
@@ -227,7 +227,7 @@ def tempo_config(tempo_url: str) -> BackendConfig:
 
 
 @pytest.fixture
-async def tempo_backend(tempo_config: BackendConfig) -> AsyncGenerator[TempoBackend, None]:
+async def tempo_backend(tempo_config: BackendConfig) -> AsyncGenerator[TempoBackend]:
     """
     Tempo backend instance for integration testing.
 
@@ -273,7 +273,7 @@ def traceloop_config(traceloop_url: str, traceloop_api_key: str) -> BackendConfi
 @pytest.fixture
 async def traceloop_backend(
     traceloop_config: BackendConfig,
-) -> AsyncGenerator[TraceloopBackend, None]:
+) -> AsyncGenerator[TraceloopBackend]:
     """
     Traceloop backend instance for integration testing.
 

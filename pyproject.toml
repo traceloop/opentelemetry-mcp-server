@@ -35,7 +35,7 @@ classifiers = [
     "Framework :: FastAPI",
 ]
 dependencies = [
-    "mcp~=1.25.0",
+    "mcp~=1.26.0",
     "fastmcp~=2.14.0",
     "pydantic~=2.12.0",
     "httpx~=0.28.0",
@@ -43,8 +43,8 @@ dependencies = [
     "click~=8.3.0",
     "uvicorn~=0.40.0",
     "starlette~=0.52.0",
-    "opentelemetry-semantic-conventions-ai>=0.4.0",
-    "opentelemetry-semantic-conventions>=0.48b0",
+    "opentelemetry-semantic-conventions-ai>=0.4.13",
+    "opentelemetry-semantic-conventions>=0.60b0",
 ]
 
 [project.urls]
@@ -76,7 +76,7 @@ dev = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
@@ -86,7 +86,7 @@ ignore = ["E501"]
 known-first-party = ["opentelemetry_mcp"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
