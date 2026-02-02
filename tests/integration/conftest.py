@@ -68,7 +68,12 @@ def filter_traceloop_timestamps(request: Request) -> Request:
     """
     try:
         # Only filter Traceloop API requests
-        if "traceloop.com" in request.uri or "localhost:3001" in request.uri:
+        # Use proper URL parsing to avoid incomplete substring matching (CWE-020)
+        parsed_uri = urlparse(request.uri)
+        hostname = parsed_uri.hostname or ""
+        is_traceloop = hostname == "traceloop.com" or hostname.endswith(".traceloop.com")
+        is_localhost = hostname == "localhost" and parsed_uri.port == 3001
+        if is_traceloop or is_localhost:
             # Parse the JSON body
             if request.body:
                 body_str = (
