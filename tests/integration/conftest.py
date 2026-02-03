@@ -68,7 +68,12 @@ def filter_traceloop_timestamps(request: Request) -> Request:
     """
     try:
         # Only filter Traceloop API requests
-        if "traceloop.com" in request.uri or "localhost:3001" in request.uri:
+        # Use proper URL parsing to avoid incomplete substring matching (CWE-020)
+        parsed_uri = urlparse(request.uri)
+        hostname = parsed_uri.hostname or ""
+        is_traceloop = hostname == "traceloop.com" or hostname.endswith(".traceloop.com")
+        is_localhost = hostname == "localhost" and parsed_uri.port == 3001
+        if is_traceloop or is_localhost:
             # Parse the JSON body
             if request.body:
                 body_str = (
@@ -193,7 +198,7 @@ def jaeger_config(jaeger_url: str) -> BackendConfig:
 
 
 @pytest.fixture
-async def jaeger_backend(jaeger_config: BackendConfig) -> AsyncGenerator[JaegerBackend, None]:
+async def jaeger_backend(jaeger_config: BackendConfig) -> AsyncGenerator[JaegerBackend]:
     """
     Jaeger backend instance for integration testing.
 
@@ -222,7 +227,7 @@ def tempo_config(tempo_url: str) -> BackendConfig:
 
 
 @pytest.fixture
-async def tempo_backend(tempo_config: BackendConfig) -> AsyncGenerator[TempoBackend, None]:
+async def tempo_backend(tempo_config: BackendConfig) -> AsyncGenerator[TempoBackend]:
     """
     Tempo backend instance for integration testing.
 
@@ -268,7 +273,7 @@ def traceloop_config(traceloop_url: str, traceloop_api_key: str) -> BackendConfi
 @pytest.fixture
 async def traceloop_backend(
     traceloop_config: BackendConfig,
-) -> AsyncGenerator[TraceloopBackend, None]:
+) -> AsyncGenerator[TraceloopBackend]:
     """
     Traceloop backend instance for integration testing.
 

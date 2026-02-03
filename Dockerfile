@@ -1,7 +1,7 @@
 # Multi-stage build for OpenTelemetry MCP Server
 
 # Stage 1: Builder with official UV image
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
+FROM ghcr.io/astral-sh/uv:0.9.27-python3.13-trixie-slim AS builder
 
 # Enable bytecode compilation for faster startup and use copy mode
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
@@ -26,7 +26,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 # Stage 2: Runtime - Minimal production image
-FROM python:3.12-slim-bookworm AS runtime
+FROM python:3.13-slim-trixie AS runtime
+
+# Upgrade packages to get latest security patches
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the entire app with virtual environment from builder
 COPY --from=builder /app /app
