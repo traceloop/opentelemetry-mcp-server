@@ -74,6 +74,7 @@ jobs:
                   context: .
                   load: true
                   push: false
+                  tags: opentelemetry-mcp-server:${{ github.sha }}-${{ matrix.platform }}
             - name: Trivy Scan
               uses: traceloop/.github/actions/ci-action-trivy@main
               with:
