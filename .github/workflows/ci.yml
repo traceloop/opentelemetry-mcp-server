@@ -51,6 +51,9 @@ jobs:
     build-test:
         needs: test
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pull-requests: write
         strategy:
             matrix:
                 platform: [amd64, arm64]
