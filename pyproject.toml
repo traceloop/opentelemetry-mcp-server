@@ -1,6 +1,6 @@
 [project]
 name = "opentelemetry-mcp"
-version = "0.2.0"
+version = "0.2.1"
 description = "MCP server for querying OpenTelemetry traces from LLM applications with Opentelemetry support"
 authors = [
     {name = "Doron Kopit", email = "doron@traceloop.com"},
