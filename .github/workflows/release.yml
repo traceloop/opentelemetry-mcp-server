@@ -49,6 +49,8 @@ jobs:
           echo "Version bump: ${{ steps.cz.outputs.version }}"
 
       - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${{ steps.cz.outputs.version }}" \
             --title "Release ${{ steps.cz.outputs.version }}" \
