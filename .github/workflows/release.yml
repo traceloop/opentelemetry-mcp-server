@@ -23,7 +23,7 @@ jobs:
           repositories: ${{ github.event.repository.name }}
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Full history required for Commitizen
           token: ${{ steps.app-token.outputs.token }}
@@ -64,7 +64,7 @@ jobs:
       id-token: write  # Required for PyPI OIDC
     steps:
       - name: Checkout code (with new version)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main  # Get the version-bumped code
 
