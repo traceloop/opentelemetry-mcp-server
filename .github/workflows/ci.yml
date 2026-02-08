@@ -53,6 +53,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: read
+            actions: read
             pull-requests: write
             security-events: write
         strategy:
