@@ -54,6 +54,7 @@ jobs:
         permissions:
             contents: read
             pull-requests: write
+            security-events: write
         strategy:
             matrix:
                 platform: [amd64, arm64]
@@ -85,4 +86,3 @@ jobs:
                 image_name: opentelemetry-mcp-server-${{ matrix.platform }}
                 scanners: secret,vuln
                 severity: CRITICAL,HIGH
-                github_token: ${{ secrets.GITHUB_TOKEN }}
