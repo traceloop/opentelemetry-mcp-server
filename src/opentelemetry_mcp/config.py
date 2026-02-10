@@ -16,7 +16,7 @@ load_dotenv()
 class BackendConfig(BaseModel):
     """Configuration for OpenTelemetry trace backend."""
 
-    type: Literal["jaeger", "tempo", "traceloop"]
+    type: Literal["jaeger", "tempo", "traceloop", "dynatrace"]
     url: HttpUrl
     api_key: str | None = Field(default=None, exclude=True)
     timeout: float = Field(default=30.0, gt=0, le=300)
@@ -35,9 +35,9 @@ class BackendConfig(BaseModel):
         """Load configuration from environment variables."""
         backend_type = os.getenv("BACKEND_TYPE", "jaeger")
         backend_url = os.getenv("BACKEND_URL", "http://localhost:16686")
-        if backend_type not in ["jaeger", "tempo", "traceloop"]:
+        if backend_type not in ["jaeger", "tempo", "traceloop", "dynatrace"]:
             raise ValueError(
-                f"Invalid BACKEND_TYPE: {backend_type}. Must be one of: jaeger, tempo, traceloop"
+                f"Invalid BACKEND_TYPE: {backend_type}. Must be one of: jaeger, tempo, traceloop, dynatrace"
             )
 
         # Parse environments from comma-separated string
@@ -102,10 +102,10 @@ class ServerConfig(BaseModel):
     ) -> None:
         """Apply CLI argument overrides to configuration."""
         if backend_type:
-            if backend_type not in ["jaeger", "tempo", "traceloop"]:
+            if backend_type not in ["jaeger", "tempo", "traceloop", "dynatrace"]:
                 raise ValueError(
                     f"Invalid backend type: {backend_type}. "
-                    "Must be one of: jaeger, tempo, traceloop"
+                    "Must be one of: jaeger, tempo, traceloop, dynatrace"
                 )
             self.backend.type = backend_type  # type: ignore
 

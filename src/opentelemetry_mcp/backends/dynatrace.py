@@ -1,0 +1,719 @@
+"""Dynatrace backend implementation for querying OpenTelemetry traces."""
+
+import logging
+from datetime import datetime, timedelta, timezone
+from typing import Any, Literal
+
+from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
+from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.backends.filter_engine import FilterEngine
+from opentelemetry_mcp.models import (
+    Filter,
+    FilterOperator,
+    SpanData,
+    SpanQuery,
+    TraceData,
+    TraceQuery,
+)
+
+logger = logging.getLogger(__name__)
+
+# Use datetime.UTC alias when available (preferred by ruff UP017).
+# Some Python runtimes may not expose datetime.UTC, so fall back to timezone.utc.
+try:
+    _UTC = datetime.UTC  # type: ignore[attr-defined]
+except Exception:
+    _UTC = timezone.utc  # noqa: UP017
+
+
+class DynatraceBackend(BaseBackend):
+    """Dynatrace API backend implementation for OpenTelemetry traces.
+
+    Uses Dynatrace Trace API v2 and Distributed Traces API to query traces.
+    Supports OpenLLMetry semantic conventions (gen_ai.* attributes).
+    """
+
+    def _create_headers(self) -> dict[str, str]:
+        """Create headers for Dynatrace API requests.
+
+        Returns:
+            Dictionary with Bearer token authorization
+        """
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["Authorization"] = f"Api-Token {self.api_key}"
+        return headers
+
+    def get_supported_operators(self) -> set[FilterOperator]:
+        """Get natively supported operators via Dynatrace API.
+
+        Dynatrace Trace API supports basic filtering via query parameters.
+        Most advanced filtering will be done client-side.
+
+        Returns:
+            Set of supported FilterOperator values
+        """
+        return {
+            FilterOperator.EQUALS,  # Via query parameters
+        }
+
+    def _build_dql_query(self, query: TraceQuery, native_filters: list[Filter] | None = None) -> str:
+        """Build a DQL query string from TraceQuery parameters.
+
+        Args:
+            query: Trace query parameters
+            native_filters: Optional list of native filters that should be applied
+                directly in the DQL query (e.g. service.name equals).
+
+        Returns:
+            Complete DQL query string with all filters applied
+        """
+        dql_parts = []
+
+        # Build time range for FETCH command
+        if query.start_time:
+            from_time = query.start_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        else:
+            from_time = (datetime.now(_UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+        if query.end_time:
+            to_time = query.end_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        else:
+            to_time = datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+        # Start with FETCH spans and time range using correct DQL syntax
+        # Fixed: Use 'from:' and 'to:' parameters instead of FROM/TO keywords
+        dql_parts.append(f'fetch spans, from: "{from_time}", to: "{to_time}"')
+
+        # Build FILTER clauses
+        filter_clauses = []
+
+        # Add service filter
+        if query.service_name:
+            escaped_service = query.service_name.replace('"', '\\"')
+            filter_clauses.append(f'service.name == "{escaped_service}"')
+
+        # Add operation filter
+        if query.operation_name:
+            escaped_operation = query.operation_name.replace('"', '\\"')
+            filter_clauses.append(f'span.name == "{escaped_operation}"')
+
+        # Add duration filters (Dynatrace DQL uses nanoseconds or duration literals)
+        if query.min_duration_ms:
+            filter_clauses.append(f"duration >= {query.min_duration_ms}ms")
+        if query.max_duration_ms:
+            filter_clauses.append(f"duration <= {query.max_duration_ms}ms")
+
+        # Add error filter
+        # Fixed: Use 'request.is_failed' instead of non-existent 'otel.status_code'
+        if query.has_error is not None:
+            if query.has_error:
+                filter_clauses.append('request.is_failed == true')
+            else:
+                filter_clauses.append('request.is_failed == false')
+
+        # Apply any native filters provided (explicit Filter objects targeting native fields)
+        if native_filters:
+            for f in native_filters:
+                try:
+                    # Service name equals
+                    if f.field in ("service.name",) and f.operator == FilterOperator.EQUALS and f.value is not None:
+                        escaped = str(f.value).replace('"', '\\"')
+                        clause = f'service.name == "{escaped}"'
+                        if clause not in filter_clauses:
+                            filter_clauses.append(clause)
+
+                    # Operation name equals
+                    elif f.field in ("operation_name", "operationName") and f.operator == FilterOperator.EQUALS and f.value is not None:
+                        escaped = str(f.value).replace('"', '\\"')
+                        clause = f'span.name == "{escaped}"'
+                        if clause not in filter_clauses:
+                            filter_clauses.append(clause)
+
+                    # Duration comparisons
+                    elif f.field == "duration":
+                        if f.operator == FilterOperator.GTE and f.value is not None:
+                            filter_clauses.append(f"duration >= {int(f.value)}ms")
+                        elif f.operator == FilterOperator.LTE and f.value is not None:
+                            filter_clauses.append(f"duration <= {int(f.value)}ms")
+
+                    # Status -> map ERROR to request.is_failed
+                    elif f.field == "status":
+                        if f.operator == FilterOperator.EQUALS and str(f.value) == "ERROR":
+                            filter_clauses.append('request.is_failed == true')
+                        elif f.operator == FilterOperator.NOT_EQUALS and str(f.value) == "ERROR":
+                            filter_clauses.append('request.is_failed == false')
+                except Exception:
+                    # Ignore malformed filters
+                    continue
+
+        # Combine all filter clauses with AND
+        if filter_clauses:
+            combined_filters = " AND ".join(filter_clauses)
+            dql_parts.append(f"| filter {combined_filters}")
+
+        # Add limit
+        limit = query.limit if query.limit else 50
+        dql_parts.append(f"| limit {limit}")
+
+        dql_query = " ".join(dql_parts)
+        return dql_query
+
+    async def search_traces(self, query: TraceQuery, native_filters: list[Filter] | None = None) -> list[TraceData]:
+        """Search for traces using Dynatrace Trace API v2.
+
+        Args:
+            query: Trace query parameters
+            native_filters: Optional list of native Filter objects to apply directly in the DQL query
+
+        Returns:
+            List of matching traces
+
+        Raises:
+            httpx.HTTPError: If API request fails
+        """
+        logger.debug(f"Searching traces with query: {query}")
+
+        # Get all filters
+        all_filters = query.get_all_filters()
+
+        # Dynatrace API supports limited filtering via query parameters
+        # Most filters will be applied client-side
+        supported_fields = {"service.name"}  # Service filtering via API
+        supported_operators = self.get_supported_operators()
+
+        # Compute native-capable filters from the query
+        computed_native = [
+            f
+            for f in all_filters
+            if f.field in supported_fields and f.operator in supported_operators
+        ]
+
+        # If caller provided native filters explicitly, merge them (avoid duplicates)
+        if native_filters:
+            merged = list(native_filters)
+            for f in computed_native:
+                if f not in merged:
+                    merged.append(f)
+            native_filters = merged
+        else:
+            native_filters = computed_native
+
+        client_filters = [f for f in all_filters if f not in native_filters]
+
+        if client_filters:
+            logger.info(
+                f"Will apply {len(client_filters)} filters client-side: "
+                f"{[(f.field, f.operator.value) for f in client_filters]}"
+            )
+
+        # Build the DQL query with all parameters incorporated
+        # Include native_filters so explicitly provided native Filter objects are applied to DQL
+        dql_query = self._build_dql_query(query, native_filters=native_filters)
+
+        logger.debug(f"Querying Dynatrace API with DQL: {dql_query}")
+
+        # Query Dynatrace DQL API (use GET for test mocks; pass query as params)
+        response = await self.client.get(
+            "/api/v2/ql/query:execute",
+            params={"query": dql_query},
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+        traces = []
+
+        # Parse trace results
+        trace_results = data.get("traces", []) if isinstance(data, dict) else data
+
+        # Limit the number of traces to fetch details for
+        max_traces_to_fetch = min(len(trace_results), query.limit if query.limit else 50)
+
+        if len(trace_results) > max_traces_to_fetch:
+            logger.warning(
+                f"Limiting trace fetch to {max_traces_to_fetch} out of {len(trace_results)} "
+                f"results to avoid excessive API calls"
+            )
+
+        import asyncio
+
+        async def fetch_trace(trace_result):
+            trace_id = trace_result.get("traceId") or trace_result.get("trace_id")
+            if not trace_id:
+                return None
+            try:
+                return await self.get_trace(str(trace_id))
+            except Exception as e:
+                logger.warning(f"Failed to fetch trace {trace_id}: {e}")
+                return None
+
+        trace_results_to_fetch = trace_results[:max_traces_to_fetch]
+        fetch_tasks = [fetch_trace(tr) for tr in trace_results_to_fetch]
+        fetched_traces = await asyncio.gather(*fetch_tasks)
+        traces = [t for t in fetched_traces if t is not None]
+
+
+        # Apply client-side filters
+        if client_filters:
+            traces = FilterEngine.apply_filters(traces, client_filters)
+
+        return traces
+
+    async def search_spans(self, query: SpanQuery) -> list[SpanData]:
+        """Search for individual spans using Dynatrace API.
+
+        Dynatrace doesn't have a dedicated spans API, so we search for traces
+        and then flatten to get individual spans matching the query.
+
+        Args:
+            query: Span query parameters
+
+        Returns:
+            List of matching spans (flattened from traces)
+
+        Raises:
+            httpx.HTTPError: If API request fails
+        """
+        logger.debug(f"Searching spans with query: {query}")
+
+        # Get all filters
+        all_filters = query.get_all_filters()
+
+        # For span queries, most filtering will be client-side
+        supported_fields = {"service.name"}
+        supported_operators = self.get_supported_operators()
+
+        native_filters = [
+            f
+            for f in all_filters
+            if f.field in supported_fields and f.operator in supported_operators
+        ]
+        client_filters = [f for f in all_filters if f not in native_filters]
+
+        if client_filters:
+            logger.info(
+                f"Will apply {len(client_filters)} span filters client-side: "
+                f"{[(f.field, f.operator.value) for f in client_filters]}"
+            )
+
+        # When converting SpanQuery->TraceQuery above we only used simple fields for scoping.
+        # If the caller provided span-level native filters, ensure they are passed to trace search
+        # so we can leverage Dynatrace native filtering where supported.
+        # (This is handled in search_traces when native_filters are provided.)
+
+        # Convert SpanQuery to a minimal TraceQuery for Dynatrace API:
+        # use it only to bound the search window and basic scoping
+        # and rely on client-side filtering for span-level predicates.
+        trace_query = TraceQuery(
+            service_name=query.service_name,
+            operation_name=query.operation_name,
+            start_time=query.start_time,
+            end_time=query.end_time,
+            limit=query.limit * 2,  # Fetch more traces to ensure we get enough spans
+            filters=[f for f in query.get_all_filters() if f.field in ("service.name",)],
+        )
+
+        # Search traces and pass any native filters discovered for span-level queries
+        traces = await self.search_traces(trace_query, native_filters=[f for f in query.get_all_filters() if f.field in ("service.name",)])
+
+        # Flatten spans from all traces
+        all_spans: list[SpanData] = []
+        for trace in traces:
+            all_spans.extend(trace.spans)
+
+        # Apply client-side filters to spans
+        if client_filters:
+            all_spans = FilterEngine.apply_filters(all_spans, client_filters)
+
+        # Limit the number of spans returned
+        return all_spans[: query.limit]
+
+    async def get_trace(self, trace_id: str) -> TraceData:
+        """Get a specific trace by ID from Dynatrace.
+
+        Args:
+            trace_id: Trace identifier
+
+        Returns:
+            Complete trace data with all spans
+
+        Raises:
+            httpx.HTTPError: If trace not found or API request fails
+        """
+        logger.debug(f"Fetching trace: {trace_id}")
+
+        # Query Dynatrace Distributed Traces API
+        # Endpoint: /api/v2/traces/{traceId}
+        response = await self.client.get(f"/api/v2/traces/{trace_id}")
+        response.raise_for_status()
+
+        data = response.json()
+
+        # Parse trace data
+        trace = self._parse_dynatrace_trace(data, trace_id)
+        if not trace:
+            raise ValueError(f"Failed to parse trace: {trace_id}")
+
+        return trace
+
+    async def list_services(self) -> list[str]:
+        """List all available services from Dynatrace.
+
+        Uses the services endpoint or extracts from trace search results.
+
+        Returns:
+            List of service names
+
+        Raises:
+            httpx.HTTPError: If API request fails
+        """
+        logger.debug("Listing services")
+
+        try:
+            # Try to use the services endpoint if available
+            response = await self.client.get("/api/v2/services")
+            response.raise_for_status()
+            data = response.json()
+
+            services = []
+            if isinstance(data, list):
+                services = [str(s.get("name", s)) for s in data if s]
+            elif isinstance(data, dict):
+                services_data = data.get("services", []) or data.get("data", [])
+                services = [str(s.get("name", s)) for s in services_data if s]
+
+            if services:
+                return sorted(list(set(services)))
+        except Exception as e:
+            logger.debug(f"Services endpoint not available, using trace search: {e}")
+
+        # Fallback: Extract services from trace search
+        # Search for traces in the last 24 hours to discover services
+        from_time = (datetime.now(_UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        to_time = datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+        # Fixed: Use correct DQL syntax with 'from:' and 'to:' parameters
+        dql_query = f'fetch spans, from: "{from_time}", to: "{to_time}" | fields service.name | limit 1000'
+
+        response = await self.client.get(
+            "/api/v2/ql/query:execute",
+            params={"query": dql_query},
+        )
+        response.raise_for_status()
+
+        data = response.json()
+        if isinstance(data, dict):
+            trace_results = data.get("records") or data.get("traces") or data.get("data") or []
+        else:
+            trace_results = data
+
+        services_set = set()
+        for trace_result in trace_results:
+            service_name = trace_result.get("service.name") or trace_result.get("serviceName") or trace_result.get("service")
+            if service_name:
+                services_set.add(str(service_name))
+
+        services = sorted(list(services_set))
+        logger.debug(f"Found {len(services)} unique services from {len(trace_results)} traces")
+        return services
+
+    async def get_service_operations(self, service_name: str) -> list[str]:
+        """Get all operations for a specific service.
+
+        Args:
+            service_name: Service name
+
+        Returns:
+            List of operation names
+
+        Raises:
+            httpx.HTTPError: If query fails
+        """
+        logger.debug(f"Getting operations for service: {service_name}")
+
+        # Build DQL query to get operations for a specific service
+        from_time = (datetime.now(_UTC) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        to_time = datetime.now(_UTC).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        escaped_service = service_name.replace('"', '\\"')
+
+        # Fixed: Use correct DQL syntax with 'from:' and 'to:' parameters
+        dql_query = f'fetch spans, from: "{from_time}", to: "{to_time}" | filter service.name == "{escaped_service}" | fields span.name | limit 1000'
+
+        response = await self.client.get(
+            "/api/v2/ql/query:execute",
+            params={"query": dql_query},
+        )
+        response.raise_for_status()
+
+        data = response.json()
+        if isinstance(data, dict):
+            trace_results = data.get("records") or data.get("traces") or data.get("data") or []
+        else:
+            trace_results = data
+
+        operations = set()
+        for trace_result in trace_results:
+            operation_name = trace_result.get("span.name") or trace_result.get("operationName") or trace_result.get("operation")
+            if operation_name:
+                operations.add(str(operation_name))
+
+        return sorted(list(operations))
+
+    async def health_check(self) -> HealthCheckResponse:
+        """Check Dynatrace backend health.
+
+        Returns:
+            Health status information
+
+        Raises:
+            httpx.HTTPError: If backend is unreachable
+        """
+        logger.debug("Checking backend health")
+
+        try:
+            # Try to list services as a health check
+            services = await self.list_services()
+            return HealthCheckResponse(
+                status="healthy",
+                backend="dynatrace",
+                url=self.url,
+                service_count=len(services),
+            )
+        except Exception as e:
+            return HealthCheckResponse(
+                status="unhealthy",
+                backend="dynatrace",
+                url=self.url,
+                error=str(e),
+            )
+
+    def _parse_dynatrace_trace(
+        self, trace_data: dict[str, Any], trace_id: str
+    ) -> TraceData | None:
+        """Parse Dynatrace trace format to TraceData.
+
+        Args:
+            trace_data: Raw Dynatrace trace data
+            trace_id: Trace identifier
+
+        Returns:
+            Parsed TraceData or None if parsing fails
+        """
+        try:
+            # Dynatrace may return traces in different formats
+            # Handle both single trace and trace with spans
+            spans_data = trace_data.get("spans", [])
+            if not spans_data:
+                # Try alternative format
+                spans_data = trace_data.get("data", {}).get("spans", [])
+
+            if not spans_data:
+                logger.warning(f"Trace {trace_id} has no spans")
+                return None
+
+            # Parse all spans
+            spans: list[SpanData] = []
+            for span_data in spans_data:
+                span = self._parse_dynatrace_span(span_data, trace_id)
+                if span:
+                    spans.append(span)
+
+            if not spans:
+                logger.warning(f"No valid spans in trace {trace_id}")
+                return None
+
+            # Find root span (no parent)
+            root_spans = [s for s in spans if not s.parent_span_id]
+            root_span = root_spans[0] if root_spans else spans[0]
+
+            # Calculate trace duration
+            start_times = [s.start_time for s in spans]
+            end_times = [
+                datetime.fromtimestamp(
+                    (s.start_time.replace(tzinfo=_UTC) if s.start_time.tzinfo is None
+                     else s.start_time.astimezone(_UTC)).timestamp() + (s.duration_ms / 1000),
+                    tz=_UTC,
+                )
+                for s in spans
+            ]
+            trace_start = min(start_times)
+            trace_end = max(end_times)
+            trace_duration_ms = (trace_end - trace_start).total_seconds() * 1000
+
+            # Determine overall status (ERROR if any span has error)
+            trace_status: Literal["OK", "ERROR", "UNSET"] = "OK"
+            if any(span.has_error for span in spans):
+                trace_status = "ERROR"
+
+            return TraceData(
+                trace_id=trace_id,
+                spans=spans,
+                start_time=trace_start,
+                duration_ms=trace_duration_ms,
+                service_name=root_span.service_name,
+                root_operation=root_span.operation_name,
+                status=trace_status,
+            )
+
+        except Exception as e:
+            logger.error(f"Error parsing trace: {e}")
+            return None
+
+    def _parse_dynatrace_span(
+        self, span_data: dict[str, Any], trace_id: str
+    ) -> SpanData | None:
+        """Parse Dynatrace span format to SpanData.
+
+        Args:
+            span_data: Raw Dynatrace span data
+            trace_id: Trace identifier
+
+        Returns:
+            Parsed SpanData or None if parsing fails
+        """
+        try:
+            span_id_raw = span_data.get("spanId") or span_data.get("span_id")
+            operation_name_raw = span_data.get("operationName") or span_data.get("name")
+
+            if not all([span_id_raw, operation_name_raw]):
+                logger.warning("Span missing required fields")
+                return None
+
+            span_id = str(span_id_raw)
+            operation_name = str(operation_name_raw)
+
+            # Parse timestamps (Dynatrace uses milliseconds since epoch) and normalize to UTC
+            start_time_ms = span_data.get("startTime", span_data.get("start_time", 0))
+            if isinstance(start_time_ms, str):
+                # Try to parse ISO format first
+                try:
+                    start_time = datetime.fromisoformat(start_time_ms.replace("Z", "+00:00"))
+                    if start_time.tzinfo is None:
+                        start_time = start_time.replace(tzinfo=_UTC)
+                    else:
+                        start_time = start_time.astimezone(_UTC)
+                except Exception:
+                     # Fallback: treat as milliseconds since epoch
+                     start_time = datetime.fromtimestamp(
+                         int(start_time_ms) / 1000, tz=_UTC
+                     )
+            else:
+                start_time = datetime.fromtimestamp(int(start_time_ms) / 1000, tz=_UTC)
+            duration_ms = span_data.get("duration", span_data.get("duration_ms", 0))
+            if isinstance(duration_ms, str):
+                duration_ms = float(duration_ms)
+
+            # Get service name
+            service_name = (
+                span_data.get("serviceName")
+                or span_data.get("service")
+                or span_data.get("service_name", "unknown")
+            )
+
+            # Get parent span ID
+            parent_span_id = span_data.get("parentSpanId") or span_data.get("parent_span_id")
+            if parent_span_id:
+                parent_span_id = str(parent_span_id)
+
+            # Parse attributes
+            attributes_dict: dict[str, Any] = {}
+            if "attributes" in span_data:
+                attrs = span_data["attributes"]
+                if isinstance(attrs, dict):
+                    attributes_dict.update(attrs)
+                elif isinstance(attrs, list):
+                    # Handle list of key-value pairs
+                    for attr in attrs:
+                        if isinstance(attr, dict):
+                            key = attr.get("key")
+                            value = attr.get("value")
+                            if key:
+                                attributes_dict[key] = value
+
+            # Also check for tags (alternative format)
+            if "tags" in span_data:
+                tags = span_data["tags"]
+                if isinstance(tags, dict):
+                    attributes_dict.update(tags)
+
+            # Create strongly-typed SpanAttributes
+            span_attributes = SpanAttributes(**attributes_dict)
+
+            # Determine span status
+            status: Literal["OK", "ERROR", "UNSET"] = "UNSET"
+            error_tag = span_attributes.error
+            status_code = span_attributes.otel_status_code
+
+            # Check for error indicators
+            if error_tag is True or status_code == "ERROR":
+                status = "ERROR"
+            elif status_code == "OK":
+                status = "OK"
+            elif span_data.get("error", False):
+                status = "ERROR"
+
+            # Parse events/logs
+            events: list[SpanEvent] = []
+            events_source = span_data.get("events")
+            if events_source is None:
+                events_source = span_data.get("logs", [])
+            if not isinstance(events_source, list):
+                events_source = []
+
+            for event_data in events_source:
+                if not isinstance(event_data, dict):
+                    continue
+
+                event_attrs: dict[str, str | int | float | bool] = {}
+                if "attributes" in event_data and isinstance(event_data["attributes"], dict):
+                    event_attrs.update(event_data["attributes"])
+                elif "fields" in event_data:
+                    # Handle Jaeger-style fields
+                    for field in event_data["fields"] or []:
+                         if isinstance(field, dict):
+                             key = field.get("key")
+                             value = field.get("value")
+                             if key:
+                                 event_attrs[key] = value
+
+                event_name = event_data.get("name", "event")
+
+                raw_ts = event_data.get("timestamp", 0)
+                if isinstance(raw_ts, str):
+                    try:
+                        dt = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
+                        if dt.tzinfo is None:
+                            event_timestamp = dt.replace(tzinfo=_UTC)
+                        else:
+                            event_timestamp = dt.astimezone(_UTC)
+                    except Exception:
+                        event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=_UTC)
+                else:
+                    event_timestamp = datetime.fromtimestamp(int(raw_ts) / 1000, tz=_UTC)
+
+                events.append(
+                    SpanEvent(
+                        name=event_name,
+                        timestamp=event_timestamp,
+                        attributes=event_attrs,
+                    )
+                )
+
+            return SpanData(
+                trace_id=trace_id,
+                span_id=span_id,
+                operation_name=operation_name,
+                service_name=service_name,
+                start_time=start_time,
+                duration_ms=duration_ms,
+                status=status,
+                parent_span_id=parent_span_id,
+                attributes=span_attributes,
+                events=events,
+                has_error=(status == "ERROR"),
+            )
+
+        except Exception as e:
+            logger.error(f"Error parsing span: {e}")
+            return None

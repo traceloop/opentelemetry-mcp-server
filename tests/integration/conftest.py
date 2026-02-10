@@ -10,6 +10,7 @@ import pytest
 from pydantic import HttpUrl, TypeAdapter
 from vcr.request import Request
 
+from opentelemetry_mcp.backends.dynatrace import DynatraceBackend
 from opentelemetry_mcp.backends.jaeger import JaegerBackend
 from opentelemetry_mcp.backends.tempo import TempoBackend
 from opentelemetry_mcp.backends.traceloop import TraceloopBackend
@@ -48,6 +49,37 @@ def filter_tempo_timestamps(request: Request) -> Request:
             request.uri = new_url.geturl()
     except Exception:
         # If anything fails, just return the original request
+        pass
+
+    return request
+
+
+def filter_dynatrace_timestamps(request: Request) -> Request:
+    """Remove timestamp ranges from Dynatrace DQL queries for better matching.
+
+    Dynatrace DQL uses `from: "<iso>"` and `to: "<iso>"` inside the `query`
+    parameter which changes every run. This strips those literal timestamp
+    values so cassettes can be matched across runs.
+    """
+    try:
+        url = urlparse(request.uri)
+        if "/api/v2/ql/query:execute" in url.path:
+            params = parse_qs(url.query)
+            if "query" in params:
+                query_str = params["query"][0]
+                # Remove the literal timestamps in from: "..." and to: "..."
+                import re
+
+                query_str = re.sub(r'from:\s*"[^"]*"', 'from: "FILTERED"', query_str)
+                query_str = re.sub(r'to:\s*"[^"]*"', 'to: "FILTERED"', query_str)
+                params["query"] = [query_str]
+
+                from urllib.parse import urlencode
+
+                new_query = urlencode(params, doseq=True)
+                new_url = url._replace(query=new_query)
+                request.uri = new_url.geturl()
+    except Exception:
         pass
 
     return request
@@ -179,6 +211,10 @@ def vcr_config(request: pytest.FixtureRequest) -> dict[str, Any]:
         config["match_on"] = ["method", "path", "body"]
         config["before_record_request"] = filter_traceloop_timestamps
 
+    # For Dynatrace tests, remove literal DQL timestamps from query parameter
+    if "dynatrace" in request.node.nodeid.lower():
+        config["before_record_request"] = filter_dynatrace_timestamps
+
     return config
 
 
@@ -283,6 +319,52 @@ async def traceloop_backend(
         url=str(traceloop_config.url),
         api_key=traceloop_config.api_key,
         timeout=traceloop_config.timeout,
+    )
+    async with backend:
+        yield backend
+
+
+# Dynatrace Backend Fixtures
+
+
+@pytest.fixture
+def dynatrace_url() -> str:
+    """Dynatrace backend URL - can be overridden via environment variable."""
+    return os.getenv("DYNATRACE_URL", "https://abc12345.live.dynatrace.com")
+
+
+@pytest.fixture
+def dynatrace_api_key() -> str:
+    """
+    Dynatrace API key - can be set via environment variable.
+
+    For recording new cassettes, set DYNATRACE_API_KEY env var.
+    For replaying cassettes, the key is not needed (filtered from cassettes).
+    """
+    return os.getenv("DYNATRACE_API_KEY", "test_api_key_for_replay")
+
+
+@pytest.fixture
+def dynatrace_config(dynatrace_url: str, dynatrace_api_key: str) -> BackendConfig:
+    """Dynatrace backend configuration."""
+    return BackendConfig(
+        type="dynatrace",
+        url=TypeAdapter(HttpUrl).validate_python(dynatrace_url),
+        api_key=dynatrace_api_key,
+    )
+
+
+@pytest.fixture
+async def dynatrace_backend(dynatrace_config: BackendConfig) -> AsyncGenerator[DynatraceBackend, None]:
+    """
+    Dynatrace backend instance for integration testing.
+
+    Uses async context manager to properly initialize and cleanup the backend.
+    """
+    backend = DynatraceBackend(
+        url=str(dynatrace_config.url),
+        api_key=dynatrace_config.api_key,
+        timeout=dynatrace_config.timeout,
     )
     async with backend:
         yield backend

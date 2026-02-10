@@ -161,7 +161,7 @@ class HealthCheckResponse(BaseModel):
     """Health check response from backend systems."""
 
     status: Literal["healthy", "unhealthy"] = Field(..., description="Health status of the backend")
-    backend: Literal["jaeger", "tempo", "traceloop"] = Field(..., description="Backend type")
+    backend: Literal["jaeger", "tempo", "traceloop", "dynatrace"] = Field(..., description="Backend type")
     url: str = Field(..., description="Backend URL")
     error: str | None = Field(default=None, description="Error message if unhealthy")
 

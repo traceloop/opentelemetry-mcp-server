@@ -9,6 +9,7 @@ import click
 from fastmcp import FastMCP
 
 from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.backends.dynatrace import DynatraceBackend
 from opentelemetry_mcp.backends.jaeger import JaegerBackend
 from opentelemetry_mcp.backends.tempo import TempoBackend
 from opentelemetry_mcp.backends.traceloop import TraceloopBackend
@@ -93,6 +94,13 @@ def _create_backend(config: ServerConfig) -> BaseBackend:
             api_key=backend_config.api_key,
             timeout=backend_config.timeout,
             environments=backend_config.environments,
+        )
+    elif backend_config.type == "dynatrace":
+        logger.info(f"Initializing Dynatrace backend: {backend_config.url}")
+        return DynatraceBackend(
+            url=str(backend_config.url),
+            api_key=backend_config.api_key,
+            timeout=backend_config.timeout,
         )
     else:
         raise ValueError(f"Unsupported backend type: {backend_config.type}")
@@ -595,7 +603,7 @@ async def list_llm_tools_tool(
 @click.command()
 @click.option(
     "--backend",
-    type=click.Choice(["jaeger", "tempo", "traceloop"]),
+    type=click.Choice(["jaeger", "tempo", "traceloop", "dynatrace"]),
     help="Backend type (overrides BACKEND_TYPE env var)",
 )
 @click.option(
@@ -642,7 +650,7 @@ def main(
 ) -> None:
     """Opentelemetry MCP Server - Query OpenTelemetry traces from LLM applications.
 
-    Supports multiple backends: Jaeger, Tempo, and Traceloop.
+    Supports multiple backends: Jaeger, Tempo, Traceloop, and Dynatrace.
     Configuration can be provided via environment variables or CLI arguments.
 
     Transport options:
