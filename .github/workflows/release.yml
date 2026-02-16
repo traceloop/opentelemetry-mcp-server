@@ -23,13 +23,13 @@ jobs:
           repositories: ${{ github.event.repository.name }}
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Full history required for Commitizen
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
@@ -64,18 +64,18 @@ jobs:
       id-token: write  # Required for PyPI OIDC
     steps:
       - name: Checkout code (with new version)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main  # Get the version-bumped code
 
       - name: Setup UV
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v7
         with:
           version: "latest"
           enable-cache: true
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 

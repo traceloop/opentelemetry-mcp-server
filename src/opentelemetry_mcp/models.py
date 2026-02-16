@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
@@ -11,7 +11,7 @@ from .attributes import SpanAttributes, SpanEvent
 from .constants import Fields, GenAI, Service
 
 
-class FilterOperator(str, Enum):
+class FilterOperator(StrEnum):
     """Supported filter operators for trace queries."""
 
     # String operators
@@ -36,7 +36,7 @@ class FilterOperator(str, Enum):
     NOT_EXISTS = "not_exists"
 
 
-class FilterType(str, Enum):
+class FilterType(StrEnum):
     """Data types for filter values."""
 
     STRING = "string"
