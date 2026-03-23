@@ -42,7 +42,7 @@ dependencies = [
     "python-dotenv~=1.2.0",
     "click~=8.3.0",
     "uvicorn~=0.40.0",
-    "starlette~=0.52.0",
+    "starlette>=0.52,<1.1",
     "opentelemetry-semantic-conventions-ai>=0.4.13",
     "opentelemetry-semantic-conventions>=0.60b0",
 ]
