@@ -70,6 +70,10 @@ Or use `uvx` (alternative):
 
 ---
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/traceloop-opentelemetry-mcp-server).
+
 ## Installation
 
 ### For End Users (Recommended)
