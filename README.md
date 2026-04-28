@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/traceloop-opentelemetry-mcp-server-badge.png)](https://mseep.ai/app/traceloop-opentelemetry-mcp-server)
+
 # OpenTelemetry MCP Server
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
