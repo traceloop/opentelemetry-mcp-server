@@ -67,6 +67,7 @@ class ServerConfig(BaseModel):
     backend: BackendConfig
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     max_traces_per_query: int = Field(default=500, ge=1, le=1000)
+    compress_responses: bool = Field(default=True)
 
     @classmethod
     def from_env(cls) -> "ServerConfig":
@@ -79,6 +80,9 @@ class ServerConfig(BaseModel):
 
         # Parse max_traces_per_query with validation
         max_traces_str = os.getenv("MAX_TRACES_PER_QUERY", "500")
+        # Parse compress_responses with validation
+        compress_responses = os.getenv("COMPRESS_RESPONSES", "true").lower() == "true"
+
         try:
             max_traces_per_query = int(max_traces_str)
         except (ValueError, TypeError) as e:
@@ -91,6 +95,7 @@ class ServerConfig(BaseModel):
             backend=BackendConfig.from_env(),
             log_level=log_level,
             max_traces_per_query=max_traces_per_query,
+            compress_responses=compress_responses,
         )
 
     def apply_cli_overrides(

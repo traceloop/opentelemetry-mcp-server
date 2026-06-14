@@ -3,7 +3,9 @@
 import json
 
 from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.config import ServerConfig
 from opentelemetry_mcp.models import LLMSpanAttributes, TraceQuery
+from opentelemetry_mcp.tools.compression import compact_json
 from opentelemetry_mcp.utils import parse_iso_timestamp
 
 
@@ -16,6 +18,7 @@ async def get_expensive_traces(
     service_name: str | None = None,
     gen_ai_request_model: str | None = None,
     gen_ai_response_model: str | None = None,
+    config: ServerConfig | None = None,
 ) -> str:
     """Find traces with highest token usage.
 
@@ -119,6 +122,9 @@ async def get_expensive_traces(
             "count": len(top_traces),
             "traces": top_traces,
         }
+
+        if config and config.compress_responses:
+            result = compact_json(result)
 
         return json.dumps(result, indent=2)
 

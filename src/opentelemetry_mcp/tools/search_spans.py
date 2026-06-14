@@ -6,7 +6,9 @@ from typing import Any
 from pydantic import ValidationError
 
 from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.config import ServerConfig
 from opentelemetry_mcp.models import Filter, SpanQuery, SpanSummary
+from opentelemetry_mcp.tools.compression import compact_json
 from opentelemetry_mcp.utils import parse_iso_timestamp
 
 
@@ -25,6 +27,7 @@ async def search_spans(
     tags: dict[str, str] | None = None,
     filters: list[dict[str, Any]] | None = None,
     limit: int = 100,
+    config: ServerConfig | None = None,
 ) -> str:
     """Search for individual OpenTelemetry spans with optional filters.
 
@@ -112,6 +115,9 @@ async def search_spans(
             "count": len(summaries),
             "spans": [s.model_dump(mode="json") for s in summaries],
         }
+
+        if config and config.compress_responses:
+            result = compact_json(result)
 
         return json.dumps(result, indent=2, default=str)
 
