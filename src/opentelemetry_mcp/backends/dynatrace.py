@@ -179,4 +179,3 @@ class DynatraceBackend(BaseBackend):
             )
         except Exception as e:
             logger.error(f"Error parsing Dynatrace trace structural metrics: {e}")
-            return None
