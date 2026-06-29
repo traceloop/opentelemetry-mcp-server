@@ -6,7 +6,9 @@ from typing import Any
 from pydantic import ValidationError
 
 from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.config import ServerConfig
 from opentelemetry_mcp.models import TraceQuery, TraceSummary
+from opentelemetry_mcp.tools.compression import compact_json
 from opentelemetry_mcp.utils import parse_iso_timestamp
 
 
@@ -16,6 +18,7 @@ async def find_errors(
     end_time: str | None = None,
     service_name: str | None = None,
     limit: int = 100,
+    config: ServerConfig | None = None,
 ) -> str:
     """Find traces with errors.
 
@@ -116,6 +119,9 @@ async def find_errors(
             error_traces.append(trace_info)
 
         result = {"count": len(error_traces), "error_traces": error_traces}
+
+        if config and config.compress_responses:
+            result = compact_json(result)
 
         return json.dumps(result, indent=2, default=str)
 

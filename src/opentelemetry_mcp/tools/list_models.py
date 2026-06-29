@@ -4,7 +4,9 @@ import json
 from typing import Any
 
 from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.config import ServerConfig
 from opentelemetry_mcp.models import LLMSpanAttributes, TraceQuery
+from opentelemetry_mcp.tools.compression import compact_json
 from opentelemetry_mcp.utils import parse_iso_timestamp
 
 
@@ -15,6 +17,7 @@ async def list_models(
     service_name: str | None = None,
     gen_ai_system: str | None = None,
     limit: int = 1000,
+    config: ServerConfig | None = None,
 ) -> str:
     """List all LLM models being used with usage statistics.
 
@@ -99,6 +102,9 @@ async def list_models(
             "count": len(models_list),
             "models": models_list,
         }
+
+        if config and config.compress_responses:
+            result = compact_json(result)
 
         return json.dumps(result, indent=2)
 
