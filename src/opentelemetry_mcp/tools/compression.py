@@ -8,17 +8,31 @@ def compact_json(data: Any, threshold: float = 0.05) -> Any:
         return {k: compact_json(v, threshold) for k, v in data.items()}
 
     # compress uniform lists
-    if isinstance(data, list) and len(data) > 1 and all(isinstance(item, dict) for item in data):
-        first_keys = list(data[0].keys())
-        if all(list(item.keys()) == first_keys for item in data):
-            compressed = {"columns": first_keys, "rows": [list(item.values()) for item in data]}
-            # only use if savings exceed threshold
-            original_size = len(json.dumps(data))
-            compressed_size = len(json.dumps(compressed))
-            savings = (original_size - compressed_size) / original_size
+    if isinstance(data, dict):
+        return {k: compact_json(v, threshold) for k, v in data.items()}
 
-            if savings >= threshold:
-                return compressed
+    # recurse into lists, then compress uniform lists of dicts
+    if isinstance(data, list):
+        compacted_items = [compact_json(item, threshold) for item in data]
+        if len(compacted_items) > 1 and all(
+            isinstance(item, dict) for item in compacted_items
+        ):
+            first_keys = list(compacted_items[0].keys())
+            if all(list(item.keys()) == first_keys for item in compacted_items):
+                compressed = {
+                    "columns": first_keys,
+                    "rows": [
+                        [item[key] for key in first_keys] for item in compacted_items
+                    ],
+                }
+                # only use if savings exceed threshold
+                original_size = len(json.dumps(compacted_items))
+                compressed_size = len(json.dumps(compressed))
+                savings = (original_size - compressed_size) / original_size
+
+                if savings >= threshold:
+                    return compressed
+        return compacted_items
 
     # everything else passes through
     return data
