@@ -81,7 +81,17 @@ class ServerConfig(BaseModel):
         # Parse max_traces_per_query with validation
         max_traces_str = os.getenv("MAX_TRACES_PER_QUERY", "500")
         # Parse compress_responses with validation
-        compress_responses = os.getenv("COMPRESS_RESPONSES", "true").lower() == "true"
+        compress_responses_str = os.getenv("COMPRESS_RESPONSES", "true").strip().lower()
+        if compress_responses_str in {"true", "1", "yes", "on"}:
+            compress_responses = True
+        elif compress_responses_str in {"false", "0", "no", "off"}:
+            compress_responses = False
+        else:
+            logger.warning(
+                "Invalid COMPRESS_RESPONSES value '%s'. Using default: true",
+                compress_responses_str,
+            )
+            compress_responses = True
 
         try:
             max_traces_per_query = int(max_traces_str)
