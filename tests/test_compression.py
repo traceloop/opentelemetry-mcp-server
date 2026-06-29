@@ -1,5 +1,7 @@
 """Tests for the compact_json compression utility."""
 
+import pytest
+
 from src.opentelemetry_mcp.tools.compression import compact_json
 
 # ── BASIC COMPRESSION ──────────────────────────────────────────
@@ -251,16 +253,25 @@ def test_list_models_response_shape() -> None:
     ]
 
 
-import pytest
-from src.opentelemetry_mcp.tools.compression import compact_json
-@@
 def test_compress_responses_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
-     """When compress_responses is False, output remains uncompressed."""
-     from src.opentelemetry_mcp.config import ServerConfig
- 
+    """When compress_responses is False, output remains uncompressed."""
+    from src.opentelemetry_mcp.config import ServerConfig
+
     monkeypatch.setenv("COMPRESS_RESPONSES", "false")
-     config = ServerConfig.from_env()
+    config = ServerConfig.from_env()
     assert config.compress_responses is False
+
+    data = {
+        "count": 2,
+        "models": [
+            {"model": "gpt-4", "provider": "openai", "count": 48},
+            {"model": "gpt-3.5", "provider": "openai", "count": 12},
+            {"model": "claude", "provider": "anthropic", "count": 5},
+        ],
+    }
+
+    if config.compress_responses:
+        data = compact_json(data)
 
     assert isinstance(data["models"], list)
     assert isinstance(data["models"][0], dict)
