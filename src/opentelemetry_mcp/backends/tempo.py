@@ -15,6 +15,7 @@ from opentelemetry_mcp.models import (
     SpanQuery,
     TraceData,
     TraceQuery,
+    resolve_root_span,
 )
 
 logger = logging.getLogger(__name__)
@@ -546,8 +547,7 @@ class TempoBackend(BaseBackend):
                 return None
 
             # Find root span
-            root_spans = [s for s in all_spans if not s.parent_span_id]
-            root_span = root_spans[0] if root_spans else all_spans[0]
+            root = resolve_root_span(all_spans)
 
             # Calculate trace duration
             start_times = [s.start_time for s in all_spans]
@@ -571,9 +571,12 @@ class TempoBackend(BaseBackend):
                 spans=all_spans,
                 start_time=trace_start,
                 duration_ms=trace_duration_ms,
-                service_name=root_span.service_name,
-                root_operation=root_span.operation_name,
+                service_name=root.span.service_name,
+                root_operation=root.span.operation_name,
                 status=trace_status,
+                root_span_id=root.span.span_id,
+                root_is_inferred=not root.is_true_root,
+                missing_root_parent_span_id=root.missing_parent_span_id,
             )
 
         except Exception as e:

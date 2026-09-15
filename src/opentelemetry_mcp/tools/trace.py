@@ -26,13 +26,26 @@ async def get_trace(backend: BaseBackend, trace_id: str) -> str:
             "trace_id": trace.trace_id,
             "service_name": trace.service_name,
             "root_operation": trace.root_operation,
+            "root_span_id": trace.root_span_id,
             "start_time": trace.start_time.isoformat(),
             "duration_ms": trace.duration_ms,
             "status": trace.status,
             "span_count": len(trace.spans),
             "has_errors": trace.has_errors,
+            "root_is_inferred": trace.root_is_inferred,
             "spans": [],
         }
+
+        if trace.root_is_inferred:
+            result["missing_root_parent_span_id"] = trace.missing_root_parent_span_id
+            result["root_note"] = (
+                "The root span of this trace was not among the spans received, so "
+                "service_name and root_operation describe the earliest span whose "
+                "parent is missing, not the real root. A span is exported only once "
+                "it ends, so a root that is still open, or one scoped to the lifetime "
+                "of a process, never appears. missing_root_parent_span_id is the id "
+                "of the span that has not been received."
+            )
 
         # Add span details
         spans: list[Any] = result["spans"]

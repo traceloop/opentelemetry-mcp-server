@@ -255,6 +255,78 @@ class SpanData(BaseModel):
         return self.status == "ERROR"
 
 
+class RootSpanResolution(BaseModel):
+    """Which span a trace is reported as rooted in, and how certain that is."""
+
+    span: SpanData
+    is_true_root: bool
+    missing_parent_span_id: str | None = None
+
+
+def _earliest_span(spans: list[SpanData]) -> SpanData:
+    """Pick the earliest span, breaking ties on span id.
+
+    Spans carrying the same start time would otherwise be separated by their
+    order in the list, which is the order the backend happened to return them
+    in. Tie-breaking on span id makes the choice a property of the trace.
+
+    Args:
+        spans: Spans to choose from, which must not be empty
+
+    Returns:
+        The earliest span
+    """
+    return min(spans, key=lambda span: (span.start_time, span.span_id))
+
+
+def resolve_root_span(spans: list[SpanData]) -> RootSpanResolution:
+    """Resolve the span a trace should be reported as rooted in.
+
+    A complete trace contains a span with no parent, and that span is the root.
+    A trace can be missing it: spans are exported when they end, so a trace
+    fetched while its root is still open contains only descendants, and a root
+    scoped to the lifetime of a process is never exported at all. Such a trace
+    is still indexed and still fetchable, so callers do get a result, and every
+    span in it has a parent.
+
+    When no span is parentless, the earliest span whose parent is absent from
+    the trace is the closest stand-in for the root, and the id of that absent
+    parent names the span that has not been received.
+
+    Args:
+        spans: All spans belonging to one trace, in any order
+
+    Returns:
+        The resolved root span, whether it is a true root, and the id of the
+        missing parent when it is not
+
+    Raises:
+        ValueError: If spans is empty
+    """
+    if not spans:
+        raise ValueError("Cannot resolve a root span from an empty span list")
+
+    true_roots = [span for span in spans if not span.parent_span_id]
+    if true_roots:
+        return RootSpanResolution(span=_earliest_span(true_roots), is_true_root=True)
+
+    present_span_ids = {span.span_id for span in spans}
+    orphans = [span for span in spans if span.parent_span_id not in present_span_ids]
+    if orphans:
+        earliest = _earliest_span(orphans)
+        return RootSpanResolution(
+            span=earliest,
+            is_true_root=False,
+            missing_parent_span_id=earliest.parent_span_id,
+        )
+
+    # Every parent present with no parentless span means the parent links form a
+    # cycle, which valid trace data cannot do. Report the earliest span rather
+    # than fail, since the caller still needs somewhere to start reading. No
+    # parent is missing here, so none is named.
+    return RootSpanResolution(span=_earliest_span(spans), is_true_root=False)
+
+
 class LLMSpanAttributes(BaseModel):
     """Parsed Opentelemetry (gen_ai.*) span attributes."""
 
@@ -436,6 +508,14 @@ class TraceData(BaseModel):
     root_operation: str
     status: Literal["OK", "ERROR", "UNSET"] = "UNSET"
 
+    # The span service_name and root_operation were read from.
+    root_span_id: str | None = None
+
+    # Set when root_operation names a span that is not a true root, because the
+    # real root was not among the spans received. See resolve_root_span.
+    root_is_inferred: bool = False
+    missing_root_parent_span_id: str | None = None
+
     @property
     def llm_spans(self) -> list[SpanData]:
         """Filter spans that are LLM operations."""
@@ -573,6 +653,10 @@ class TraceSummary(BaseModel):
     total_tokens: int = 0
     has_errors: bool = False
 
+    # True when operation_name and service_name describe an inferred root rather
+    # than a real one, so they name a code site only provisionally.
+    root_is_inferred: bool = False
+
     @classmethod
     def from_trace(cls, trace: TraceData) -> "TraceSummary":
         """Create summary from full trace data."""
@@ -587,6 +671,7 @@ class TraceSummary(BaseModel):
             llm_span_count=len(trace.llm_spans),
             total_tokens=trace.total_llm_tokens,
             has_errors=trace.has_errors,
+            root_is_inferred=trace.root_is_inferred,
         )
 
 

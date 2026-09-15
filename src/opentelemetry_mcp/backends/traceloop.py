@@ -16,6 +16,7 @@ from opentelemetry_mcp.models import (
     SpanQuery,
     TraceData,
     TraceQuery,
+    resolve_root_span,
 )
 
 logger = logging.getLogger(__name__)
@@ -687,8 +688,8 @@ class TraceloopBackend(BaseBackend):
             return None
 
         # Find root span
-        root_spans = [s for s in spans if not s.parent_span_id]
-        root_span = root_spans[0] if root_spans else spans[0]
+        root = resolve_root_span(spans)
+        root_span = root.span
 
         # Calculate trace duration
         if spans:
@@ -718,6 +719,9 @@ class TraceloopBackend(BaseBackend):
             service_name=root_span.service_name,
             root_operation=root_span.operation_name,
             status=self._status_code_to_status(trace_status),
+            root_span_id=root_span.span_id,
+            root_is_inferred=not root.is_true_root,
+            missing_root_parent_span_id=root.missing_parent_span_id,
         )
 
     # Trims the prefix STATUS_CODE_ from the status code
