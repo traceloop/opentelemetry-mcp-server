@@ -7,6 +7,7 @@ from typing import Any
 
 import click
 from fastmcp import FastMCP
+from pydantic import BaseModel
 
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.backends.jaeger import JaegerBackend
@@ -50,87 +51,123 @@ def _handle_tool_error(tool_name: str, error: Exception) -> str:
     return json.dumps({"error": f"Tool execution failed: {str(error)}"})
 
 
-# Global backend instance
-_backend: BaseBackend | None = None
+class EnvironmentsResponse(BaseModel):
+    """Response model for the list_environments tool."""
+
+    environments: list[str]
+    default_environment: str
+
+
+# Global backend instances per environment
+_backends: dict[str, BaseBackend] = {}
+_default_environment: str = "default"
+_health_checked: set[str] = set()
 _config: ServerConfig | None = None
 
 # Initialize FastMCP server
 mcp = FastMCP("opentelemetry-mcp")
 
 
-def _create_backend(config: ServerConfig) -> BaseBackend:
-    """Create backend instance based on configuration.
+def _create_backends(config: ServerConfig) -> dict[str, BaseBackend]:
+    """Instantiate one backend per configured environment URL.
 
     Args:
         config: Server configuration
 
     Returns:
-        Backend instance
+        Mapping of environment name to backend instance
 
     Raises:
         ValueError: If backend type is unsupported
     """
     backend_config = config.backend
 
-    if backend_config.type == "jaeger":
-        logger.info(f"Initializing Jaeger backend: {backend_config.url}")
-        return JaegerBackend(
-            url=str(backend_config.url),
-            api_key=backend_config.api_key,
-            timeout=backend_config.timeout,
-        )
-    elif backend_config.type == "tempo":
-        logger.info(f"Initializing Tempo backend: {backend_config.url}")
-        return TempoBackend(
-            url=str(backend_config.url),
-            api_key=backend_config.api_key,
-            timeout=backend_config.timeout,
-        )
-    elif backend_config.type == "traceloop":
-        logger.info(f"Initializing Traceloop backend: {backend_config.url}")
-        return TraceloopBackend(
-            url=str(backend_config.url),
-            api_key=backend_config.api_key,
-            timeout=backend_config.timeout,
-            environments=backend_config.environments,
-        )
+    # Backward compatibility: if no named URLs are configured, fall back to the
+    # single legacy `url` field keyed under the default environment.
+    if backend_config.backend_urls:
+        urls = backend_config.backend_urls
     else:
-        raise ValueError(f"Unsupported backend type: {backend_config.type}")
+        urls = {backend_config.default_environment: backend_config.url}
+
+    backends: dict[str, BaseBackend] = {}
+    for name, url in urls.items():
+        url_str = str(url)
+        if backend_config.type == "jaeger":
+            logger.info(f"Initializing Jaeger backend '{name}': {url_str}")
+            backends[name] = JaegerBackend(
+                url=url_str,
+                api_key=backend_config.api_key,
+                timeout=backend_config.timeout,
+            )
+        elif backend_config.type == "tempo":
+            logger.info(f"Initializing Tempo backend '{name}': {url_str}")
+            backends[name] = TempoBackend(
+                url=url_str,
+                api_key=backend_config.api_key,
+                timeout=backend_config.timeout,
+            )
+        elif backend_config.type == "traceloop":
+            logger.info(f"Initializing Traceloop backend '{name}': {url_str}")
+            backends[name] = TraceloopBackend(
+                url=url_str,
+                api_key=backend_config.api_key,
+                timeout=backend_config.timeout,
+                environments=backend_config.environments,
+            )
+        else:
+            raise ValueError(f"Unsupported backend type: {backend_config.type}")
+
+    return backends
 
 
-async def _get_backend() -> BaseBackend:
-    """Get or lazily create backend in the current event loop.
+async def _get_backend(environment: str | None = None) -> BaseBackend:
+    """Get (lazily creating) the backend for the given environment.
 
-    This ensures the backend is always created within FastMCP's event loop,
+    This ensures backends are always created within FastMCP's event loop,
     avoiding "Event loop is closed" errors from premature initialization.
 
+    Args:
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev').
+            Uses the default environment when omitted.
+
     Returns:
-        Backend instance
+        Backend instance for the requested environment
 
     Raises:
         RuntimeError: If server configuration is not set
+        ValueError: If the environment is unknown
     """
-    global _backend, _config
+    global _backends, _default_environment, _config
 
     if not _config:
         raise RuntimeError("Server configuration not set")
 
-    # Lazily create backend on first use
-    if _backend is None:
-        logger.info("Creating backend in current event loop")
-        _backend = _create_backend(_config)
+    # Lazily create backends on first use
+    if not _backends:
+        logger.info("Creating backends in current event loop")
+        _backends = _create_backends(_config)
+        _default_environment = _config.backend.default_environment
 
-        # Perform health check on first initialization
+    env = environment or _default_environment
+    if env not in _backends:
+        raise ValueError(f"Unknown environment '{env}'. Available: {sorted(_backends)}")
+
+    backend = _backends[env]
+
+    # Health-check the selected environment once, on first use, so an
+    # unreachable backend in another environment does not delay this request.
+    if env not in _health_checked:
+        _health_checked.add(env)
         try:
-            health = await _backend.health_check()
-            logger.info(f"Backend health check: {health}")
+            health = await backend.health_check()
+            logger.info(f"Backend '{env}' health check: {health}")
             if health.status != "healthy":
-                logger.warning("Backend is not healthy, but continuing...")
+                logger.warning(f"Backend '{env}' is not healthy, but continuing...")
         except Exception as e:
-            logger.error(f"Backend health check failed: {e}")
+            logger.error(f"Backend '{env}' health check failed: {e}")
             logger.warning("Continuing anyway, requests may fail...")
 
-    return _backend
+    return backend
 
 
 @mcp.tool()
@@ -148,6 +185,7 @@ async def search_traces(
     tags: dict[str, str] | None = None,
     filters: list[dict[str, Any]] | None = None,
     limit: int = 100,
+    environment: str | None = None,
 ) -> str:
     """Search for OpenTelemetry traces with filters.
 
@@ -173,6 +211,7 @@ async def search_traces(
             - values: List of values for "in", "not_in", "between" operators
             - value_type: Type of value(s) - "string", "number", or "boolean"
         limit: Maximum number of traces to return (1-1000, default: 100)
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with search results
@@ -191,7 +230,7 @@ async def search_traces(
         {"field": "gen_ai.request.is_streaming", "operator": "equals", "value": true, "value_type": "boolean"}
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await search.search_traces(
             backend,
             service_name=service_name,
@@ -214,19 +253,20 @@ async def search_traces(
 
 
 @mcp.tool()
-async def get_trace(trace_id: str) -> str:
+async def get_trace(trace_id: str, environment: str | None = None) -> str:
     """Get complete trace details by trace ID.
 
     Returns all spans with attributes, including parsed Opentelemetry data for LLM operations.
 
     Args:
         trace_id: Trace identifier
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with trace details
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await trace.get_trace(backend, trace_id=trace_id)
         return result
     except Exception as e:
@@ -242,6 +282,7 @@ async def get_llm_usage(
     gen_ai_request_model: str | None = None,
     gen_ai_response_model: str | None = None,
     limit: int = 1000,
+    environment: str | None = None,
 ) -> str:
     """Get aggregated LLM usage metrics (token counts) for a time period.
 
@@ -255,12 +296,13 @@ async def get_llm_usage(
         gen_ai_request_model: Filter by requested model name
         gen_ai_response_model: Filter by actual model used
         limit: Maximum traces to analyze (default: 1000)
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with usage metrics
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await usage.get_llm_usage(
             backend,
             start_time=start_time,
@@ -277,14 +319,17 @@ async def get_llm_usage(
 
 
 @mcp.tool()
-async def list_services() -> str:
+async def list_services(environment: str | None = None) -> str:
     """List all available services in the OpenTelemetry backend.
+
+    Args:
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with list of services
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await services.list_services(backend)
         return result
     except Exception as e:
@@ -297,6 +342,7 @@ async def find_errors(
     end_time: str | None = None,
     service_name: str | None = None,
     limit: int = 100,
+    environment: str | None = None,
 ) -> str:
     """Find traces with errors.
 
@@ -307,12 +353,13 @@ async def find_errors(
         end_time: End time in ISO 8601 format
         service_name: Filter by service name
         limit: Maximum error traces to return (default: 100)
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with error traces
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await errors.find_errors(
             backend,
             start_time=start_time,
@@ -332,6 +379,7 @@ async def list_llm_models(
     service_name: str | None = None,
     gen_ai_system: str | None = None,
     limit: int = 1000,
+    environment: str | None = None,
 ) -> str:
     """List all LLM models being used with usage statistics.
 
@@ -343,12 +391,13 @@ async def list_llm_models(
         service_name: Filter by service name
         gen_ai_system: Filter by LLM provider (e.g., openai, anthropic, cohere)
         limit: Maximum traces to analyze for model discovery (default: 1000)
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with list of models and their statistics (count, request_count, first_seen, last_seen)
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await list_models.list_models(
             backend,
             start_time=start_time,
@@ -368,6 +417,7 @@ async def get_llm_model_stats(
     start_time: str | None = None,
     end_time: str | None = None,
     service_name: str | None = None,
+    environment: str | None = None,
 ) -> str:
     """Get detailed performance statistics for a specific LLM model.
 
@@ -379,12 +429,13 @@ async def get_llm_model_stats(
         start_time: Start time in ISO 8601 format (e.g., 2024-01-01T00:00:00Z)
         end_time: End time in ISO 8601 format
         service_name: Filter by service name
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with comprehensive model statistics including duration/token percentiles
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await model_stats.get_model_stats(
             backend,
             model_name=model_name,
@@ -406,6 +457,7 @@ async def get_llm_expensive_traces(
     service_name: str | None = None,
     gen_ai_request_model: str | None = None,
     gen_ai_response_model: str | None = None,
+    environment: str | None = None,
 ) -> str:
     """Find traces with highest LLM token usage.
 
@@ -419,12 +471,13 @@ async def get_llm_expensive_traces(
         service_name: Filter by service name
         gen_ai_request_model: Filter by requested model name (e.g., "gpt-4")
         gen_ai_response_model: Filter by actual model used (e.g., "gpt-4-0613")
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with top N most expensive traces sorted by total token usage
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await expensive_traces.get_expensive_traces(
             backend,
             limit=limit,
@@ -449,6 +502,7 @@ async def get_llm_slow_traces(
     service_name: str | None = None,
     gen_ai_request_model: str | None = None,
     gen_ai_response_model: str | None = None,
+    environment: str | None = None,
 ) -> str:
     """Find slowest LLM traces by duration.
 
@@ -462,12 +516,13 @@ async def get_llm_slow_traces(
         service_name: Filter by service name
         gen_ai_request_model: Filter by requested model name (e.g., "gpt-4")
         gen_ai_response_model: Filter by actual model used (e.g., "gpt-4-0613")
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with top N slowest traces sorted by duration
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await slow_traces.get_slow_traces(
             backend,
             limit=limit,
@@ -498,6 +553,7 @@ async def search_spans_tool(
     tags: dict[str, str] | None = None,
     filters: list[dict[str, Any]] | None = None,
     limit: int = 100,
+    environment: str | None = None,
 ) -> str:
     """Search for individual OpenTelemetry spans with optional filters.
 
@@ -524,6 +580,7 @@ async def search_spans_tool(
             - values: List of values for "in", "not_in", "between" operators
             - value_type: Type of value(s) - "string", "number", or "boolean"
         limit: Maximum number of spans to return (1-1000, default: 100)
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with span summaries
@@ -532,7 +589,7 @@ async def search_spans_tool(
         {"field": "traceloop.span.kind", "operator": "equals", "value": "tool", "value_type": "string"}
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await search_spans.search_spans(
             backend,
             service_name=service_name,
@@ -561,6 +618,7 @@ async def list_llm_tools_tool(
     service_name: str | None = None,
     gen_ai_system: str | None = None,
     limit: int = 1000,
+    environment: str | None = None,
 ) -> str:
     """List all LLM tools being used by identifying traceloop.span.kind == tool.
 
@@ -573,12 +631,13 @@ async def list_llm_tools_tool(
         service_name: Filter by service name
         gen_ai_system: Filter by LLM provider (openai, anthropic, etc.)
         limit: Maximum spans to analyze (default: 1000)
+        environment: Target environment name (e.g., 'prod', 'qa', 'dev'). Uses default if omitted.
 
     Returns:
         JSON string with list of tools and their statistics (usage count, services, first/last seen)
     """
     try:
-        backend = await _get_backend()
+        backend = await _get_backend(environment)
         result = await list_llm_tools.list_llm_tools(
             backend,
             start_time=start_time,
@@ -590,6 +649,28 @@ async def list_llm_tools_tool(
         return result
     except Exception as e:
         return _handle_tool_error("list_llm_tools_tool", e)
+
+
+@mcp.tool()
+async def list_environments() -> str:
+    """List all configured backend environments.
+
+    Returns the available environment names and which one is used by default
+    when no environment is specified in a tool call.
+
+    Returns:
+        JSON string with environments list and default environment name
+    """
+    try:
+        # Ensure backends are initialised
+        await _get_backend()
+        response = EnvironmentsResponse(
+            environments=sorted(_backends.keys()),
+            default_environment=_default_environment,
+        )
+        return json.dumps(response.model_dump(mode="json"), indent=2)
+    except Exception as e:
+        return _handle_tool_error("list_environments", e)
 
 
 @click.command()
@@ -614,6 +695,16 @@ async def list_llm_tools_tool(
     help="Comma-separated list of environments for Traceloop backend (overrides BACKEND_ENVIRONMENTS env var)",
 )
 @click.option(
+    "--backend-urls",
+    type=str,
+    help="Named backend URLs as JSON or comma-separated key=url pairs (e.g., 'prod=https://...,qa=https://...'). Overrides BACKEND_URLS env var.",
+)
+@click.option(
+    "--default-environment",
+    type=str,
+    help="Default environment name when none is specified in a tool call. Overrides DEFAULT_ENVIRONMENT env var.",
+)
+@click.option(
     "--transport",
     type=click.Choice(["stdio", "http"]),
     default="stdio",
@@ -636,6 +727,8 @@ def main(
     url: str | None,
     api_key: str | None,
     environments: str | None,
+    backend_urls: str | None,
+    default_environment: str | None,
     transport: str,
     host: str,
     port: int,
@@ -669,12 +762,14 @@ def main(
         logging.getLogger().setLevel(_config.log_level)
 
         # Apply CLI overrides
-        if backend or url or api_key or environments:
+        if backend or url or api_key or environments or backend_urls or default_environment:
             _config.apply_cli_overrides(
                 backend_type=backend,
                 backend_url=url,
                 api_key=api_key,
                 environments=environments,
+                backend_urls=backend_urls,
+                default_environment=default_environment,
             )
 
         # Backend will be lazily initialized on first tool call
@@ -688,7 +783,9 @@ def main(
             mcp.run(transport="streamable-http", host=host, port=port)
         else:
             logger.info(
-                f"Starting MCP server with stdio transport using Backend: {_config.backend.type} connected to: {_config.backend.url}"
+                f"Starting MCP server with stdio transport using Backend: {_config.backend.type} "
+                f"connected to environments: "
+                f"{sorted(_config.backend.backend_urls) or [_config.backend.default_environment]}"
             )
             mcp.run(transport="stdio")
 

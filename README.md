@@ -526,7 +526,9 @@ opentelemetry-mcp --backend traceloop --url https://api.traceloop.com --api-key 
 | Variable               | Type    | Default  | Description                                        |
 | ---------------------- | ------- | -------- | -------------------------------------------------- |
 | `BACKEND_TYPE`         | string  | `jaeger` | Backend type: `jaeger`, `tempo`, or `traceloop`    |
-| `BACKEND_URL`          | URL     | -        | Backend API endpoint (required)                    |
+| `BACKEND_URL`          | URL     | -        | Backend API endpoint                               |
+| `BACKEND_URLS`         | map     | -        | Named backend URLs: JSON or `name=url,...` pairs (see [Multiple Environments](#multiple-backend-environments)) |
+| `DEFAULT_ENVIRONMENT`  | string  | `default`| Environment used when a tool call omits `environment` |
 | `BACKEND_API_KEY`      | string  | -        | API key (required for Traceloop)                   |
 | `BACKEND_TIMEOUT`      | integer | `30`     | Request timeout in seconds                         |
 | `LOG_LEVEL`            | string  | `INFO`   | Logging level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
@@ -538,6 +540,12 @@ opentelemetry-mcp --backend traceloop --url https://api.traceloop.com --api-key 
 # Backend configuration
 BACKEND_TYPE=jaeger
 BACKEND_URL=http://localhost:16686
+
+# Optional: named backend URLs (JSON or comma-separated 'name=url' pairs)
+# BACKEND_URLS=prod=http://localhost:16686,qa=http://localhost:16687
+
+# Optional: environment used when a tool call omits 'environment' (default: default)
+# DEFAULT_ENVIRONMENT=prod
 
 # Optional: API key (mainly for Traceloop)
 BACKEND_API_KEY=
@@ -551,6 +559,32 @@ LOG_LEVEL=INFO
 # Optional: Max traces per query (default: 100)
 MAX_TRACES_PER_QUERY=100
 ```
+
+</details>
+
+<a id="multiple-backend-environments"></a>
+<details>
+<summary><b>Multiple Backend Environments</b></summary>
+
+A single server instance can route to multiple Jaeger/Tempo/Traceloop backends using
+`BACKEND_URLS` (or `--backend-urls`). Every tool accepts an optional `environment`
+parameter — the call is routed to the matching backend, or to `DEFAULT_ENVIRONMENT`
+when omitted. Use the `list_environments` tool to discover the configured environments.
+
+```bash
+BACKEND_TYPE=jaeger
+BACKEND_URLS=prod=http://localhost:16686,qa=http://localhost:16687
+DEFAULT_ENVIRONMENT=prod
+```
+
+`BACKEND_URLS` accepts either the comma-separated `name=url` format above or JSON:
+
+```bash
+BACKEND_URLS={"prod":"http://localhost:16686","qa":"http://localhost:16687"}
+```
+
+Backward compatible: if only `BACKEND_URL` is set, it is treated as the sole backend
+keyed under `DEFAULT_ENVIRONMENT` (`default`).
 
 </details>
 
