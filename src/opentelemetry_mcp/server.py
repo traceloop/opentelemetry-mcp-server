@@ -9,6 +9,7 @@ import click
 from fastmcp import FastMCP
 
 from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.backends.datadog import DatadogBackend
 from opentelemetry_mcp.backends.jaeger import JaegerBackend
 from opentelemetry_mcp.backends.tempo import TempoBackend
 from opentelemetry_mcp.backends.traceloop import TraceloopBackend
@@ -93,6 +94,14 @@ def _create_backend(config: ServerConfig) -> BaseBackend:
             api_key=backend_config.api_key,
             timeout=backend_config.timeout,
             environments=backend_config.environments,
+        )
+    elif backend_config.type == "datadog":
+        logger.info(f"Initializing Datadog backend: {backend_config.url}")
+        return DatadogBackend(
+            url=str(backend_config.url),
+            api_key=backend_config.api_key,
+            app_key=backend_config.app_key,
+            timeout=backend_config.timeout,
         )
     else:
         raise ValueError(f"Unsupported backend type: {backend_config.type}")
@@ -595,7 +604,7 @@ async def list_llm_tools_tool(
 @click.command()
 @click.option(
     "--backend",
-    type=click.Choice(["jaeger", "tempo", "traceloop"]),
+    type=click.Choice(["jaeger", "tempo", "traceloop", "datadog"]),
     help="Backend type (overrides BACKEND_TYPE env var)",
 )
 @click.option(
@@ -607,6 +616,12 @@ async def list_llm_tools_tool(
     "--api-key",
     type=str,
     help="API key for backend authentication (overrides BACKEND_API_KEY env var)",
+)
+@click.option(
+    "--app-key",
+    type=str,
+    help="Application key, required by the Datadog backend in addition to "
+    "--api-key (overrides BACKEND_APP_KEY env var)",
 )
 @click.option(
     "--environments",
@@ -635,6 +650,7 @@ def main(
     backend: str | None,
     url: str | None,
     api_key: str | None,
+    app_key: str | None,
     environments: str | None,
     transport: str,
     host: str,
@@ -642,7 +658,7 @@ def main(
 ) -> None:
     """Opentelemetry MCP Server - Query OpenTelemetry traces from LLM applications.
 
-    Supports multiple backends: Jaeger, Tempo, and Traceloop.
+    Supports multiple backends: Jaeger, Tempo, Traceloop, and Datadog.
     Configuration can be provided via environment variables or CLI arguments.
 
     Transport options:
@@ -669,11 +685,12 @@ def main(
         logging.getLogger().setLevel(_config.log_level)
 
         # Apply CLI overrides
-        if backend or url or api_key or environments:
+        if backend or url or api_key or app_key or environments:
             _config.apply_cli_overrides(
                 backend_type=backend,
                 backend_url=url,
                 api_key=api_key,
+                app_key=app_key,
                 environments=environments,
             )
 

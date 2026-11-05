@@ -440,7 +440,7 @@ pip install opentelemetry-mcp
 
 ### Core Capabilities
 
-- **🔌 Multiple Backend Support** - Connect to Jaeger, Grafana Tempo, or Traceloop
+- **🔌 Multiple Backend Support** - Connect to Jaeger, Grafana Tempo, Traceloop, or Datadog
 - **🤖 LLM-First Design** - Specialized tools for analyzing AI application traces
 - **🔍 Advanced Filtering** - Generic filter system with powerful operators
 - **📊 Token Analytics** - Track and aggregate LLM token usage across models and services
@@ -463,16 +463,18 @@ pip install opentelemetry-mcp
 
 ### Backend Support Matrix
 
-| Feature          | Jaeger | Tempo | Traceloop |
-| ---------------- | :----: | :---: | :-------: |
-| Search traces    |   ✓    |   ✓   |     ✓     |
-| Advanced filters |   ✓    |   ✓   |     ✓     |
-| Span search      |  ✓\*   |   ✓   |     ✓     |
-| Token tracking   |   ✓    |   ✓   |     ✓     |
-| Error traces     |   ✓    |   ✓   |     ✓     |
-| LLM tools        |   ✓    |   ✓   |     ✓     |
+| Feature          | Jaeger | Tempo | Traceloop | Datadog |
+| ---------------- | :----: | :---: | :-------: | :-----: |
+| Search traces    |   ✓    |   ✓   |     ✓     |   ✓†    |
+| Advanced filters |   ✓    |   ✓   |     ✓     |    ✓    |
+| Span search      |  ✓\*   |   ✓   |     ✓     |    ✓    |
+| Token tracking   |   ✓    |   ✓   |     ✓     |    ✓    |
+| Error traces     |   ✓    |   ✓   |     ✓     |    ✓    |
+| LLM tools        |   ✓    |   ✓   |     ✓     |    ✓    |
 
 <sub>\* Jaeger requires `service_name` parameter for span search</sub>
+<sub>† Datadog has no trace-level API; traces are reconstructed by searching spans and
+grouping by `trace_id`</sub>
 
 ### For Developers
 
@@ -496,11 +498,12 @@ uv pip install -e ".[dev]"
 
 ### Supported Backends
 
-| Backend       | Type        | URL Example                 | Notes                      |
-| ------------- | ----------- | --------------------------- | -------------------------- |
-| **Jaeger**    | Local       | `http://localhost:16686`    | Popular open-source option |
-| **Tempo**     | Local/Cloud | `http://localhost:3200`     | Grafana's trace backend    |
-| **Traceloop** | Cloud       | `https://api.traceloop.com` | Requires API key           |
+| Backend       | Type        | URL Example                 | Notes                          |
+| ------------- | ----------- | --------------------------- | ------------------------------- |
+| **Jaeger**    | Local       | `http://localhost:16686`    | Popular open-source option     |
+| **Tempo**     | Local/Cloud | `http://localhost:3200`     | Grafana's trace backend        |
+| **Traceloop** | Cloud       | `https://api.traceloop.com` | Requires API key                |
+| **Datadog**   | Cloud       | `https://api.datadoghq.com` | Requires API key + App key     |
 
 ### Quick Configuration
 
@@ -523,12 +526,13 @@ opentelemetry-mcp --backend traceloop --url https://api.traceloop.com --api-key 
 <details>
 <summary><b>All Configuration Options</b></summary>
 
-| Variable               | Type    | Default  | Description                                        |
-| ---------------------- | ------- | -------- | -------------------------------------------------- |
-| `BACKEND_TYPE`         | string  | `jaeger` | Backend type: `jaeger`, `tempo`, or `traceloop`    |
-| `BACKEND_URL`          | URL     | -        | Backend API endpoint (required)                    |
-| `BACKEND_API_KEY`      | string  | -        | API key (required for Traceloop)                   |
-| `BACKEND_TIMEOUT`      | integer | `30`     | Request timeout in seconds                         |
+| Variable               | Type    | Default  | Description                                                  |
+| ---------------------- | ------- | -------- | -------------------------------------------------------------- |
+| `BACKEND_TYPE`         | string  | `jaeger` | Backend type: `jaeger`, `tempo`, `traceloop`, or `datadog`    |
+| `BACKEND_URL`          | URL     | -        | Backend API endpoint (required)                                |
+| `BACKEND_API_KEY`      | string  | -        | API key (required for Traceloop and Datadog)                   |
+| `BACKEND_APP_KEY`      | string  | -        | Application key (required for Datadog, in addition to API key) |
+| `BACKEND_TIMEOUT`      | integer | `30`     | Request timeout in seconds                                     |
 | `LOG_LEVEL`            | string  | `INFO`   | Logging level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 | `MAX_TRACES_PER_QUERY` | integer | `100`    | Maximum traces to return per query (1-1000)        |
 
@@ -580,6 +584,47 @@ BACKEND_API_KEY=your_api_key_here
 ```
 
 > **Note:** The API key contains project information. The backend uses a project slug of `"default"` and Traceloop resolves the actual project/environment from the API key.
+
+### Datadog
+
+```bash
+BACKEND_TYPE=datadog
+# US site (default): https://api.datadoghq.com
+# EU site:            https://api.datadoghq.eu
+BACKEND_URL=https://api.datadoghq.com
+BACKEND_API_KEY=your_api_key_here
+BACKEND_APP_KEY=your_application_key_here
+```
+
+Claude Desktop integration example:
+
+```json
+{
+  "mcpServers": {
+    "opentelemetry": {
+      "command": "opentelemetry-mcp",
+      "env": {
+        "BACKEND_TYPE": "datadog",
+        "BACKEND_URL": "https://api.datadoghq.com",
+        "BACKEND_API_KEY": "your_api_key_here",
+        "BACKEND_APP_KEY": "your_application_key_here"
+      }
+    }
+  }
+}
+```
+
+> **Note:** Datadog requires **both** an API key and an Application key -
+> unlike the other backends, a single key is not enough. Trace search uses
+> [Datadog's span search query syntax](https://docs.datadoghq.com/logs/explorer/search_syntax/)
+> rather than TraceQL or Jaeger-style tag params, and traces are reconstructed
+> from spans since Datadog has no trace-level lookup endpoint.
+>
+> **Troubleshooting:** a `403` from the Datadog API almost always means the
+> Application key (not the API key) is missing or invalid - Datadog requires
+> the App key specifically for querying, even though ingestion only needs the
+> API key. If you're on the EU site, double check `BACKEND_URL` is
+> `https://api.datadoghq.eu`, not the US default.
 
 </details>
 

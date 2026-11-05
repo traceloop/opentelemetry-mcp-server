@@ -1,5 +1,6 @@
 """Pytest configuration and fixtures."""
 
+from collections.abc import Callable
 from typing import Any
 
 import pytest
@@ -8,6 +9,36 @@ from pydantic import HttpUrl
 from opentelemetry_mcp.attributes import SpanAttributes
 from opentelemetry_mcp.config import BackendConfig
 from opentelemetry_mcp.models import SpanData, TraceData
+
+
+class FakeJsonResponse:
+    """A minimal stand-in for ``httpx.Response`` used by ``fake_json_client``."""
+
+    def __init__(self, payload: Any) -> None:
+        self._payload = payload
+
+    def raise_for_status(self) -> None:
+        pass
+
+    def json(self) -> Any:
+        return self._payload
+
+
+class FakeJsonClient:
+    """A minimal stand-in for ``httpx.AsyncClient`` used by ``fake_json_client``.
+
+    Only implements what ``BaseBackend``'s callers actually use (``post`` and
+    ``is_closed``); it is not a real ``httpx.AsyncClient`` and is not meant to
+    satisfy that type - tests assign it directly to ``backend._client``.
+    """
+
+    is_closed = False
+
+    def __init__(self, *payloads: Any) -> None:
+        self._responses = list(payloads)
+
+    async def post(self, *args: object, **kwargs: object) -> FakeJsonResponse:
+        return FakeJsonResponse(self._responses.pop(0))
 
 
 @pytest.fixture
@@ -76,3 +107,18 @@ def jaeger_backend_config() -> BackendConfig:
         url=HttpUrl("http://localhost:16686"),
         timeout=5.0,
     )
+
+
+@pytest.fixture
+def fake_json_client() -> Callable[..., FakeJsonClient]:
+    """Factory for a fake httpx-like client whose ``post()`` returns the
+    given JSON payloads in sequence, one per call - used to exercise a
+    backend's raw response-parsing code (pagination, malformed envelopes)
+    without a real network dependency.
+
+    Usage: ``client = fake_json_client(payload)`` for a single response, or
+    ``fake_json_client(page_1, page_2)`` for sequential calls (e.g. cursor
+    pagination). A payload can be any JSON-serializable value, including a
+    non-dict, to test a malformed top-level response body.
+    """
+    return FakeJsonClient

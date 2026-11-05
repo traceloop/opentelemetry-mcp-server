@@ -16,9 +16,12 @@ load_dotenv()
 class BackendConfig(BaseModel):
     """Configuration for OpenTelemetry trace backend."""
 
-    type: Literal["jaeger", "tempo", "traceloop"]
+    type: Literal["jaeger", "tempo", "traceloop", "datadog"]
     url: HttpUrl
     api_key: str | None = Field(default=None, exclude=True)
+    app_key: str | None = Field(
+        default=None, exclude=True, description="Datadog Application key (Datadog backend only)"
+    )
     timeout: float = Field(default=30.0, gt=0, le=300)
     environments: list[str] = Field(default_factory=lambda: ["prd"])
 
@@ -35,9 +38,10 @@ class BackendConfig(BaseModel):
         """Load configuration from environment variables."""
         backend_type = os.getenv("BACKEND_TYPE", "jaeger")
         backend_url = os.getenv("BACKEND_URL", "http://localhost:16686")
-        if backend_type not in ["jaeger", "tempo", "traceloop"]:
+        if backend_type not in ["jaeger", "tempo", "traceloop", "datadog"]:
             raise ValueError(
-                f"Invalid BACKEND_TYPE: {backend_type}. Must be one of: jaeger, tempo, traceloop"
+                f"Invalid BACKEND_TYPE: {backend_type}. "
+                "Must be one of: jaeger, tempo, traceloop, datadog"
             )
 
         # Parse environments from comma-separated string
@@ -56,6 +60,7 @@ class BackendConfig(BaseModel):
             type=backend_type,  # type: ignore
             url=backend_url,  # type: ignore
             api_key=os.getenv("BACKEND_API_KEY"),
+            app_key=os.getenv("BACKEND_APP_KEY"),
             timeout=timeout,
             environments=environments,
         )
@@ -98,14 +103,15 @@ class ServerConfig(BaseModel):
         backend_type: str | None = None,
         backend_url: str | None = None,
         api_key: str | None = None,
+        app_key: str | None = None,
         environments: str | None = None,
     ) -> None:
         """Apply CLI argument overrides to configuration."""
         if backend_type:
-            if backend_type not in ["jaeger", "tempo", "traceloop"]:
+            if backend_type not in ["jaeger", "tempo", "traceloop", "datadog"]:
                 raise ValueError(
                     f"Invalid backend type: {backend_type}. "
-                    "Must be one of: jaeger, tempo, traceloop"
+                    "Must be one of: jaeger, tempo, traceloop, datadog"
                 )
             self.backend.type = backend_type  # type: ignore
 
@@ -114,6 +120,9 @@ class ServerConfig(BaseModel):
 
         if api_key:
             self.backend.api_key = api_key
+
+        if app_key:
+            self.backend.app_key = app_key
 
         if environments:
             self.backend.environments = [
