@@ -4,10 +4,12 @@ import json
 from typing import Any
 
 from opentelemetry_mcp.backends.base import BaseBackend
+from opentelemetry_mcp.config import ServerConfig
 from opentelemetry_mcp.models import LLMSpanAttributes
+from opentelemetry_mcp.tools.compression import compact_json
 
 
-async def get_trace(backend: BaseBackend, trace_id: str) -> str:
+async def get_trace(backend: BaseBackend, trace_id: str, config: ServerConfig | None = None) -> str:
     """Get complete trace details by trace ID.
 
     Args:
@@ -73,6 +75,9 @@ async def get_trace(backend: BaseBackend, trace_id: str) -> str:
                     }
                 ),
             }
+
+        if config and config.compress_responses:
+            result = compact_json(result)
 
         return json.dumps(result, indent=2, default=str)
 
