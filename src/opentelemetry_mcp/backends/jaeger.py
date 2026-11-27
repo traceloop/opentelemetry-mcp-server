@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
+from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent, SpanLink
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.backends.filter_engine import FilterEngine
 from opentelemetry_mcp.models import FilterOperator, SpanData, SpanQuery, TraceData, TraceQuery
@@ -403,12 +403,25 @@ class JaegerBackend(BaseBackend):
             elif "process" in span_data:
                 service_name = span_data["process"].get("serviceName", "unknown")
 
-            # Parse references to find parent
+            # Parse references: the first CHILD_OF is the parent, every other
+            # reference (e.g. FOLLOWS_FROM) is a link to another span
             parent_span_id = None
+            parent_ref: dict[str, Any] | None = None
             for ref in span_data.get("references", []):
                 if ref.get("refType") == "CHILD_OF":
                     parent_span_id = ref.get("spanID")
+                    parent_ref = ref
                     break
+
+            links: list[SpanLink] = []
+            for ref in span_data.get("references", []):
+                if ref is parent_ref:
+                    continue
+                ref_trace_id = ref.get("traceID")
+                ref_span_id = ref.get("spanID")
+                if not ref_trace_id or not ref_span_id:
+                    continue
+                links.append(SpanLink(trace_id=str(ref_trace_id), span_id=str(ref_span_id)))
 
             # Parse tags to attributes dictionary
             attributes_dict: dict[str, Any] = {}
@@ -467,6 +480,7 @@ class JaegerBackend(BaseBackend):
                 status=status,  # type: ignore
                 attributes=span_attributes,
                 events=events,
+                links=links,
             )
 
         except Exception as e:
