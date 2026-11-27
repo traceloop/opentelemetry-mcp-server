@@ -48,6 +48,10 @@ async def get_trace(backend: BaseBackend, trace_id: str) -> str:
                 "attributes": span.attributes.to_dict(),
             }
 
+            # Span links (e.g. a consumer span linking to its producer span)
+            if span.links:
+                span_data["links"] = [link.model_dump(mode="json") for link in span.links]
+
             # If it's an LLM span, parse Opentelemetry attributes
             if span.is_llm_span:
                 llm_attrs = LLMSpanAttributes.from_span(span)

@@ -1,10 +1,13 @@
 """Grafana Tempo backend implementation with TraceQL support."""
 
+import base64
+import binascii
 import logging
+import re
 from datetime import datetime
 from typing import Any, Literal
 
-from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent
+from opentelemetry_mcp.attributes import HealthCheckResponse, SpanAttributes, SpanEvent, SpanLink
 from opentelemetry_mcp.backends.base import BaseBackend
 from opentelemetry_mcp.backends.filter_engine import FilterEngine
 from opentelemetry_mcp.models import (
@@ -646,6 +649,21 @@ class TempoBackend(BaseBackend):
                     )
                 )
 
+            # Parse links to spans in other (or the same) traces
+            links: list[SpanLink] = []
+            for link_data in span_data.get("links", []):
+                link_trace_id = link_data.get("traceId")
+                link_span_id = link_data.get("spanId")
+                if not link_trace_id or not link_span_id:
+                    continue
+                links.append(
+                    SpanLink(
+                        trace_id=self._normalize_trace_id(str(link_trace_id)),
+                        span_id=str(link_span_id),
+                        attributes=self._parse_otlp_attributes(link_data.get("attributes", [])),
+                    )
+                )
+
             return SpanData(
                 trace_id=trace_id,
                 span_id=span_id,
@@ -657,11 +675,27 @@ class TempoBackend(BaseBackend):
                 status=status,
                 attributes=span_attributes,
                 events=events,
+                links=links,
             )
 
         except Exception as e:
             logger.error(f"Error parsing OTLP span: {e}")
             return None
+
+    @staticmethod
+    def _normalize_trace_id(trace_id: str) -> str:
+        """Return a trace ID in the hex form that get_trace accepts.
+
+        OTLP JSON may carry trace IDs base64-encoded; values that are already
+        hex are returned unchanged.
+        """
+        if re.fullmatch(r"[0-9a-fA-F]{32}", trace_id):
+            return trace_id.lower()
+        try:
+            decoded = base64.b64decode(trace_id, validate=True)
+        except (binascii.Error, ValueError):
+            return trace_id
+        return decoded.hex() if len(decoded) == 16 else trace_id
 
     def _parse_otlp_attributes(
         self, attributes: list[dict[str, Any]]

@@ -7,7 +7,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from .attributes import SpanAttributes, SpanEvent
+from .attributes import SpanAttributes, SpanEvent, SpanLink
 from .constants import Fields, GenAI, Service
 
 
@@ -238,6 +238,7 @@ class SpanData(BaseModel):
     status: Literal["OK", "ERROR", "UNSET"] = "UNSET"
     attributes: SpanAttributes = Field(default_factory=SpanAttributes)  # type: ignore[arg-type]
     events: list[SpanEvent] = Field(default_factory=list)
+    links: list[SpanLink] = Field(default_factory=list)
 
     @property
     def is_llm_span(self) -> bool:

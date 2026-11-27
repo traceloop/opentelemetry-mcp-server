@@ -157,6 +157,20 @@ class SpanEvent(BaseModel):
     )
 
 
+class SpanLink(BaseModel):
+    """Link from a span to a span in the same or another trace.
+
+    Links connect causally related spans that are not in a parent/child relationship,
+    for example a message consumer that starts a new trace and links to the producer span.
+    """
+
+    trace_id: str = Field(..., description="Trace ID of the linked span (hex)")
+    span_id: str = Field(..., description="Span ID of the linked span")
+    attributes: dict[str, str | int | float | bool] = Field(
+        default_factory=dict, description="Link attributes with typed values"
+    )
+
+
 class HealthCheckResponse(BaseModel):
     """Health check response from backend systems."""
 
